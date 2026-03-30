@@ -4,6 +4,6 @@ buildCommand = "pnpm --filter @crm/shared-types build && pnpm --filter @crm/api 
 [deploy]
 startCommand = "node apps/api/dist/main"
 preDeployCommand = "cd apps/api && npx tsx src/database/run-migrations.ts"
-healthcheckPath = "/api/v1/health"
+healthcheckPath = "/health"
 restartPolicyType = "on_failure"
 restartPolicyMaxRetries = 5
