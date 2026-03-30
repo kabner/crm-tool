@@ -1,0 +1,12 @@
+export { TicketCategory } from './ticket-category.entity';
+export { BusinessHours } from './business-hours.entity';
+export { SLAPolicy } from './sla-policy.entity';
+export { Ticket } from './ticket.entity';
+export { TicketMessage } from './ticket-message.entity';
+export { TicketMacro } from './ticket-macro.entity';
+export { ChatSession } from './chat-session.entity';
+export { ChatMessage } from './chat-message.entity';
+export { SurveyResponse } from './survey-response.entity';
+export { KBCategory } from './kb-category.entity';
+export { KBSection } from './kb-section.entity';
+export { KBArticle } from './kb-article.entity';
