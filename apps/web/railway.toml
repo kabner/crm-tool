@@ -1,0 +1,7 @@
+[build]
+buildCommand = "pnpm --filter @crm/shared-types build && pnpm --filter @crm/web build"
+
+[deploy]
+startCommand = "node apps/web/.next/standalone/apps/web/server.js"
+restartPolicyType = "on_failure"
+restartPolicyMaxRetries = 5

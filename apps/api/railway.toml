@@ -1,0 +1,8 @@
+[build]
+buildCommand = "pnpm --filter @crm/shared-types build && pnpm --filter @crm/api build"
+
+[deploy]
+startCommand = "node apps/api/dist/main"
+healthcheckPath = "/api/v1/health"
+restartPolicyType = "on_failure"
+restartPolicyMaxRetries = 5
