@@ -1,0 +1,162 @@
+name: Deploy CRM
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  AWS_REGION: ${{ vars.AWS_REGION }}
+  SHARED_SERVICES_ACCOUNT: ${{ vars.SHARED_SERVICES_ACCOUNT }}
+  DEV_ACCOUNT: ${{ vars.DEV_ACCOUNT }}
+  PROD_ACCOUNT: ${{ vars.PROD_ACCOUNT }}
+  ECR_REGISTRY: ${{ vars.ECR_REGISTRY }}
+
+jobs:
+  build:
+    name: Build and Push Images
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials (shared services)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::${{ vars.SHARED_SERVICES_ACCOUNT }}:role/github-actions-ecr-push
+          aws-region: ${{ vars.AWS_REGION }}
+          # OIDC role scoped to kabner/* repos only
+
+      - name: Login to Amazon ECR
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build and push API image
+        run: |
+          docker build \
+            -f dockerfiles/crm/Dockerfile.api \
+            -t ${{ vars.ECR_REGISTRY }}/crm/api:${{ github.sha }} \
+            -t ${{ vars.ECR_REGISTRY }}/crm/api:latest \
+            .
+          docker push ${{ vars.ECR_REGISTRY }}/crm/api:${{ github.sha }}
+          docker push ${{ vars.ECR_REGISTRY }}/crm/api:latest
+
+      - name: Build and push Web image
+        run: |
+          docker build \
+            -f dockerfiles/crm/Dockerfile.web \
+            -t ${{ vars.ECR_REGISTRY }}/crm/web:${{ github.sha }} \
+            -t ${{ vars.ECR_REGISTRY }}/crm/web:latest \
+            .
+          docker push ${{ vars.ECR_REGISTRY }}/crm/web:${{ github.sha }}
+          docker push ${{ vars.ECR_REGISTRY }}/crm/web:latest
+
+  deploy-dev:
+    name: Deploy to Dev
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Configure AWS credentials (shared services)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::${{ vars.SHARED_SERVICES_ACCOUNT }}:role/github-actions-ecr-push
+          aws-region: ${{ vars.AWS_REGION }}
+          # OIDC role scoped to kabner/* repos only
+
+      - name: Assume dev ECS deploy role (role chaining)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::${{ vars.DEV_ACCOUNT }}:role/ecs-deploy-role
+          aws-region: ${{ vars.AWS_REGION }}
+          role-chaining: true
+
+      - name: Update ECS services
+        run: |
+          aws ecs update-service \
+            --cluster crm-dev \
+            --service crm-dev-api \
+            --force-new-deployment \
+            --region ${{ vars.AWS_REGION }}
+          aws ecs update-service \
+            --cluster crm-dev \
+            --service crm-dev-web \
+            --force-new-deployment \
+            --region ${{ vars.AWS_REGION }}
+
+      - name: Wait for services to stabilize
+        run: |
+          aws ecs wait services-stable \
+            --cluster crm-dev \
+            --services crm-dev-api crm-dev-web \
+            --region ${{ vars.AWS_REGION }}
+
+      - name: Run migrations via ECS run-task
+        run: |
+          aws ecs run-task \
+            --cluster crm-dev \
+            --task-definition crm-dev-migrate \
+            --launch-type FARGATE \
+            --network-configuration "awsvpcConfiguration={subnets=[$(aws cloudformation describe-stacks --stack-name CrmDevStack --query 'Stacks[0].Outputs[?OutputKey==`PrivateSubnets`].OutputValue' --output text)],securityGroups=[$(aws cloudformation describe-stacks --stack-name CrmDevStack --query 'Stacks[0].Outputs[?OutputKey==`MigrateTaskSG`].OutputValue' --output text)],assignPublicIp=DISABLED}" \
+            --region ${{ vars.AWS_REGION }}
+
+      - name: Smoke test
+        run: |
+          curl --fail --retry 5 --retry-delay 10 \
+            https://crm-dev.stowe.cloud/api/health
+
+  deploy-prod:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    needs: deploy-dev
+    environment: production
+    steps:
+      - name: Configure AWS credentials (shared services)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::${{ vars.SHARED_SERVICES_ACCOUNT }}:role/github-actions-ecr-push
+          aws-region: ${{ vars.AWS_REGION }}
+          # OIDC role scoped to kabner/* repos only
+
+      - name: Assume prod ECS deploy role (role chaining)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::${{ vars.PROD_ACCOUNT }}:role/ecs-deploy-role
+          aws-region: ${{ vars.AWS_REGION }}
+          role-chaining: true
+
+      - name: Update ECS services
+        run: |
+          aws ecs update-service \
+            --cluster crm-prod \
+            --service crm-prod-api \
+            --force-new-deployment \
+            --region ${{ vars.AWS_REGION }}
+          aws ecs update-service \
+            --cluster crm-prod \
+            --service crm-prod-web \
+            --force-new-deployment \
+            --region ${{ vars.AWS_REGION }}
+
+      - name: Wait for services to stabilize
+        run: |
+          aws ecs wait services-stable \
+            --cluster crm-prod \
+            --services crm-prod-api crm-prod-web \
+            --region ${{ vars.AWS_REGION }}
+
+      - name: Run migrations via ECS run-task
+        run: |
+          aws ecs run-task \
+            --cluster crm-prod \
+            --task-definition crm-prod-migrate \
+            --launch-type FARGATE \
+            --network-configuration "awsvpcConfiguration={subnets=[$(aws cloudformation describe-stacks --stack-name CrmProdStack --query 'Stacks[0].Outputs[?OutputKey==`PrivateSubnets`].OutputValue' --output text)],securityGroups=[$(aws cloudformation describe-stacks --stack-name CrmProdStack --query 'Stacks[0].Outputs[?OutputKey==`MigrateTaskSG`].OutputValue' --output text)],assignPublicIp=DISABLED}" \
+            --region ${{ vars.AWS_REGION }}
+
+      - name: Smoke test
+        run: |
+          curl --fail --retry 5 --retry-delay 10 \
+            https://crm.stowe.cloud/api/health
