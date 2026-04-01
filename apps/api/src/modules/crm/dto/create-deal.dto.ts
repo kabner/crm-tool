@@ -7,6 +7,7 @@ import {
   IsDateString,
   IsArray,
   IsObject,
+  IsIn,
 } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
@@ -65,4 +66,10 @@ export class CreateDealDto {
   @IsOptional()
   @IsObject()
   customProps?: Record<string, any>;
+
+  @ApiPropertyOptional({ description: 'Deal priority', enum: ['none', 'low', 'medium', 'high'] })
+  @IsOptional()
+  @IsString()
+  @IsIn(['none', 'low', 'medium', 'high'])
+  priority?: string;
 }
