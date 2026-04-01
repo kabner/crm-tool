@@ -158,7 +158,7 @@ export class DealsService {
           updateData.won = false;
         }
       }
-      (updateData as any).lastStageChangeAt = new Date();
+      Object.assign(updateData, { lastStageChangeAt: new Date() });
     }
 
     Object.assign(deal, updateData);

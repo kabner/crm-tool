@@ -56,7 +56,7 @@ export class Deal {
   @Column({ name: 'last_activity_at', type: 'timestamptz', nullable: true })
   lastActivityAt: Date;
 
-  @Column({ default: 'none' })
+  @Column({ default: 'none', length: 10 })
   priority: string;
 
   @Column({ name: 'custom_props', type: 'jsonb', default: '{}' })
