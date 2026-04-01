@@ -49,7 +49,7 @@ export function DealQuickView({ dealId, open, onOpenChange, onRequestLossReason 
   const { data: deal, isLoading } = useDeal(dealId ?? "");
   const moveDealStage = useMoveDealStage();
 
-  const pipelineId = deal?.pipeline?.id ?? (deal?.stage as any)?.pipeline?.id ?? "";
+  const pipelineId = deal?.pipeline?.id ?? deal?.stage?.pipeline?.id ?? "";
   const { data: pipeline } = usePipeline(pipelineId);
 
   const stages = pipeline?.stages
@@ -66,8 +66,8 @@ export function DealQuickView({ dealId, open, onOpenChange, onRequestLossReason 
     moveDealStage.mutate({ id: dealId, stageId });
   };
 
-  const days = (deal as any)?.lastStageChangeAt ? daysInStage((deal as any).lastStageChangeAt as string) : null;
-  const priorityInfo = (deal as any)?.priority ? PRIORITY_BADGE[(deal as any).priority] : null;
+  const days = deal?.lastStageChangeAt ? daysInStage(deal.lastStageChangeAt) : null;
+  const priorityInfo = deal?.priority ? PRIORITY_BADGE[deal.priority] : null;
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>

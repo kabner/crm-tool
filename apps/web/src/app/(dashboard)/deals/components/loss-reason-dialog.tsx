@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import * as Dialog from "@radix-ui/react-dialog";
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
@@ -18,7 +18,7 @@ const COMMON_REASONS = [
 interface LossReasonDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onConfirm: (reason: string) => void;
+  onConfirm: (reason: string) => void | Promise<void>;
   dealName?: string;
 }
 
@@ -30,6 +30,13 @@ export function LossReasonDialog({
 }: LossReasonDialogProps) {
   const [reason, setReason] = useState("");
   const [customReason, setCustomReason] = useState("");
+
+  useEffect(() => {
+    if (!open) {
+      setReason("");
+      setCustomReason("");
+    }
+  }, [open]);
 
   const handleConfirm = () => {
     const finalReason = reason === "__custom" ? customReason : reason;

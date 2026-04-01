@@ -144,10 +144,10 @@ export default function DealsPage() {
     setLossReasonOpen(true);
   };
 
-  const handleLossConfirm = (reason: string) => {
+  const handleLossConfirm = async (reason: string) => {
     if (lossDealId && lossStageId) {
-      moveDealStage.mutate({ id: lossDealId, stageId: lossStageId });
-      updateDeal.mutate({ id: lossDealId, data: { lostReason: reason } });
+      await moveDealStage.mutateAsync({ id: lossDealId, stageId: lossStageId });
+      await updateDeal.mutateAsync({ id: lossDealId, data: { lostReason: reason } });
     }
     setLossReasonOpen(false);
     setLossDealId(null);
