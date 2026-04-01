@@ -27,6 +27,7 @@ export class DealsService {
       ...dealData,
       tenantId,
       ownerId: dealData.ownerId ?? userId,
+      lastStageChangeAt: new Date(),
     });
 
     const savedDeal = await this.dealRepository.save(deal);
@@ -157,6 +158,7 @@ export class DealsService {
           updateData.won = false;
         }
       }
+      Object.assign(updateData, { lastStageChangeAt: new Date() });
     }
 
     Object.assign(deal, updateData);
@@ -191,6 +193,7 @@ export class DealsService {
     const updateFields: Record<string, unknown> = {
       stageId,
       won: wonValue,
+      lastStageChangeAt: new Date(),
     };
 
     if (position !== undefined) {

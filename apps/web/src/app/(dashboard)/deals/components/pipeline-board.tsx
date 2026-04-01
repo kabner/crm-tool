@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 
 interface PipelineBoardProps {
   pipelineId: string;
+  onDealClick?: (dealId: string) => void;
 }
 
 function formatCurrency(amount: number): string {
@@ -31,6 +32,27 @@ function stageTextColor(stageType: string) {
   return "text-foreground";
 }
 
+function daysAgo(dateStr: string | null): number | null {
+  if (!dateStr) return null;
+  return Math.floor((Date.now() - new Date(dateStr).getTime()) / (1000 * 60 * 60 * 24));
+}
+
+function staleness(lastStageChangeAt: string | null, lastActivityAt: string | null): "fresh" | "aging" | "stale" {
+  const stageDays = daysAgo(lastStageChangeAt);
+  const activityDays = daysAgo(lastActivityAt);
+  const mostRecentDays = Math.min(stageDays ?? Infinity, activityDays ?? Infinity);
+  if (mostRecentDays === Infinity) return "fresh";
+  if (mostRecentDays > 14) return "stale";
+  if (mostRecentDays > 7) return "aging";
+  return "fresh";
+}
+
+const PRIORITY_DOT: Record<string, string> = {
+  high: "bg-red-500",
+  medium: "bg-amber-500",
+  low: "bg-blue-400",
+};
+
 interface DealInfo {
   id: string;
   name: string;
@@ -38,9 +60,12 @@ interface DealInfo {
   closeDate: string | null;
   owner: { firstName: string; lastName: string } | null;
   company: { name: string } | null;
+  lastStageChangeAt: string | null;
+  lastActivityAt: string | null;
+  priority: string;
 }
 
-export function PipelineBoard({ pipelineId }: PipelineBoardProps) {
+export function PipelineBoard({ pipelineId, onDealClick }: PipelineBoardProps) {
   const { data, isLoading } = usePipelineBoard(pipelineId);
   const moveDealStage = useMoveDealStage();
   const router = useRouter();
@@ -176,12 +201,15 @@ export function PipelineBoard({ pipelineId }: PipelineBoardProps) {
   }
 
   function handleCardClick(dealId: string) {
-    // If we were dragging, don't navigate
     if (didDragRef.current) {
       didDragRef.current = false;
       return;
     }
-    router.push(`/deals/${dealId}`);
+    if (onDealClick) {
+      onDealClick(dealId);
+    } else {
+      router.push(`/deals/${dealId}`);
+    }
   }
 
   if (isLoading) {
@@ -276,12 +304,20 @@ export function PipelineBoard({ pipelineId }: PipelineBoardProps) {
                         onMouseDown={(e) => handleCardMouseDown(e, deal.id)}
                         onClick={() => handleCardClick(deal.id)}
                         className={cn(
-                          "rounded-lg border border-border bg-card p-3 shadow-sm transition-all",
+                          "rounded-lg border bg-card p-3 shadow-sm transition-all",
                           isDragging ? "opacity-30 ring-2 ring-primary scale-95" : "hover:shadow-md hover:border-primary/30",
                           draggingDealId ? "cursor-grabbing" : "cursor-pointer",
+                          !isDragging && staleness(deal.lastStageChangeAt, deal.lastActivityAt) === "stale" && "border-destructive/40",
+                          !isDragging && staleness(deal.lastStageChangeAt, deal.lastActivityAt) === "aging" && "border-amber-500/40",
                         )}
                       >
-                        <p className="text-sm font-semibold text-foreground truncate">{deal.name}</p>
+                        {/* Priority dot + Name */}
+                        <div className="flex items-center gap-1.5">
+                          {deal.priority && PRIORITY_DOT[deal.priority] && (
+                            <span className={cn("h-2 w-2 rounded-full shrink-0", PRIORITY_DOT[deal.priority])} />
+                          )}
+                          <p className="text-sm font-semibold text-foreground truncate">{deal.name}</p>
+                        </div>
                         {deal.company && (
                           <p className="mt-1 text-xs text-muted-foreground truncate">{deal.company.name}</p>
                         )}
@@ -291,23 +327,29 @@ export function PipelineBoard({ pipelineId }: PipelineBoardProps) {
                           </p>
                         )}
                         <div className="mt-2 flex items-center justify-between">
-                          {deal.closeDate ? (
-                            <span
-                              className={cn(
-                                "text-xs",
-                                new Date(deal.closeDate) < new Date()
-                                  ? "font-medium text-destructive"
-                                  : "text-muted-foreground",
-                              )}
-                            >
-                              {new Date(deal.closeDate).toLocaleDateString("en-US", {
-                                month: "short",
-                                day: "numeric",
-                              })}
-                            </span>
-                          ) : (
-                            <span />
-                          )}
+                          <div className="flex items-center gap-2">
+                            {deal.closeDate ? (
+                              <span
+                                className={cn(
+                                  "text-xs",
+                                  new Date(deal.closeDate) < new Date()
+                                    ? "font-medium text-destructive"
+                                    : "text-muted-foreground",
+                                )}
+                              >
+                                {new Date(deal.closeDate).toLocaleDateString("en-US", {
+                                  month: "short",
+                                  day: "numeric",
+                                })}
+                              </span>
+                            ) : null}
+                            {(() => {
+                              const s = staleness(deal.lastStageChangeAt, deal.lastActivityAt);
+                              if (s === "stale") return <span className="h-2 w-2 rounded-full bg-destructive animate-pulse" title="Stale — no activity in 14+ days" />;
+                              if (s === "aging") return <span className="h-2 w-2 rounded-full bg-amber-500" title="Aging — no activity in 7+ days" />;
+                              return null;
+                            })()}
+                          </div>
                           {deal.owner && (
                             <div
                               className="flex h-6 w-6 items-center justify-center rounded-full bg-primary/10 text-[10px] font-semibold text-primary"

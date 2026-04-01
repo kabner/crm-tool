@@ -30,6 +30,10 @@ export interface Deal {
   customProps: Record<string, unknown>;
   createdAt: string;
   updatedAt: string;
+  won: boolean | null;
+  lastStageChangeAt: string | null;
+  lastActivityAt: string | null;
+  priority: string;
 }
 
 export interface DealsResponse {
@@ -70,6 +74,9 @@ export interface PipelineStage {
     closeDate: string | null;
     owner: DealOwner | null;
     company: DealCompany | null;
+    lastStageChangeAt: string | null;
+    lastActivityAt: string | null;
+    priority: string;
   }[];
 }
 
@@ -128,7 +135,9 @@ export interface CreateDealInput {
   ownerId?: string;
 }
 
-export interface UpdateDealInput extends Partial<CreateDealInput> {}
+export interface UpdateDealInput extends Partial<CreateDealInput> {
+  lostReason?: string;
+}
 
 // Helpers
 

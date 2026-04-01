@@ -5,6 +5,7 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, SelectQueryBuilder } from 'typeorm';
 import { Activity } from '../entities/activity.entity';
+import { Deal } from '../entities/deal.entity';
 import { CreateActivityDto } from '../dto/create-activity.dto';
 import { UpdateActivityDto } from '../dto/update-activity.dto';
 import { ActivityFilterDto } from '../dto/activity-filter.dto';
@@ -14,6 +15,8 @@ export class ActivitiesService {
   constructor(
     @InjectRepository(Activity)
     private readonly activityRepo: Repository<Activity>,
+    @InjectRepository(Deal)
+    private readonly dealRepository: Repository<Deal>,
   ) {}
 
   async create(
@@ -28,7 +31,16 @@ export class ActivitiesService {
       dueDate: dto.dueDate ? new Date(dto.dueDate) : undefined,
       metadata: dto.metadata ?? {},
     });
-    return this.activityRepo.save(activity);
+    const savedActivity = await this.activityRepo.save(activity);
+
+    if (savedActivity.dealId) {
+      await this.dealRepository.update(
+        { id: savedActivity.dealId, tenantId },
+        { lastActivityAt: new Date() },
+      );
+    }
+
+    return savedActivity;
   }
 
   async findAll(

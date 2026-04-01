@@ -48,6 +48,12 @@ function slugify(text: string): string {
     .replace(/(^-|-$)/g, '');
 }
 
+function randomDaysAgo(maxDays: number): Date {
+  const d = new Date();
+  d.setDate(d.getDate() - Math.floor(Math.random() * maxDays));
+  return d;
+}
+
 // ---------------------------------------------------------------------------
 // Static data pools
 // ---------------------------------------------------------------------------
@@ -939,6 +945,9 @@ async function seed() {
         ownerId: randomItem(userIds),
         companyId: companyIds[companyIdx],
         customProps: {},
+        lastStageChangeAt: randomDaysAgo(30),
+        lastActivityAt: Math.random() > 0.2 ? randomDaysAgo(21) : null,
+        priority: randomItem(['none', 'none', 'none', 'low', 'medium', 'high']),
       };
 
       if (stage.stageType === 'won') {

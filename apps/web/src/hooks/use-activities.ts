@@ -35,6 +35,11 @@ export interface ActivityListResponse {
   limit: number;
 }
 
+export interface ActivitiesResponse {
+  data: Activity[];
+  meta: { total: number; page: number; limit: number; totalPages: number };
+}
+
 export interface ActivityFilters {
   type?: string;
   contactId?: string;
@@ -137,6 +142,28 @@ export function useCompleteTask() {
   return useMutation<Activity, Error, string>({
     mutationFn: (id) =>
       apiClient.patch<Activity>(`/api/v1/activities/${id}/complete`),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["activities"] });
+    },
+  });
+}
+
+export function useDealActivities(dealId: string, page = 1) {
+  return useQuery<ActivitiesResponse>({
+    queryKey: ["activities", "deal", dealId, page],
+    queryFn: () =>
+      apiClient.get<ActivitiesResponse>(
+        `/api/v1/activities?dealId=${dealId}&page=${page}&limit=20&sort=createdAt&order=DESC`,
+      ),
+    enabled: !!dealId,
+  });
+}
+
+export function useCompleteActivity() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) =>
+      apiClient.patch(`/api/v1/activities/${id}/complete`, {}),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["activities"] });
     },

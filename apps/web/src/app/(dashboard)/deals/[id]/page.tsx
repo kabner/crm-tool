@@ -21,6 +21,7 @@ import {
   usePipeline,
 } from "@/hooks/use-deals";
 import { DealForm } from "../components/deal-form";
+import { DealActivityTimeline } from "../components/deal-activity-timeline";
 
 function formatCurrency(amount: number): string {
   return new Intl.NumberFormat("en-US", {
@@ -396,9 +397,7 @@ export default function DealDetailPage() {
                 <CardTitle>Activity</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-sm text-muted-foreground">
-                  No activities yet
-                </p>
+                <DealActivityTimeline dealId={id} />
               </CardContent>
             </Card>
           </div>
