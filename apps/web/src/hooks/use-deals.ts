@@ -135,7 +135,9 @@ export interface CreateDealInput {
   ownerId?: string;
 }
 
-export interface UpdateDealInput extends Partial<CreateDealInput> {}
+export interface UpdateDealInput extends Partial<CreateDealInput> {
+  lostReason?: string;
+}
 
 // Helpers
 

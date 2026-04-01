@@ -14,11 +14,15 @@ import {
   usePipelines,
   usePipelineSummary,
   useCreateDeal,
+  useMoveDealStage,
+  useUpdateDeal,
   type DealFilters,
 } from "@/hooks/use-deals";
 import { PipelineBoard } from "./components/pipeline-board";
 import { DealsTable } from "./components/deals-table";
 import { DealForm } from "./components/deal-form";
+import { DealQuickView } from "./components/deal-quick-view";
+import { LossReasonDialog } from "./components/loss-reason-dialog";
 
 type ViewMode = "board" | "list";
 
@@ -40,6 +44,17 @@ export default function DealsPage() {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
+
+  // Quick view
+  const [quickViewDealId, setQuickViewDealId] = useState<string | null>(null);
+  const [quickViewOpen, setQuickViewOpen] = useState(false);
+
+  // Loss reason dialog
+  const [lossReasonOpen, setLossReasonOpen] = useState(false);
+  const [lossDealId, setLossDealId] = useState<string | null>(null);
+  const [lossStageId, setLossStageId] = useState<string | null>(null);
+  const moveDealStage = useMoveDealStage();
+  const updateDeal = useUpdateDeal();
 
   // Filters
   const [filterOwner, setFilterOwner] = useState<"mine" | "">("");
@@ -116,6 +131,27 @@ export default function DealsPage() {
   }) => {
     await createDeal.mutateAsync(formData);
     setShowCreateForm(false);
+  };
+
+  const handleDealClick = (dealId: string) => {
+    setQuickViewDealId(dealId);
+    setQuickViewOpen(true);
+  };
+
+  const handleRequestLossReason = (dealId: string, stageId: string) => {
+    setLossDealId(dealId);
+    setLossStageId(stageId);
+    setLossReasonOpen(true);
+  };
+
+  const handleLossConfirm = (reason: string) => {
+    if (lossDealId && lossStageId) {
+      moveDealStage.mutate({ id: lossDealId, stageId: lossStageId });
+      updateDeal.mutate({ id: lossDealId, data: { lostReason: reason } });
+    }
+    setLossReasonOpen(false);
+    setLossDealId(null);
+    setLossStageId(null);
   };
 
   const deals = dealsData?.data ?? [];
@@ -353,7 +389,10 @@ export default function DealsPage() {
       {/* Content */}
       {viewMode === "board" ? (
         selectedPipelineId ? (
-          <PipelineBoard pipelineId={selectedPipelineId} />
+          <PipelineBoard
+            pipelineId={selectedPipelineId}
+            onDealClick={handleDealClick}
+          />
         ) : (
           <div className="flex min-h-[300px] items-center justify-center rounded-md border border-border">
             <p className="text-sm text-muted-foreground">
@@ -414,6 +453,21 @@ export default function DealsPage() {
           )}
         </>
       )}
+
+      {/* Quick view panel */}
+      <DealQuickView
+        dealId={quickViewDealId}
+        open={quickViewOpen}
+        onOpenChange={setQuickViewOpen}
+        onRequestLossReason={handleRequestLossReason}
+      />
+
+      {/* Loss reason dialog */}
+      <LossReasonDialog
+        open={lossReasonOpen}
+        onOpenChange={setLossReasonOpen}
+        onConfirm={handleLossConfirm}
+      />
     </div>
   );
 }
