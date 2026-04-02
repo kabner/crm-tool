@@ -44,11 +44,22 @@ jobs:
           docker push ${{ vars.ECR_REGISTRY }}/crm/api:${{ github.sha }}
           docker push ${{ vars.ECR_REGISTRY }}/crm/api:latest
 
-      - name: Build and push Web image
+      - name: Build and push Web image (dev)
         run: |
           docker build \
             -f Dockerfile.web \
-            --build-arg NEXT_PUBLIC_API_URL=https://crm-dev.stowe.cloud \
+            --build-arg NEXT_PUBLIC_API_URL=https://dev-crm.stowe.cloud \
+            -t ${{ vars.ECR_REGISTRY }}/crm/web:${{ github.sha }}-dev \
+            -t ${{ vars.ECR_REGISTRY }}/crm/web:dev \
+            .
+          docker push ${{ vars.ECR_REGISTRY }}/crm/web:${{ github.sha }}-dev
+          docker push ${{ vars.ECR_REGISTRY }}/crm/web:dev
+
+      - name: Build and push Web image (prod)
+        run: |
+          docker build \
+            -f Dockerfile.web \
+            --build-arg NEXT_PUBLIC_API_URL=https://crm.stowe.cloud \
             -t ${{ vars.ECR_REGISTRY }}/crm/web:${{ github.sha }} \
             -t ${{ vars.ECR_REGISTRY }}/crm/web:latest \
             .
@@ -94,19 +105,10 @@ jobs:
             --services crm-dev-api crm-dev-web \
             --region ${{ vars.AWS_REGION }}
 
-      - name: Run migrations via ECS run-task
-        run: |
-          aws ecs run-task \
-            --cluster crm-dev \
-            --task-definition crm-dev-migrate \
-            --launch-type FARGATE \
-            --network-configuration "awsvpcConfiguration={subnets=[$(aws cloudformation describe-stacks --stack-name CrmDevStack --query 'Stacks[0].Outputs[?OutputKey==`PrivateSubnets`].OutputValue' --output text)],securityGroups=[$(aws cloudformation describe-stacks --stack-name CrmDevStack --query 'Stacks[0].Outputs[?OutputKey==`MigrateTaskSG`].OutputValue' --output text)],assignPublicIp=DISABLED}" \
-            --region ${{ vars.AWS_REGION }}
-
       - name: Smoke test
         run: |
           curl --fail --retry 5 --retry-delay 10 \
-            https://crm-dev.stowe.cloud/api/health
+            https://dev-crm.stowe.cloud/health
 
   deploy-prod:
     name: Deploy to Production
@@ -148,16 +150,7 @@ jobs:
             --services crm-prod-api crm-prod-web \
             --region ${{ vars.AWS_REGION }}
 
-      - name: Run migrations via ECS run-task
-        run: |
-          aws ecs run-task \
-            --cluster crm-prod \
-            --task-definition crm-prod-migrate \
-            --launch-type FARGATE \
-            --network-configuration "awsvpcConfiguration={subnets=[$(aws cloudformation describe-stacks --stack-name CrmProdStack --query 'Stacks[0].Outputs[?OutputKey==`PrivateSubnets`].OutputValue' --output text)],securityGroups=[$(aws cloudformation describe-stacks --stack-name CrmProdStack --query 'Stacks[0].Outputs[?OutputKey==`MigrateTaskSG`].OutputValue' --output text)],assignPublicIp=DISABLED}" \
-            --region ${{ vars.AWS_REGION }}
-
       - name: Smoke test
         run: |
           curl --fail --retry 5 --retry-delay 10 \
-            https://crm.stowe.cloud/api/health
+            https://crm.stowe.cloud/health
