@@ -37,7 +37,7 @@ jobs:
       - name: Build and push API image
         run: |
           docker build \
-            -f dockerfiles/crm/Dockerfile.api \
+            -f Dockerfile.api \
             -t ${{ vars.ECR_REGISTRY }}/crm/api:${{ github.sha }} \
             -t ${{ vars.ECR_REGISTRY }}/crm/api:latest \
             .
@@ -47,7 +47,8 @@ jobs:
       - name: Build and push Web image
         run: |
           docker build \
-            -f dockerfiles/crm/Dockerfile.web \
+            -f Dockerfile.web \
+            --build-arg NEXT_PUBLIC_API_URL=https://crm-dev.stowe.cloud \
             -t ${{ vars.ECR_REGISTRY }}/crm/web:${{ github.sha }} \
             -t ${{ vars.ECR_REGISTRY }}/crm/web:latest \
             .
