@@ -27,7 +27,7 @@ jobs:
       - name: Configure AWS credentials (shared services)
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: arn:aws:iam::${{ vars.SHARED_SERVICES_ACCOUNT }}:role/github-actions-ecr-push
+          role-to-assume: arn:aws:iam::${{ vars.SHARED_SERVICES_ACCOUNT }}:role/github-actions-crm
           aws-region: ${{ vars.AWS_REGION }}
           # OIDC role scoped to kabner/* repos only
 
@@ -63,7 +63,7 @@ jobs:
       - name: Configure AWS credentials (shared services)
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: arn:aws:iam::${{ vars.SHARED_SERVICES_ACCOUNT }}:role/github-actions-ecr-push
+          role-to-assume: arn:aws:iam::${{ vars.SHARED_SERVICES_ACCOUNT }}:role/github-actions-crm
           aws-region: ${{ vars.AWS_REGION }}
           # OIDC role scoped to kabner/* repos only
 
@@ -117,7 +117,7 @@ jobs:
       - name: Configure AWS credentials (shared services)
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: arn:aws:iam::${{ vars.SHARED_SERVICES_ACCOUNT }}:role/github-actions-ecr-push
+          role-to-assume: arn:aws:iam::${{ vars.SHARED_SERVICES_ACCOUNT }}:role/github-actions-crm
           aws-region: ${{ vars.AWS_REGION }}
           # OIDC role scoped to kabner/* repos only
 
