@@ -159,6 +159,7 @@ The web container has a minimal set of variables:
 |----------|-------|
 | `NEXT_PUBLIC_API_URL` | `https://dev-crm.stowe.cloud` (dev) or `https://crm.stowe.cloud` (prod) |
 | `NODE_ENV` | `development` (dev) or `production` (prod) |
+| `HOSTNAME` | `0.0.0.0` (required — prevents Next.js from binding to Fargate's container hostname) |
 
 ---
 
@@ -191,6 +192,7 @@ docker buildx build \
 # Web image
 docker buildx build \
   --platform linux/amd64 \
+  --build-arg NEXT_PUBLIC_API_URL=https://dev-crm.stowe.cloud \
   -f Dockerfile.web \
   -t 602578934562.dkr.ecr.us-east-1.amazonaws.com/crm/web:latest \
   .
@@ -249,6 +251,7 @@ docker buildx build \
 
 docker buildx build \
   --platform linux/amd64 \
+  --build-arg NEXT_PUBLIC_API_URL=https://dev-crm.stowe.cloud \
   -f Dockerfile.web \
   -t 602578934562.dkr.ecr.us-east-1.amazonaws.com/crm/web:latest \
   .
@@ -452,7 +455,7 @@ push to main
 
 ### Authentication Flow
 
-1. GitHub Actions authenticates to the shared-services account via **OIDC federation** (no stored AWS credentials). It assumes the `github-actions-ecr-push` role in account `602578934562`.
+1. GitHub Actions authenticates to the shared-services account via **OIDC federation** (no stored AWS credentials). It assumes the `github-actions-crm` role in account `602578934562`.
 2. For deployment, it **chains** into the `ecs-deploy-role` in the target workload account (dev or prod) using `role-chaining: true`.
 
 ### Required GitHub Repository Variables
@@ -599,6 +602,50 @@ executionRole.addToPolicy(new iam.PolicyStatement({
 
 **Fix:** Set Cloudflare SSL/TLS mode to **Flexible** for the `stowe.cloud` domain. In Flexible mode, Cloudflare terminates TLS for the client and connects to the ALB over HTTP/80.
 
+### 12. `NEXT_PUBLIC_API_URL` must be set at Docker build time
+
+**Symptom:** The web app makes API calls to `localhost:3001` (or the wrong host) in production, even though the ECS task definition has `NEXT_PUBLIC_API_URL` set correctly.
+
+**Cause:** Next.js inlines `NEXT_PUBLIC_*` environment variables into the client JavaScript bundle during `next build`. Setting them as runtime environment variables in the ECS task definition has no effect on client-side code. The Dockerfile uses a build ARG:
+```dockerfile
+ARG NEXT_PUBLIC_API_URL=http://localhost:3001
+ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
+```
+Always pass `--build-arg NEXT_PUBLIC_API_URL=https://crm.stowe.cloud` (or the dev URL) when building the web image.
+
+### 13. Next.js standalone binds to Fargate's HOSTNAME
+
+**Symptom:** ECS tasks start successfully (no crash), but ALB health checks fail and the service never reaches a healthy state.
+
+**Cause:** Next.js standalone server uses `process.env.HOSTNAME || '0.0.0.0'` as its bind address. Fargate sets `HOSTNAME` to the container's internal hostname (e.g., `ip-10-2-5-25.ec2.internal`), causing the server to bind only to that address — making it unreachable by the ALB health checks.
+
+**Fix:** Set `HOSTNAME: '0.0.0.0'` in the ECS task definition environment variables.
+
+### 14. `ecs-deploy-role` trust policy needs `sts:TagSession`
+
+**Symptom:** GitHub Actions deploy step fails with "not authorized to perform: sts:TagSession".
+
+**Cause:** The `aws-actions/configure-aws-credentials@v4` GitHub Action uses session tags when doing role chaining. The `ecs-deploy-role` trust policy in dev and prod accounts must allow both `sts:AssumeRole` AND `sts:TagSession` from the shared services account.
+
+**Fix:** Update the trust policy on `ecs-deploy-role` in both the dev and prod accounts to include `sts:TagSession` alongside `sts:AssumeRole`.
+
+### 15. Database must be seeded on first deploy
+
+**Symptom:** After the first deploy and migration, the login page shows "Loading..." indefinitely.
+
+**Cause:** There is no tenant in the database. The app queries for a tenant on load and hangs when none exists.
+
+**Fix:** Run the seed script via ECS run-task after the first migration:
+```bash
+aws ecs run-task \
+  --cluster crm-{env} \
+  --task-definition {api-task-def} \
+  --launch-type FARGATE \
+  --network-configuration "awsvpcConfiguration={subnets=[...],securityGroups=[...],assignPublicIp=DISABLED}" \
+  --overrides '{"containerOverrides":[{"name":"api","command":["node","dist/database/seeds/seed.js"]}]}'
+```
+This creates the initial tenant (Acme Corporation), admin user, and demo data.
+
 ---
 
 ## 10. Useful Commands
@@ -713,7 +760,7 @@ aws ecs run-task \
 docker buildx build --platform linux/amd64 -f Dockerfile.api -t crm-api:latest .
 
 # Build Web for ECS (amd64)
-docker buildx build --platform linux/amd64 -f Dockerfile.web -t crm-web:latest .
+docker buildx build --platform linux/amd64 --build-arg NEXT_PUBLIC_API_URL=https://crm.stowe.cloud -f Dockerfile.web -t crm-web:latest .
 
 # Build for local testing (native arch)
 docker build -f Dockerfile.api -t crm-api:local .
