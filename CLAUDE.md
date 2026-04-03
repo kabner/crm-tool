@@ -244,3 +244,4 @@ apps/api/src/
 4. **Databases persist across deploys** — Aurora and Redis are not touched by CDK or ECS deployments
 5. **ECS services have circuit breakers** — if a new deployment fails health checks, it automatically rolls back to the previous version
 6. **All GitHub integrations must be scoped to `kabner/*` repos only**
+7. **NEVER use `cdk deploy` to update ECS services with new code or task definition changes.** CloudFormation has a 30-minute ECS stabilization timeout that causes cascading rollback loops, resets desiredCount to 0, and can take hours to resolve. For app deployments, use the ECS API directly: `aws ecs register-task-definition` + `aws ecs update-service --force-new-deployment`. The CI/CD pipeline already does this correctly. Only use `cdk deploy` for infrastructure changes (new resources, security groups, IAM roles, ALB config).
