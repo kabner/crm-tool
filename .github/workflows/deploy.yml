@@ -105,6 +105,19 @@ jobs:
             --services crm-dev-api crm-dev-web \
             --region ${{ vars.AWS_REGION }}
 
+      - name: Run database migrations
+        run: |
+          TASK_DEF=$(aws ecs describe-services --cluster crm-dev --services crm-dev-api --region ${{ vars.AWS_REGION }} --query 'services[0].taskDefinition' --output text)
+          SUBNET=$(aws ecs describe-services --cluster crm-dev --services crm-dev-api --region ${{ vars.AWS_REGION }} --query 'services[0].networkConfiguration.awsvpcConfiguration.subnets[0]' --output text)
+          SG=$(aws ecs describe-services --cluster crm-dev --services crm-dev-api --region ${{ vars.AWS_REGION }} --query 'services[0].networkConfiguration.awsvpcConfiguration.securityGroups[0]' --output text)
+          TASK_ARN=$(aws ecs run-task --cluster crm-dev --task-definition "$TASK_DEF" --launch-type FARGATE \
+            --network-configuration "awsvpcConfiguration={subnets=[$SUBNET],securityGroups=[$SG],assignPublicIp=DISABLED}" \
+            --overrides '{"containerOverrides":[{"name":"api","command":["node","dist/database/run-migrations.js"]}]}' \
+            --region ${{ vars.AWS_REGION }} --query 'tasks[0].taskArn' --output text)
+          aws ecs wait tasks-stopped --cluster crm-dev --tasks "$TASK_ARN" --region ${{ vars.AWS_REGION }}
+          EXIT_CODE=$(aws ecs describe-tasks --cluster crm-dev --tasks "$TASK_ARN" --region ${{ vars.AWS_REGION }} --query 'tasks[0].containers[0].exitCode' --output text)
+          if [ "$EXIT_CODE" != "0" ]; then echo "Migration failed with exit code $EXIT_CODE"; exit 1; fi
+
       - name: Smoke test
         run: |
           curl --fail --retry 5 --retry-delay 10 \
@@ -149,6 +162,19 @@ jobs:
             --cluster crm-prod \
             --services crm-prod-api crm-prod-web \
             --region ${{ vars.AWS_REGION }}
+
+      - name: Run database migrations
+        run: |
+          TASK_DEF=$(aws ecs describe-services --cluster crm-prod --services crm-prod-api --region ${{ vars.AWS_REGION }} --query 'services[0].taskDefinition' --output text)
+          SUBNET=$(aws ecs describe-services --cluster crm-prod --services crm-prod-api --region ${{ vars.AWS_REGION }} --query 'services[0].networkConfiguration.awsvpcConfiguration.subnets[0]' --output text)
+          SG=$(aws ecs describe-services --cluster crm-prod --services crm-prod-api --region ${{ vars.AWS_REGION }} --query 'services[0].networkConfiguration.awsvpcConfiguration.securityGroups[0]' --output text)
+          TASK_ARN=$(aws ecs run-task --cluster crm-prod --task-definition "$TASK_DEF" --launch-type FARGATE \
+            --network-configuration "awsvpcConfiguration={subnets=[$SUBNET],securityGroups=[$SG],assignPublicIp=DISABLED}" \
+            --overrides '{"containerOverrides":[{"name":"api","command":["node","dist/database/run-migrations.js"]}]}' \
+            --region ${{ vars.AWS_REGION }} --query 'tasks[0].taskArn' --output text)
+          aws ecs wait tasks-stopped --cluster crm-prod --tasks "$TASK_ARN" --region ${{ vars.AWS_REGION }}
+          EXIT_CODE=$(aws ecs describe-tasks --cluster crm-prod --tasks "$TASK_ARN" --region ${{ vars.AWS_REGION }} --query 'tasks[0].containers[0].exitCode' --output text)
+          if [ "$EXIT_CODE" != "0" ]; then echo "Migration failed with exit code $EXIT_CODE"; exit 1; fi
 
       - name: Smoke test
         run: |

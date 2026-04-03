@@ -153,3 +153,94 @@ apps/api/src/
 - [x] API Keys: Generate with scopes, bcrypt-hashed, prefix identification, revoke
 - [x] Slack integration: Webhook notifications, deal/ticket alert formatting
 - [ ] Phase 6: Polish, Scale & Deploy (security hardening, AWS, performance)
+
+---
+
+## Development Workflow
+
+**The expected cycle for all changes is: Local → Dev → Prod.**
+
+1. **Local development** — Make changes, run the full stack locally with `./start.sh` or `pnpm dev`. Verify the UI at http://localhost:3000 and test API at http://localhost:3001. Iterate until satisfied.
+2. **Push to master** — This triggers the CI/CD pipeline automatically.
+3. **Dev deployment** — CI builds images, deploys to `dev-crm.stowe.cloud`. Verify the feature works in the cloud environment.
+4. **Prod deployment** — After dev passes, a manual approval gate in GitHub allows promotion to `crm.stowe.cloud`.
+
+**Always test locally first.** The CI pipeline takes several minutes. Fast iteration happens on your machine, not in AWS.
+
+## AWS Deployment Architecture
+
+- **Accounts:** Shared services (602578934562) hosts ECR. Dev (769953010606) and Prod (975037863116) run workloads.
+- **ECS Fargate** runs two services per environment: `crm-{env}-api` (port 3001) and `crm-{env}-web` (port 3000)
+- **ALB** with path-based routing: `/api/*` and `/health` → API service, everything else → Web service
+- **Aurora Serverless v2** (PostgreSQL 16) for the database — persists across deploys
+- **ElastiCache Redis 7** for caching
+- **Cloudflare** terminates TLS, proxies to ALB on port 80
+- **WAF** on ALB with AWS managed rules + rate limiting
+
+**Domains:**
+- Dev: `dev-crm.stowe.cloud`
+- Prod: `crm.stowe.cloud`
+
+## CI/CD Pipeline
+
+**Trigger:** Push to `master` branch.
+
+**Workflow:** `.github/workflows/deploy.yml`
+
+**Jobs:**
+1. **Build** — Builds API image (`:latest`), dev Web image (`:dev` with `NEXT_PUBLIC_API_URL=https://dev-crm.stowe.cloud`), and prod Web image (`:latest` with `NEXT_PUBLIC_API_URL=https://crm.stowe.cloud`). Pushes all to ECR.
+2. **Deploy to Dev** — Force new ECS deployment, wait for stabilization, run migrations, smoke test.
+3. **Deploy to Prod** — Requires manual approval via GitHub `production` environment. Same steps as dev.
+
+**Authentication:** GitHub OIDC → `github-actions-crm` role in shared services → role-chain to `ecs-deploy-role` in target account.
+
+**Required GitHub Repository Variables** (Settings → Secrets and variables → Actions → Variables):
+
+| Variable | Value |
+|----------|-------|
+| `AWS_REGION` | `us-east-1` |
+| `SHARED_SERVICES_ACCOUNT` | `602578934562` |
+| `DEV_ACCOUNT` | `769953010606` |
+| `PROD_ACCOUNT` | `975037863116` |
+| `ECR_REGISTRY` | `602578934562.dkr.ecr.us-east-1.amazonaws.com` |
+
+## Database Migrations
+
+**System:** TypeORM migrations with raw SQL at `apps/api/src/database/migrations/`.
+
+**To add a migration:**
+1. Create a new file: `apps/api/src/database/migrations/{timestamp}-{Name}.ts`
+2. Implement `up()` and `down()` methods using raw SQL
+3. Test locally: `pnpm db:migrate`
+4. Push to master — CI runs migrations automatically after deploy
+
+**Rules:**
+- Migrations MUST have working `down()` methods for rollback
+- Never use `synchronize: true` — always write explicit migrations
+- Never drop a column that code still references — remove the code reference first, deploy, then drop the column in the next release
+- Naming convention: `{timestamp}-{PascalCaseName}.ts` (e.g., `1711930000000-AddDealSalesFields.ts`)
+
+**Seeding dev:** Run via ECS run-task with command override `["node","dist/database/seeds/seed.js"]`. Creates tenant "Acme Corporation", 6 users, 10K contacts, 500 companies, 200 deals. Login: `admin@acme.com` / `Password123!`
+
+## Docker Build
+
+**Critical requirements:**
+- `--platform linux/amd64` when building on Apple Silicon (ECS runs x86_64)
+- `--shamefully-hoist` in pnpm install (symlinks don't survive Docker COPY between stages)
+- `--build-arg NEXT_PUBLIC_API_URL=...` for web image (Next.js bakes NEXT_PUBLIC_* at build time, NOT runtime)
+- `package.json` must be copied to final API image (health endpoint imports it)
+- `/uploads` directory must be created with `node` ownership in Dockerfile
+
+**Image tags:**
+- API: always `:latest`
+- Web dev: `:dev` (baked with `https://dev-crm.stowe.cloud`)
+- Web prod: `:latest` (baked with `https://crm.stowe.cloud`)
+
+## Hard Rules
+
+1. **Never set `desiredCount: 0`** in CDK config — this kills running services on deploy
+2. **`HOSTNAME=0.0.0.0`** must be set in ECS web task definition — Next.js standalone binds to Fargate's container hostname otherwise, making ALB health checks fail
+3. **`sts:TagSession`** is required on both the source role (github-actions-crm) and target role (ecs-deploy-role) trust policies for GitHub Actions role chaining
+4. **Databases persist across deploys** — Aurora and Redis are not touched by CDK or ECS deployments
+5. **ECS services have circuit breakers** — if a new deployment fails health checks, it automatically rolls back to the previous version
+6. **All GitHub integrations must be scoped to `kabner/*` repos only**
