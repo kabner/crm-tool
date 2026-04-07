@@ -1,9 +1,16 @@
 "use client";
 
 import { useState, useRef, useEffect, useCallback } from "react";
+import { CalendarDays, CheckSquare } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
 import { usePipelineBoard, useMoveDealStage } from "@/hooks/use-deals";
+import {
+  useActivities,
+  useCreateActivity,
+  useUpdateActivity,
+} from "@/hooks/use-activities";
+import { useUserSettings } from "@/hooks/use-user-settings";
 import { useRouter } from "next/navigation";
 
 interface PipelineBoardProps {
@@ -47,6 +54,19 @@ function staleness(lastStageChangeAt: string | null, lastActivityAt: string | nu
   return "fresh";
 }
 
+const DEFAULT_CARD_FIELDS = ["name", "amount", "company", "owner"];
+
+interface PipelineCardSettings {
+  cardFields?: string[];
+}
+
+function formatShortDate(dateStr: string): string {
+  const d = new Date(dateStr);
+  return d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+}
+
+type ExpandedSection = "calendar" | "tasks";
+
 const PRIORITY_DOT: Record<string, string> = {
   high: "bg-red-500",
   medium: "bg-amber-500",
@@ -65,14 +85,245 @@ interface DealInfo {
   priority: string;
 }
 
+function DealCardExpansion({
+  dealId,
+  section,
+}: {
+  dealId: string;
+  section: ExpandedSection;
+}) {
+  const { data: activitiesData } = useActivities({
+    dealId,
+    type: section === "tasks" ? "task" : undefined,
+    limit: 50,
+  });
+  const createActivity = useCreateActivity();
+  const updateActivity = useUpdateActivity();
+  const [addingTask, setAddingTask] = useState(false);
+  const [newTaskName, setNewTaskName] = useState("");
+
+  const activities = activitiesData?.data ?? [];
+
+  if (section === "calendar") {
+    const upcoming = activities
+      .filter(
+        (a) => a.dueDate && !a.completedAt && new Date(a.dueDate) >= new Date(),
+      )
+      .sort(
+        (a, b) =>
+          new Date(a.dueDate!).getTime() - new Date(b.dueDate!).getTime(),
+      );
+
+    const next = upcoming[0];
+
+    return (
+      <div className="mt-2 border-t pt-2 text-xs text-muted-foreground space-y-1">
+        {next ? (
+          <div>
+            <p className="font-medium text-foreground">
+              {next.type === "task" ? "Task" : next.type === "meeting" ? "Meeting" : next.type === "call" ? "Call" : "Activity"}: {next.subject}
+            </p>
+            <p>
+              {next.dueDate ? formatShortDate(next.dueDate) : "No date"}
+            </p>
+          </div>
+        ) : (
+          <p>No upcoming actions</p>
+        )}
+      </div>
+    );
+  }
+
+  // Tasks section
+  const tasks = activities.filter((a) => a.type === "task");
+  const outstandingTasks = tasks.filter((t) => !t.completedAt);
+  const completedTasks = tasks.filter((t) => t.completedAt);
+
+  const handleCreateTask = () => {
+    if (!newTaskName.trim()) return;
+    createActivity.mutate({
+      type: "task",
+      subject: newTaskName.trim(),
+      dealId,
+    });
+    setNewTaskName("");
+    setAddingTask(false);
+  };
+
+  const handleCompleteTask = (taskId: string) => {
+    updateActivity.mutate({
+      id: taskId,
+      data: { completedAt: new Date().toISOString() },
+    });
+  };
+
+  return (
+    <div className="mt-2 border-t pt-2 space-y-1 text-xs">
+      {outstandingTasks.map((task) => (
+        <label key={task.id} className="flex items-center gap-2 cursor-pointer">
+          <input
+            type="checkbox"
+            className="rounded"
+            onChange={() => handleCompleteTask(task.id)}
+            onClick={(e) => e.stopPropagation()}
+          />
+          <span>{task.subject}</span>
+        </label>
+      ))}
+      {!addingTask ? (
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            setAddingTask(true);
+          }}
+          className="text-primary hover:underline"
+        >
+          + Add Task
+        </button>
+      ) : (
+        <div className="flex gap-1" onClick={(e) => e.stopPropagation()}>
+          <input
+            className="flex-1 rounded border px-2 py-1 text-xs"
+            placeholder="Task name..."
+            value={newTaskName}
+            onChange={(e) => setNewTaskName(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && handleCreateTask()}
+            autoFocus
+          />
+          <button onClick={handleCreateTask} className="text-primary text-xs font-medium">
+            Add
+          </button>
+        </div>
+      )}
+      {completedTasks.length > 0 && (
+        <div className="mt-1 opacity-60">
+          {completedTasks.map((task) => (
+            <label key={task.id} className="flex items-center gap-2 line-through">
+              <input type="checkbox" checked disabled className="rounded" />
+              <span>{task.subject}</span>
+            </label>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function DealCardFooter({
+  deal,
+  expandedSection,
+  onToggleExpand,
+}: {
+  deal: DealInfo;
+  expandedSection: ExpandedSection | null;
+  onToggleExpand: (section: ExpandedSection) => void;
+}) {
+  // Fetch tasks count for the badge
+  const { data: tasksData } = useActivities({
+    dealId: deal.id,
+    type: "task",
+    limit: 100,
+  });
+
+  // Fetch upcoming activities for calendar badge
+  const { data: allActivitiesData } = useActivities({
+    dealId: deal.id,
+    limit: 100,
+  });
+
+  const tasks = tasksData?.data ?? [];
+  const outstandingTaskCount = tasks.filter((t) => !t.completedAt).length;
+
+  const allActivities = allActivitiesData?.data ?? [];
+  const nextAction = allActivities
+    .filter(
+      (a) => a.dueDate && !a.completedAt && new Date(a.dueDate) >= new Date(),
+    )
+    .sort(
+      (a, b) =>
+        new Date(a.dueDate!).getTime() - new Date(b.dueDate!).getTime(),
+    )[0];
+
+  return (
+    <>
+      <div className="flex items-center justify-between border-t pt-2 mt-2 text-xs text-muted-foreground">
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onToggleExpand("calendar");
+          }}
+          className={cn(
+            "flex items-center gap-1 hover:text-foreground transition-colors",
+            expandedSection === "calendar" && "text-primary",
+          )}
+        >
+          <CalendarDays className="h-3.5 w-3.5" />
+          {nextAction?.dueDate && (
+            <span>{formatShortDate(nextAction.dueDate)}</span>
+          )}
+        </button>
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onToggleExpand("tasks");
+          }}
+          className={cn(
+            "flex items-center gap-1 hover:text-foreground transition-colors",
+            expandedSection === "tasks" && "text-primary",
+          )}
+        >
+          <CheckSquare className="h-3.5 w-3.5" />
+          {outstandingTaskCount > 0 && <span>{outstandingTaskCount}</span>}
+        </button>
+        <div
+          className="flex h-6 w-6 items-center justify-center rounded-full bg-primary/10 text-[10px] font-medium text-primary"
+          title={
+            deal.owner
+              ? `${deal.owner.firstName} ${deal.owner.lastName}`
+              : "Unassigned"
+          }
+        >
+          {deal.owner
+            ? `${deal.owner.firstName[0]}${deal.owner.lastName[0]}`
+            : "??"}
+        </div>
+      </div>
+      {expandedSection && (
+        <div
+          className="animate-in slide-in-from-top-1 duration-200"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <DealCardExpansion dealId={deal.id} section={expandedSection} />
+        </div>
+      )}
+    </>
+  );
+}
+
 export function PipelineBoard({ pipelineId, onDealClick }: PipelineBoardProps) {
   const { data, isLoading } = usePipelineBoard(pipelineId);
   const moveDealStage = useMoveDealStage();
   const router = useRouter();
+  const { data: cardSettings } = useUserSettings<PipelineCardSettings>("pipelines");
+  const cardFields = cardSettings?.cardFields ?? DEFAULT_CARD_FIELDS;
 
   const [draggingDealId, setDraggingDealId] = useState<string | null>(null);
   const [hoveredStageId, setHoveredStageId] = useState<string | null>(null);
   const [hoveredPosition, setHoveredPosition] = useState<number>(0);
+
+  // Inline expansion state
+  const [expandedDealId, setExpandedDealId] = useState<string | null>(null);
+  const [expandedSection, setExpandedSection] = useState<ExpandedSection | null>(null);
+
+  const toggleExpand = useCallback((dealId: string, section: ExpandedSection) => {
+    if (expandedDealId === dealId && expandedSection === section) {
+      setExpandedDealId(null);
+      setExpandedSection(null);
+    } else {
+      setExpandedDealId(dealId);
+      setExpandedSection(section);
+    }
+  }, [expandedDealId, expandedSection]);
 
   // Refs to avoid stale closures
   const draggingRef = useRef<string | null>(null);
@@ -311,55 +562,58 @@ export function PipelineBoard({ pipelineId, onDealClick }: PipelineBoardProps) {
                           !isDragging && staleness(deal.lastStageChangeAt, deal.lastActivityAt) === "aging" && "border-amber-500/40",
                         )}
                       >
-                        {/* Priority dot + Name */}
+                        {/* Priority dot + Name (always shown) */}
                         <div className="flex items-center gap-1.5">
                           {deal.priority && PRIORITY_DOT[deal.priority] && (
                             <span className={cn("h-2 w-2 rounded-full shrink-0", PRIORITY_DOT[deal.priority])} />
                           )}
                           <p className="text-sm font-semibold text-foreground truncate">{deal.name}</p>
                         </div>
-                        {deal.company && (
+
+                        {/* Dynamic card fields */}
+                        {cardFields.includes("company") && deal.company && (
                           <p className="mt-1 text-xs text-muted-foreground truncate">{deal.company.name}</p>
                         )}
-                        {deal.amount != null && (
+                        {cardFields.includes("amount") && deal.amount != null && (
                           <p className="mt-2 text-base font-bold text-foreground">
                             {formatCurrency(Number(deal.amount))}
                           </p>
                         )}
-                        <div className="mt-2 flex items-center justify-between">
-                          <div className="flex items-center gap-2">
-                            {deal.closeDate ? (
-                              <span
-                                className={cn(
-                                  "text-xs",
-                                  new Date(deal.closeDate) < new Date()
-                                    ? "font-medium text-destructive"
-                                    : "text-muted-foreground",
-                                )}
-                              >
-                                {new Date(deal.closeDate).toLocaleDateString("en-US", {
-                                  month: "short",
-                                  day: "numeric",
-                                })}
-                              </span>
-                            ) : null}
-                            {(() => {
-                              const s = staleness(deal.lastStageChangeAt, deal.lastActivityAt);
-                              if (s === "stale") return <span className="h-2 w-2 rounded-full bg-destructive animate-pulse" title="Stale — no activity in 14+ days" />;
-                              if (s === "aging") return <span className="h-2 w-2 rounded-full bg-amber-500" title="Aging — no activity in 7+ days" />;
-                              return null;
-                            })()}
-                          </div>
-                          {deal.owner && (
-                            <div
-                              className="flex h-6 w-6 items-center justify-center rounded-full bg-primary/10 text-[10px] font-semibold text-primary"
-                              title={`${deal.owner.firstName} ${deal.owner.lastName}`}
-                            >
-                              {deal.owner.firstName.charAt(0)}
-                              {deal.owner.lastName.charAt(0)}
-                            </div>
-                          )}
+                        {cardFields.includes("owner") && deal.owner && (
+                          <p className="mt-1 text-xs text-muted-foreground truncate">
+                            {deal.owner.firstName} {deal.owner.lastName}
+                          </p>
+                        )}
+                        {cardFields.includes("closeDate") && deal.closeDate && (
+                          <p className={cn(
+                            "mt-1 text-xs",
+                            new Date(deal.closeDate) < new Date()
+                              ? "font-medium text-destructive"
+                              : "text-muted-foreground",
+                          )}>
+                            Close: {formatShortDate(deal.closeDate)}
+                          </p>
+                        )}
+                        {cardFields.includes("priority") && deal.priority && (
+                          <p className="mt-1 text-xs text-muted-foreground">Priority: {deal.priority}</p>
+                        )}
+
+                        {/* Staleness indicator */}
+                        <div className="mt-1 flex items-center gap-2">
+                          {(() => {
+                            const s = staleness(deal.lastStageChangeAt, deal.lastActivityAt);
+                            if (s === "stale") return <span className="h-2 w-2 rounded-full bg-destructive animate-pulse" title="Stale — no activity in 14+ days" />;
+                            if (s === "aging") return <span className="h-2 w-2 rounded-full bg-amber-500" title="Aging — no activity in 7+ days" />;
+                            return null;
+                          })()}
                         </div>
+
+                        {/* Card footer with icons */}
+                        <DealCardFooter
+                          deal={deal}
+                          expandedSection={expandedDealId === deal.id ? expandedSection : null}
+                          onToggleExpand={(section) => toggleExpand(deal.id, section)}
+                        />
                       </div>
                       {showIndicatorAfter && (
                         <div className="h-1 bg-primary rounded-full mx-1 mt-1 animate-pulse" />

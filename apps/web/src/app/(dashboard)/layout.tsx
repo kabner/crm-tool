@@ -57,7 +57,7 @@ const navSections: NavSection[] = [
   {
     section: "Sales",
     items: [
-      { label: "Deals", href: "/deals", icon: Handshake },
+      { label: "Pipelines", href: "/deals", icon: Handshake },
       { label: "Sequences", href: "/sequences", icon: GitBranch },
       { label: "Lists", href: "/lists", icon: ListFilter },
     ],
