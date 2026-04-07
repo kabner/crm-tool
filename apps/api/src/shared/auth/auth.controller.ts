@@ -4,6 +4,7 @@ import {
   Get,
   HttpCode,
   HttpStatus,
+  Patch,
   Post,
   Req,
   UnauthorizedException,
@@ -113,6 +114,17 @@ export class AuthController {
       dto.newPassword,
     );
     return { message: 'Password changed successfully' };
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Patch('profile')
+  @ApiOperation({ summary: 'Update current user profile' })
+  @ApiResponse({ status: 200, description: 'Profile updated successfully' })
+  async updateProfile(
+    @CurrentUser() user: RequestUser,
+    @Body() dto: { firstName?: string; lastName?: string },
+  ) {
+    return this.authService.updateProfile(user.userId, dto);
   }
 
   @Public()
