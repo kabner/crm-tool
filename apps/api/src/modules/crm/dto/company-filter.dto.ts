@@ -32,4 +32,14 @@ export class CompanyFilterDto extends PaginationQueryDto {
   @IsOptional()
   @IsDateString()
   createdBefore?: string;
+
+  @ApiPropertyOptional({ description: 'Filter by lifecycle stage' })
+  @IsOptional()
+  @IsString()
+  lifecycleStage?: string;
+
+  @ApiPropertyOptional({ description: 'Filter by favorites only' })
+  @IsOptional()
+  @IsString()
+  favorite?: string;
 }

@@ -41,9 +41,10 @@ export class ContactsController {
   @ApiResponse({ status: 200, description: 'Paginated list of contacts' })
   async findAll(
     @CurrentUser('tenantId') tenantId: string,
+    @CurrentUser('id') userId: string,
     @Query() filters: ContactFilterDto,
   ) {
-    return this.contactsService.findAll(tenantId, filters);
+    return this.contactsService.findAll(tenantId, filters, userId);
   }
 
   @Get(':id')
@@ -65,9 +66,10 @@ export class ContactsController {
   @ApiResponse({ status: 201, description: 'Contact created' })
   async create(
     @CurrentUser('tenantId') tenantId: string,
+    @CurrentUser('id') userId: string,
     @Body() dto: CreateContactDto,
   ) {
-    return this.contactsService.create(tenantId, dto);
+    return this.contactsService.create(tenantId, dto, userId);
   }
 
   @Patch(':id')

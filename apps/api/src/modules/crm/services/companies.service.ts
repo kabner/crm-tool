@@ -7,6 +7,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Company } from '../entities/company.entity';
 import { ContactCompany } from '../entities/contact-company.entity';
+import { UserFavorite } from '../entities/user-favorite.entity';
 import { CreateCompanyDto } from '../dto/create-company.dto';
 import { UpdateCompanyDto } from '../dto/update-company.dto';
 import { CompanyFilterDto } from '../dto/company-filter.dto';
@@ -18,28 +19,40 @@ export class CompaniesService {
     private readonly companyRepo: Repository<Company>,
     @InjectRepository(ContactCompany)
     private readonly contactCompanyRepo: Repository<ContactCompany>,
+    @InjectRepository(UserFavorite)
+    private readonly userFavoriteRepo: Repository<UserFavorite>,
   ) {}
 
-  async create(tenantId: string, dto: CreateCompanyDto): Promise<Company> {
+  async create(tenantId: string, dto: CreateCompanyDto, userId?: string): Promise<Company> {
     const company = this.companyRepo.create({
       ...dto,
       tenantId,
+      createdById: userId,
     });
     return this.companyRepo.save(company);
   }
 
-  async findAll(tenantId: string, filters: CompanyFilterDto) {
-    const { page, limit, sort, order, search, industry, size, ownerId, createdAfter, createdBefore } = filters;
+  async findAll(tenantId: string, filters: CompanyFilterDto, userId?: string) {
+    const { page, limit, sort, order, search, industry, size, ownerId, createdAfter, createdBefore, lifecycleStage, favorite } = filters;
+
+    // Total unfiltered count for this tenant
+    const totalCount = await this.companyRepo.count({
+      where: { tenantId },
+    });
 
     const qb = this.companyRepo
       .createQueryBuilder('company')
+      .leftJoinAndSelect('company.createdBy', 'createdBy')
       .where('company.tenantId = :tenantId', { tenantId });
 
     if (search) {
+      // Left join deals for search expansion (Task 8)
+      qb.leftJoin('deals', 'deal', 'deal.company_id = company.id');
       qb.andWhere(
-        '(company.name ILIKE :search OR company.domain ILIKE :search)',
+        '(company.name ILIKE :search OR company.domain ILIKE :search OR company.phone ILIKE :search OR deal.name ILIKE :search)',
         { search: `%${search}%` },
       );
+      qb.distinct(true);
     }
 
     if (industry) {
@@ -54,12 +67,26 @@ export class CompaniesService {
       qb.andWhere('company.ownerId = :ownerId', { ownerId });
     }
 
+    if (lifecycleStage) {
+      qb.andWhere('company.lifecycleStage = :lifecycleStage', { lifecycleStage });
+    }
+
     if (createdAfter) {
       qb.andWhere('company.createdAt >= :createdAfter', { createdAfter });
     }
 
     if (createdBefore) {
       qb.andWhere('company.createdAt <= :createdBefore', { createdBefore });
+    }
+
+    // Favorite filter
+    if (favorite === 'true' && userId) {
+      qb.innerJoin(
+        UserFavorite,
+        'fav',
+        'fav.entityId = company.id AND fav.entityType = :favType AND fav.userId = :favUserId',
+        { favType: 'company', favUserId: userId },
+      );
     }
 
     const sortField = sort ? `company.${sort}` : 'company.createdAt';
@@ -75,6 +102,7 @@ export class CompaniesService {
       data,
       meta: {
         total,
+        totalCount,
         page,
         limit,
         totalPages: Math.ceil(total / limit),
@@ -86,6 +114,7 @@ export class CompaniesService {
     const company = await this.companyRepo
       .createQueryBuilder('company')
       .leftJoinAndSelect('company.parent', 'parent')
+      .leftJoinAndSelect('company.createdBy', 'createdBy')
       .where('company.id = :id', { id })
       .andWhere('company.tenantId = :tenantId', { tenantId })
       .getOne();

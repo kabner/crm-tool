@@ -80,15 +80,25 @@ export class SearchService {
     pattern: string,
     limit: number,
   ): Promise<SearchResult[]> {
-    const contacts = await this.contactRepo
+    const raw = pattern.replace(/%/g, '').trim();
+    const parts = raw.split(/\s+/);
+    const qb = this.contactRepo
       .createQueryBuilder('c')
-      .where('c.tenant_id = :tenantId', { tenantId })
-      .andWhere(
-        '(c.first_name ILIKE :pattern OR c.last_name ILIKE :pattern OR c.email ILIKE :pattern)',
+      .where('c.tenant_id = :tenantId', { tenantId });
+
+    if (parts.length >= 2) {
+      qb.andWhere(
+        '((c.first_name ILIKE :first AND c.last_name ILIKE :last) OR c.email ILIKE :pattern OR c.phone ILIKE :pattern)',
+        { first: `%${parts[0]}%`, last: `%${parts.slice(1).join(' ')}%`, pattern },
+      );
+    } else {
+      qb.andWhere(
+        '(c.first_name ILIKE :pattern OR c.last_name ILIKE :pattern OR c.email ILIKE :pattern OR c.phone ILIKE :pattern)',
         { pattern },
-      )
-      .take(limit)
-      .getMany();
+      );
+    }
+
+    const contacts = await qb.take(limit).getMany();
 
     return contacts.map((c) => ({
       id: c.id,

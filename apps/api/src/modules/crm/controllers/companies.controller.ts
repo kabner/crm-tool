@@ -39,9 +39,10 @@ export class CompaniesController {
   @ApiResponse({ status: 200, description: 'Paginated list of companies' })
   findAll(
     @CurrentUser('tenantId') tenantId: string,
+    @CurrentUser('id') userId: string,
     @Query() filters: CompanyFilterDto,
   ) {
-    return this.companiesService.findAll(tenantId, filters);
+    return this.companiesService.findAll(tenantId, filters, userId);
   }
 
   @Get(':id')
@@ -63,9 +64,10 @@ export class CompaniesController {
   @ApiResponse({ status: 201, description: 'Company created' })
   create(
     @CurrentUser('tenantId') tenantId: string,
+    @CurrentUser('id') userId: string,
     @Body() dto: CreateCompanyDto,
   ) {
-    return this.companiesService.create(tenantId, dto);
+    return this.companiesService.create(tenantId, dto, userId);
   }
 
   @Patch(':id')

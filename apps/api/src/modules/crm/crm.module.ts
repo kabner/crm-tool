@@ -33,6 +33,10 @@ import { SearchController } from './controllers/search.controller';
 import { SearchService } from './services/search.service';
 import { SavedViewsController } from './controllers/saved-views.controller';
 import { SavedViewsService } from './services/saved-views.service';
+import { FavoritesController } from './controllers/favorites.controller';
+import { FavoritesService } from './services/favorites.service';
+import { UserSettingsController } from './controllers/user-settings.controller';
+import { UserSettingsService } from './services/user-settings.service';
 
 @Module({
   imports: [
@@ -52,8 +56,8 @@ import { SavedViewsService } from './services/saved-views.service';
       UserSetting,
     ]),
   ],
-  controllers: [ContactsController, CompaniesController, ActivitiesController, DealsController, PipelinesController, ListsController, ImportExportController, SearchController, SavedViewsController],
-  providers: [ContactsService, CompaniesService, ActivitiesService, DealsService, PipelinesService, ListsService, ImportExportService, SearchService, SavedViewsService],
-  exports: [ContactsService, CompaniesService, ActivitiesService, DealsService, PipelinesService, ListsService, ImportExportService, SearchService, SavedViewsService],
+  controllers: [ContactsController, CompaniesController, ActivitiesController, DealsController, PipelinesController, ListsController, ImportExportController, SearchController, SavedViewsController, FavoritesController, UserSettingsController],
+  providers: [ContactsService, CompaniesService, ActivitiesService, DealsService, PipelinesService, ListsService, ImportExportService, SearchService, SavedViewsService, FavoritesService, UserSettingsService],
+  exports: [ContactsService, CompaniesService, ActivitiesService, DealsService, PipelinesService, ListsService, ImportExportService, SearchService, SavedViewsService, FavoritesService, UserSettingsService],
 })
 export class CrmModule {}
