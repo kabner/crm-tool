@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
+  Home,
   LayoutDashboard,
   Users,
   Building2,
@@ -48,6 +49,7 @@ const navSections: NavSection[] = [
   {
     section: "CRM",
     items: [
+      { label: "Home", href: "/home", icon: Home },
       { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
       { label: "Contacts", href: "/contacts", icon: Users },
       { label: "Companies", href: "/companies", icon: Building2 },
