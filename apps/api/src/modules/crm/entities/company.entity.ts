@@ -48,6 +48,12 @@ export class Company {
   @Column({ name: 'custom_props', type: 'jsonb', default: '{}' })
   customProps: Record<string, any>;
 
+  @Column({ name: 'lifecycle_stage', default: 'lead' })
+  lifecycleStage: string;
+
+  @Column({ name: 'created_by_id', nullable: true })
+  createdById: string;
+
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 
@@ -57,6 +63,10 @@ export class Company {
   @ManyToOne(() => User)
   @JoinColumn({ name: 'owner_id' })
   owner: User;
+
+  @ManyToOne(() => User)
+  @JoinColumn({ name: 'created_by_id' })
+  createdBy: User;
 
   @ManyToOne(() => Company, (company) => company.children, { nullable: true })
   @JoinColumn({ name: 'parent_id' })

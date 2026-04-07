@@ -271,4 +271,25 @@ export class AuthService {
     const newPasswordHash = await bcrypt.hash(newPassword, SALT_ROUNDS);
     await this.userRepository.update(userId, { passwordHash: newPasswordHash });
   }
+
+  async updateProfile(
+    userId: string,
+    data: { firstName?: string; lastName?: string },
+  ): Promise<{ id: string; firstName: string; lastName: string; email: string }> {
+    const user = await this.userRepository.findOne({ where: { id: userId } });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    if (data.firstName !== undefined) user.firstName = data.firstName;
+    if (data.lastName !== undefined) user.lastName = data.lastName;
+
+    const saved = await this.userRepository.save(user);
+    return {
+      id: saved.id,
+      firstName: saved.firstName,
+      lastName: saved.lastName,
+      email: saved.email,
+    };
+  }
 }

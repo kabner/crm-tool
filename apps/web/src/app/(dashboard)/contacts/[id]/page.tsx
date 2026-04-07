@@ -1,23 +1,39 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { useParams, useRouter } from "next/navigation";
-import { ArrowLeft, Pencil, Trash2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { useState, useMemo, useCallback } from 'react';
+import { useParams, useRouter } from 'next/navigation';
+import { ArrowLeft, Pencil, Trash2 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
+} from '@/components/ui/card';
+import { Skeleton } from '@/components/ui/skeleton';
+import { PhoneDisplay } from '@/components/ui/phone-display';
+import { FavoriteButton } from '@/components/favorite-button';
 import {
   useContact,
   useUpdateContact,
   useDeleteContact,
-} from "@/hooks/use-contacts";
-import { ContactForm } from "../components/contact-form";
+} from '@/hooks/use-contacts';
+import { useFavorites, useToggleFavorite } from '@/hooks/use-favorites';
+import { ContactForm } from '../components/contact-form';
+
+const LIFECYCLE_STAGE_VARIANT: Record<
+  string,
+  'default' | 'secondary' | 'outline' | 'destructive'
+> = {
+  subscriber: 'outline',
+  lead: 'secondary',
+  mql: 'secondary',
+  sql: 'default',
+  opportunity: 'default',
+  customer: 'default',
+  evangelist: 'default',
+};
 
 export default function ContactDetailPage() {
   const params = useParams();
@@ -27,8 +43,19 @@ export default function ContactDetailPage() {
   const { data: contact, isLoading } = useContact(id);
   const updateContact = useUpdateContact();
   const deleteContact = useDeleteContact();
+  const { data: favorites } = useFavorites('contact');
+  const toggleFavorite = useToggleFavorite();
 
   const [isEditing, setIsEditing] = useState(false);
+
+  const favoriteIds = useMemo(() => {
+    if (!favorites) return new Set<string>();
+    return new Set(favorites.map((f) => f.entityId));
+  }, [favorites]);
+
+  const handleToggleFavorite = useCallback(() => {
+    toggleFavorite.mutate({ entityType: 'contact', entityId: id });
+  }, [toggleFavorite, id]);
 
   const handleUpdate = async (formData: {
     firstName: string;
@@ -36,7 +63,7 @@ export default function ContactDetailPage() {
     email?: string;
     phone?: string;
     jobTitle?: string;
-    lifecycleStage?: string;
+    companyId: string;
     leadStatus?: string;
     tags?: string[];
     source?: string;
@@ -48,11 +75,11 @@ export default function ContactDetailPage() {
   const handleDelete = async () => {
     if (
       window.confirm(
-        "Are you sure you want to delete this contact? This action cannot be undone.",
+        'Are you sure you want to delete this contact? This action cannot be undone.',
       )
     ) {
       await deleteContact.mutateAsync(id);
-      router.push("/contacts");
+      router.push('/contacts');
     }
   };
 
@@ -97,7 +124,7 @@ export default function ContactDetailPage() {
   if (!contact) {
     return (
       <div className="space-y-6">
-        <Button variant="ghost" onClick={() => router.push("/contacts")}>
+        <Button variant="ghost" onClick={() => router.push('/contacts')}>
           <ArrowLeft className="mr-2 h-4 w-4" />
           Back to Contacts
         </Button>
@@ -110,12 +137,16 @@ export default function ContactDetailPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <Button variant="ghost" size="icon" onClick={() => router.push("/contacts")}>
+          <Button variant="ghost" size="icon" onClick={() => router.push('/contacts')}>
             <ArrowLeft className="h-4 w-4" />
           </Button>
           <h1 className="text-3xl font-bold tracking-tight">
             {contact.firstName} {contact.lastName}
           </h1>
+          <FavoriteButton
+            isFavorite={favoriteIds.has(id)}
+            onToggle={handleToggleFavorite}
+          />
         </div>
         <div className="flex items-center gap-2">
           <Button
@@ -124,7 +155,7 @@ export default function ContactDetailPage() {
             onClick={() => setIsEditing(!isEditing)}
           >
             <Pencil className="mr-2 h-4 w-4" />
-            {isEditing ? "Cancel" : "Edit"}
+            {isEditing ? 'Cancel' : 'Edit'}
           </Button>
           <Button
             variant="destructive"
@@ -148,6 +179,7 @@ export default function ContactDetailPage() {
               initialData={contact}
               onSubmit={handleUpdate}
               isLoading={updateContact.isPending}
+              onCancel={() => setIsEditing(false)}
             />
           </CardContent>
         </Card>
@@ -173,20 +205,30 @@ export default function ContactDetailPage() {
                     <dt className="text-sm font-medium text-muted-foreground">
                       Email
                     </dt>
-                    <dd className="mt-1 text-sm">{contact.email ?? "-"}</dd>
+                    <dd className="mt-1 text-sm">{contact.email ?? '-'}</dd>
                   </div>
                   <div>
                     <dt className="text-sm font-medium text-muted-foreground">
                       Phone
                     </dt>
-                    <dd className="mt-1 text-sm">{contact.phone ?? "-"}</dd>
+                    <dd className="mt-1 text-sm">
+                      <PhoneDisplay phone={contact.phone} />
+                    </dd>
                   </div>
                   <div>
                     <dt className="text-sm font-medium text-muted-foreground">
                       Job Title
                     </dt>
                     <dd className="mt-1 text-sm">
-                      {contact.jobTitle ?? "-"}
+                      {contact.jobTitle ?? '-'}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt className="text-sm font-medium text-muted-foreground">
+                      Company
+                    </dt>
+                    <dd className="mt-1 text-sm">
+                      {contact.company?.name ?? '-'}
                     </dd>
                   </div>
                   <div>
@@ -194,9 +236,17 @@ export default function ContactDetailPage() {
                       Lifecycle Stage
                     </dt>
                     <dd className="mt-1">
-                      <Badge variant="secondary">
-                        {contact.lifecycleStage}
-                      </Badge>
+                      {contact.company?.lifecycleStage ? (
+                        <Badge
+                          variant={
+                            LIFECYCLE_STAGE_VARIANT[contact.company.lifecycleStage] ?? 'outline'
+                          }
+                        >
+                          {contact.company.lifecycleStage}
+                        </Badge>
+                      ) : (
+                        <span className="text-sm text-muted-foreground">-</span>
+                      )}
                     </dd>
                   </div>
                   <div>
@@ -204,14 +254,24 @@ export default function ContactDetailPage() {
                       Lead Status
                     </dt>
                     <dd className="mt-1 text-sm">
-                      {contact.leadStatus ?? "-"}
+                      {contact.leadStatus ?? '-'}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt className="text-sm font-medium text-muted-foreground">
+                      Created By
+                    </dt>
+                    <dd className="mt-1 text-sm">
+                      {contact.createdBy
+                        ? `${contact.createdBy.firstName} ${contact.createdBy.lastName}`
+                        : 'System'}
                     </dd>
                   </div>
                   <div>
                     <dt className="text-sm font-medium text-muted-foreground">
                       Source
                     </dt>
-                    <dd className="mt-1 text-sm">{contact.source ?? "-"}</dd>
+                    <dd className="mt-1 text-sm">{contact.source ?? '-'}</dd>
                   </div>
                   <div>
                     <dt className="text-sm font-medium text-muted-foreground">

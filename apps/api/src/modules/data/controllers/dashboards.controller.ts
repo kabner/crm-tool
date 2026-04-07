@@ -44,7 +44,7 @@ export class DashboardsController {
   @ApiResponse({ status: 200, description: 'System dashboards' })
   async getSystemDashboards(
     @CurrentUser('tenantId') tenantId: string,
-    @CurrentUser('id') userId: string,
+    @CurrentUser('userId') userId: string,
   ) {
     return this.dashboardsService.getSystemDashboards(tenantId, userId);
   }
@@ -66,7 +66,7 @@ export class DashboardsController {
   @ApiResponse({ status: 201, description: 'Dashboard created' })
   async create(
     @CurrentUser('tenantId') tenantId: string,
-    @CurrentUser('id') userId: string,
+    @CurrentUser('userId') userId: string,
     @Body() dto: CreateDashboardDto,
   ) {
     return this.dashboardsService.create(tenantId, userId, dto);

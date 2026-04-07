@@ -1,0 +1,171 @@
+<h2>Sales Feed — Layout Approach</h2>
+<p class="subtitle">How should the feed page be structured?</p>
+
+<div class="cards">
+  <div class="card" data-choice="a" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div style="padding: 16px; font-family: monospace; font-size: 12px; line-height: 1.6; background: #1a1a2e; color: #e0e0e0; border-radius: 8px;">
+        <div style="display: flex; gap: 12px; margin-bottom: 12px;">
+          <div style="padding: 6px 16px; background: #6366f1; color: white; border-radius: 6px; font-weight: bold;">Following</div>
+          <div style="padding: 6px 16px; background: #2a2a3e; color: #999; border-radius: 6px;">All Activity</div>
+          <div style="padding: 6px 16px; background: #2a2a3e; color: #999; border-radius: 6px;">Tasks</div>
+          <div style="flex:1"></div>
+          <div style="padding: 6px 12px; background: #2a2a3e; border-radius: 6px; color: #999;">+ Log Activity</div>
+        </div>
+        <div style="display: flex; gap: 8px; margin-bottom: 16px;">
+          <div style="padding: 4px 10px; background: #2a2a3e; border-radius: 12px; font-size: 11px; color: #aaa;">All Types ▾</div>
+          <div style="padding: 4px 10px; background: #2a2a3e; border-radius: 12px; font-size: 11px; color: #aaa;">All Users ▾</div>
+        </div>
+        <div style="display: flex; gap: 16px;">
+          <div style="flex: 1;">
+            <!-- Feed items -->
+            <div style="background: #2a2a3e; border-radius: 8px; padding: 12px; margin-bottom: 8px;">
+              <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
+                <div style="width: 28px; height: 28px; border-radius: 50%; background: #6366f1; display: flex; align-items: center; justify-content: center; font-size: 10px; color: white;">JD</div>
+                <div><span style="color: #e0e0e0;">Jane Doe</span> <span style="color: #888;">moved deal</span></div>
+                <div style="margin-left: auto; color: #666; font-size: 10px;">2m ago</div>
+              </div>
+              <div style="margin-left: 36px; padding: 8px; background: #1a1a2e; border-radius: 4px; font-size: 11px;">
+                <span style="color: #f59e0b;">🔶 Acme Corp Deal</span> → <span style="color: #22c55e;">Proposal Sent</span> ($45,000)
+              </div>
+            </div>
+            <div style="background: #2a2a3e; border-radius: 8px; padding: 12px; margin-bottom: 8px;">
+              <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
+                <div style="width: 28px; height: 28px; border-radius: 50%; background: #8b5cf6; display: flex; align-items: center; justify-content: center; font-size: 10px; color: white;">MS</div>
+                <div><span style="color: #e0e0e0;">Mike Smith</span> <span style="color: #888;">logged a call with</span> <span style="color: #60a5fa;">Bob Wilson</span></div>
+                <div style="margin-left: auto; color: #666; font-size: 10px;">15m ago</div>
+              </div>
+              <div style="margin-left: 36px; font-size: 11px; color: #aaa;">
+                📞 Discussed pricing for Q2 renewal. Follow-up scheduled for Friday.
+              </div>
+            </div>
+            <div style="background: #2a2a3e; border-radius: 8px; padding: 12px; margin-bottom: 8px;">
+              <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
+                <div style="width: 28px; height: 28px; border-radius: 50%; background: #ec4899; display: flex; align-items: center; justify-content: center; font-size: 10px; color: white;">SJ</div>
+                <div><span style="color: #e0e0e0;">Sarah Jones</span> <span style="color: #888;">added a note on</span> <span style="color: #60a5fa;">TechStart Inc</span></div>
+                <div style="margin-left: auto; color: #666; font-size: 10px;">1h ago</div>
+              </div>
+              <div style="margin-left: 36px; font-size: 11px; color: #aaa;">
+                📝 Met at conference. Very interested in enterprise plan. Decision maker is CTO.
+              </div>
+            </div>
+            <div style="background: #2a2a3e; border-radius: 8px; padding: 12px;">
+              <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
+                <div style="width: 28px; height: 28px; border-radius: 50%; background: #6366f1; display: flex; align-items: center; justify-content: center; font-size: 10px; color: white;">JD</div>
+                <div><span style="color: #e0e0e0;">Jane Doe</span> <span style="color: #888;">won a deal</span> 🎉</div>
+                <div style="margin-left: auto; color: #666; font-size: 10px;">3h ago</div>
+              </div>
+              <div style="margin-left: 36px; padding: 8px; background: #1a1a2e; border-radius: 4px; font-size: 11px;">
+                <span style="color: #22c55e;">✅ Widget Co Enterprise</span> — $120,000 closed won
+              </div>
+            </div>
+          </div>
+          <!-- Right sidebar summary -->
+          <div style="width: 220px; flex-shrink: 0;">
+            <div style="background: #2a2a3e; border-radius: 8px; padding: 12px; margin-bottom: 8px;">
+              <div style="font-size: 10px; color: #888; text-transform: uppercase; margin-bottom: 8px;">Today's Summary</div>
+              <div style="display: flex; justify-content: space-between; margin-bottom: 4px; font-size: 11px;"><span style="color: #aaa;">Deals moved</span><span style="color: #e0e0e0;">7</span></div>
+              <div style="display: flex; justify-content: space-between; margin-bottom: 4px; font-size: 11px;"><span style="color: #aaa;">Calls logged</span><span style="color: #e0e0e0;">12</span></div>
+              <div style="display: flex; justify-content: space-between; margin-bottom: 4px; font-size: 11px;"><span style="color: #aaa;">Emails sent</span><span style="color: #e0e0e0;">23</span></div>
+              <div style="display: flex; justify-content: space-between; font-size: 11px;"><span style="color: #aaa;">Deals won</span><span style="color: #22c55e;">2 ($165K)</span></div>
+            </div>
+            <div style="background: #2a2a3e; border-radius: 8px; padding: 12px;">
+              <div style="font-size: 10px; color: #888; text-transform: uppercase; margin-bottom: 8px;">Upcoming Tasks</div>
+              <div style="font-size: 11px; color: #aaa; margin-bottom: 6px;">☐ Follow up with Acme <span style="color:#f59e0b;">today</span></div>
+              <div style="font-size: 11px; color: #aaa; margin-bottom: 6px;">☐ Send proposal to Nova <span style="color:#888;">tomorrow</span></div>
+              <div style="font-size: 11px; color: #aaa;">☐ Demo call prep <span style="color:#888;">Apr 5</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>A: Feed + Sidebar Summary</h3>
+      <p>Main feed on the left, daily summary stats + upcoming tasks on the right. Copper-style layout with everything visible at once.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="b" onclick="toggleSelect(this)">
+    <div class="card-image">
+      <div style="padding: 16px; font-family: monospace; font-size: 12px; line-height: 1.6; background: #1a1a2e; color: #e0e0e0; border-radius: 8px;">
+        <div style="display: flex; gap: 12px; margin-bottom: 12px;">
+          <div style="padding: 6px 16px; background: #6366f1; color: white; border-radius: 6px; font-weight: bold;">Following</div>
+          <div style="padding: 6px 16px; background: #2a2a3e; color: #999; border-radius: 6px;">All Activity</div>
+          <div style="padding: 6px 16px; background: #2a2a3e; color: #999; border-radius: 6px;">Tasks</div>
+          <div style="flex:1"></div>
+          <div style="padding: 6px 12px; background: #2a2a3e; border-radius: 6px; color: #999;">+ Log Activity</div>
+        </div>
+        <!-- KPI cards row -->
+        <div style="display: flex; gap: 8px; margin-bottom: 12px;">
+          <div style="flex:1; background: #2a2a3e; border-radius: 8px; padding: 10px; text-align: center;">
+            <div style="font-size: 20px; color: #6366f1; font-weight: bold;">$482K</div>
+            <div style="font-size: 10px; color: #888;">Pipeline Value</div>
+          </div>
+          <div style="flex:1; background: #2a2a3e; border-radius: 8px; padding: 10px; text-align: center;">
+            <div style="font-size: 20px; color: #22c55e; font-weight: bold;">$165K</div>
+            <div style="font-size: 10px; color: #888;">Won This Month</div>
+          </div>
+          <div style="flex:1; background: #2a2a3e; border-radius: 8px; padding: 10px; text-align: center;">
+            <div style="font-size: 20px; color: #f59e0b; font-weight: bold;">14</div>
+            <div style="font-size: 10px; color: #888;">Open Deals</div>
+          </div>
+          <div style="flex:1; background: #2a2a3e; border-radius: 8px; padding: 10px; text-align: center;">
+            <div style="font-size: 20px; color: #ef4444; font-weight: bold;">3</div>
+            <div style="font-size: 10px; color: #888;">Stale Deals</div>
+          </div>
+        </div>
+        <div style="display: flex; gap: 8px; margin-bottom: 12px;">
+          <div style="padding: 4px 10px; background: #2a2a3e; border-radius: 12px; font-size: 11px; color: #aaa;">All Types ▾</div>
+          <div style="padding: 4px 10px; background: #2a2a3e; border-radius: 12px; font-size: 11px; color: #aaa;">All Users ▾</div>
+        </div>
+        <!-- Full width feed -->
+        <div style="background: #2a2a3e; border-radius: 8px; padding: 12px; margin-bottom: 8px;">
+          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
+            <div style="width: 28px; height: 28px; border-radius: 50%; background: #6366f1; display: flex; align-items: center; justify-content: center; font-size: 10px; color: white;">JD</div>
+            <div><span style="color: #e0e0e0;">Jane Doe</span> <span style="color: #888;">moved deal</span></div>
+            <div style="margin-left: auto; color: #666; font-size: 10px;">2m ago</div>
+          </div>
+          <div style="margin-left: 36px; padding: 8px; background: #1a1a2e; border-radius: 4px; font-size: 11px;">
+            <span style="color: #f59e0b;">🔶 Acme Corp Deal</span> → <span style="color: #22c55e;">Proposal Sent</span> ($45,000)
+          </div>
+        </div>
+        <div style="background: #2a2a3e; border-radius: 8px; padding: 12px; margin-bottom: 8px;">
+          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
+            <div style="width: 28px; height: 28px; border-radius: 50%; background: #8b5cf6; display: flex; align-items: center; justify-content: center; font-size: 10px; color: white;">MS</div>
+            <div><span style="color: #e0e0e0;">Mike Smith</span> <span style="color: #888;">logged a call with</span> <span style="color: #60a5fa;">Bob Wilson</span></div>
+            <div style="margin-left: auto; color: #666; font-size: 10px;">15m ago</div>
+          </div>
+          <div style="margin-left: 36px; font-size: 11px; color: #aaa;">
+            📞 Discussed pricing for Q2 renewal. Follow-up scheduled for Friday.
+          </div>
+        </div>
+        <div style="background: #2a2a3e; border-radius: 8px; padding: 12px;">
+          <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
+            <div style="width: 28px; height: 28px; border-radius: 50%; background: #ec4899; display: flex; align-items: center; justify-content: center; font-size: 10px; color: white;">SJ</div>
+            <div><span style="color: #e0e0e0;">Sarah Jones</span> <span style="color: #888;">added a note on</span> <span style="color: #60a5fa;">TechStart Inc</span></div>
+            <div style="margin-left: auto; color: #666; font-size: 10px;">1h ago</div>
+          </div>
+          <div style="margin-left: 36px; font-size: 11px; color: #aaa;">
+            📝 Met at conference. Very interested in enterprise plan.
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>B: KPI Cards + Full-Width Feed</h3>
+      <p>Sales KPI cards across the top, then a full-width activity feed below. Tasks live in the "Tasks" tab rather than the sidebar. Cleaner, more focused.</p>
+    </div>
+  </div>
+</div>
+
+<div class="section" style="margin-top: 24px;">
+  <h3>Both options include:</h3>
+  <ul style="color: #ccc; line-height: 2;">
+    <li><strong>3 tabs:</strong> Following (records you follow) · All Activity (team-wide) · Tasks (your to-dos)</li>
+    <li><strong>Activity type filter:</strong> Calls, Emails, Notes, Meetings, Deal changes</li>
+    <li><strong>User filter:</strong> Filter feed by team member</li>
+    <li><strong>Log Activity button:</strong> Quick-add notes, calls, meetings from the feed</li>
+    <li><strong>Clickable links:</strong> Contact/company/deal names link to their detail pages</li>
+    <li><strong>Relative timestamps:</strong> "2m ago", "1h ago", "yesterday"</li>
+  </ul>
+</div>

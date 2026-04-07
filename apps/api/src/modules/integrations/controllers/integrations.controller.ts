@@ -50,7 +50,7 @@ export class IntegrationsController {
   @ApiResponse({ status: 200, description: 'Slack integration configured' })
   async configureSlack(
     @CurrentUser('tenantId') tenantId: string,
-    @CurrentUser('id') userId: string,
+    @CurrentUser('userId') userId: string,
     @Body() body: { webhookUrl: string },
   ) {
     let integration = await this.integrationRepository.findOne({

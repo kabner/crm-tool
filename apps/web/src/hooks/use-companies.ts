@@ -20,6 +20,7 @@ export interface Company {
     zip?: string;
     country?: string;
   } | null;
+  lifecycleStage: string;
   ownerId: string | null;
   parentId: string | null;
   customProps: Record<string, unknown>;
@@ -27,6 +28,8 @@ export interface Company {
   updatedAt: string;
   contactsCount?: number;
   parent?: Company | null;
+  createdById: string | null;
+  createdBy: { firstName: string; lastName: string } | null;
 }
 
 export interface CompanyContact {
@@ -49,6 +52,8 @@ export interface CompanyFilters {
   industry?: string;
   size?: string;
   ownerId?: string;
+  lifecycleStage?: string;
+  favorite?: string;
   createdAfter?: string;
   createdBefore?: string;
 }
@@ -57,6 +62,7 @@ interface PaginatedResponse<T> {
   data: T[];
   meta: {
     total: number;
+    totalCount: number;
     page: number;
     limit: number;
     totalPages: number;
@@ -69,6 +75,7 @@ export interface CreateCompanyInput {
   industry?: string;
   size?: string;
   phone?: string;
+  lifecycleStage?: string;
   address?: {
     street?: string;
     city?: string;

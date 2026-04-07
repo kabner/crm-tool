@@ -194,7 +194,6 @@ export class FormsService {
           lastName,
           phone: phoneField ? dto.data[phoneField.name] : undefined,
           source: 'form',
-          lifecycleStage: 'lead',
         });
         contact = await this.contactRepo.save(contact);
       }

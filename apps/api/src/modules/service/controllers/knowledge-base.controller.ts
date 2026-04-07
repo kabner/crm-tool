@@ -207,7 +207,7 @@ export class KnowledgeBaseController {
   @ApiResponse({ status: 201, description: 'Article created' })
   async createArticle(
     @CurrentUser('tenantId') tenantId: string,
-    @CurrentUser('id') userId: string,
+    @CurrentUser('userId') userId: string,
     @Body() dto: CreateKBArticleDto,
   ) {
     return this.kbService.createArticle(tenantId, userId, dto);

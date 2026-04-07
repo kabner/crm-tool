@@ -10,10 +10,10 @@ export class ContactFilterDto extends PaginationQueryDto {
   @IsString()
   search?: string;
 
-  @ApiPropertyOptional({ description: 'Filter by lifecycle stage' })
+  @ApiPropertyOptional({ description: 'Filter by favorites only' })
   @IsOptional()
   @IsString()
-  lifecycleStage?: string;
+  favorite?: string;
 
   @ApiPropertyOptional({ description: 'Filter by lead status' })
   @IsOptional()

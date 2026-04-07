@@ -22,7 +22,7 @@ export class NotificationsController {
   @Get()
   async list(
     @CurrentUser('tenantId') tenantId: string,
-    @CurrentUser('id') userId: string,
+    @CurrentUser('userId') userId: string,
     @Query('unreadOnly') unreadOnly?: string,
     @Query('limit') limit?: string,
     @Query('offset') offset?: string,
@@ -37,7 +37,7 @@ export class NotificationsController {
   @Get('unread-count')
   async unreadCount(
     @CurrentUser('tenantId') tenantId: string,
-    @CurrentUser('id') userId: string,
+    @CurrentUser('userId') userId: string,
   ) {
     const count = await this.notificationsService.getUnreadCount(tenantId, userId);
     return { count };
@@ -47,7 +47,7 @@ export class NotificationsController {
   @HttpCode(HttpStatus.NO_CONTENT)
   async markAsRead(
     @CurrentUser('tenantId') tenantId: string,
-    @CurrentUser('id') userId: string,
+    @CurrentUser('userId') userId: string,
     @Param('id', ParseUUIDPipe) id: string,
   ) {
     await this.notificationsService.markAsRead(tenantId, userId, id);
@@ -57,7 +57,7 @@ export class NotificationsController {
   @HttpCode(HttpStatus.NO_CONTENT)
   async markAllAsRead(
     @CurrentUser('tenantId') tenantId: string,
-    @CurrentUser('id') userId: string,
+    @CurrentUser('userId') userId: string,
   ) {
     await this.notificationsService.markAllAsRead(tenantId, userId);
   }

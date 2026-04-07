@@ -1,0 +1,2169 @@
+{
+  "/CrmDevStack/CrmVpc": [
+    {
+      "type": "aws:cdk:analytics:construct",
+      "data": {
+        "maxAzs": "*",
+        "natGateways": "*",
+        "ipAddresses": "*",
+        "subnetConfiguration": [
+          {
+            "cidrMask": "*",
+            "name": "*",
+            "subnetType": "Public"
+          },
+          {
+            "cidrMask": "*",
+            "name": "*",
+            "subnetType": "Private"
+          },
+          {
+            "cidrMask": "*",
+            "name": "*",
+            "subnetType": "Isolated"
+          }
+        ],
+        "flowLogs": "*"
+      }
+    }
+  ],
+  "/CrmDevStack/Custom::VpcRestrictDefaultSGCustomResourceProvider": [
+    {
+      "type": "aws:cdk:is-custom-resource-handler-customResourceProvider",
+      "data": true
+    }
+  ],
+  "/CrmDevStack/AlbSg": [
+    {
+      "type": "aws:cdk:analytics:construct",
+      "data": {
+        "vpc": "*",
+        "description": "*",
+        "allowAllOutbound": false
+      }
+    },
+    {
+      "type": "aws:cdk:analytics:method",
+      "data": {
+        "addIngressRule": [
+          {
+            "canInlineRule": true,
+            "connections": "*",
+            "uniqueId": "*"
+          },
+          {},
+          "*"
+        ]
+      }
+    },
+    {
+      "type": "aws:cdk:analytics:method",
+      "data": {
+        "addIngressRule": [
+          {
+            "canInlineRule": true,
+            "connections": "*",
+            "uniqueId": "*"
+          },
+          {},
+          "*"
+        ]
+      }
+    },
+    {
+      "type": "aws:cdk:analytics:method",
+      "data": {
+        "addEgressRule": [
+          "*",
+          {},
+          "*"
+        ]
+      }
+    },
+    {
+      "type": "aws:cdk:analytics:method",
+      "data": {
+        "addEgressRule": [
+          "*",
+          {},
+          "*"
+        ]
+      }
+    },
+    {
+      "type": "aws:cdk:analytics:method",
+      "data": {
+        "addIngressRule": [
+          {
+            "canInlineRule": true,
+            "connections": "*",
+            "uniqueId": "*"
+          },
+          {},
+          "*",
+          false
+        ]
+      }
+    },
+    {
+      "type": "aws:cdk:analytics:method",
+      "data": {
+        "addEgressRule": [
+          "*",
+          {},
+          "*",
+          true
+        ]
+      }
+    },
+    {
+      "type": "aws:cdk:analytics:method",
+      "data": {
+        "addEgressRule": [
+          "*",
+          {},
+          "*",
+          true
+        ]
+      }
+    }
+  ],
+  "/CrmDevStack/FargateSg": [
+    {
+      "type": "aws:cdk:analytics:construct",
+      "data": {
+        "vpc": "*",
+        "description": "*"
+      }
+    },
+    {
+      "type": "aws:cdk:analytics:method",
+      "data": {
+        "addIngressRule": [
+          "*",
+          {},
+          "*"
+        ]
+      }
+    },
+    {
+      "type": "aws:cdk:analytics:method",
+      "data": {
+        "addIngressRule": [
+          "*",
+          {},
+          "*"
+        ]
+      }
+    },
+    {
+      "type": "aws:cdk:analytics:method",
+      "data": {
+        "addIngressRule": [
+          "*",
+          {},
+          "*",
+          false
+        ]
+      }
+    },
+    {
+      "type": "aws:cdk:analytics:method",
+      "data": {
+        "addIngressRule": [
+          "*",
+          {},
+          "*",
+          false
+        ]
+      }
+    }
+  ],
+  "/CrmDevStack/DbSg": [
+    {
+      "type": "aws:cdk:analytics:construct",
+      "data": {
+        "vpc": "*",
+        "description": "*",
+        "allowAllOutbound": false
+      }
+    },
+    {
+      "type": "aws:cdk:analytics:method",
+      "data": {
+        "addIngressRule": [
+          "*",
+          {},
+          "*"
+        ]
+      }
+    }
+  ],
+  "/CrmDevStack/RedisSg": [
+    {
+      "type": "aws:cdk:analytics:construct",
+      "data": {
+        "vpc": "*",
+        "description": "*",
+        "allowAllOutbound": false
+      }
+    },
+    {
+      "type": "aws:cdk:analytics:method",
+      "data": {
+        "addIngressRule": [
+          "*",
+          {},
+          "*"
+        ]
+      }
+    }
+  ],
+  "/CrmDevStack/DbSecret": [
+    {
+      "type": "aws:cdk:analytics:construct",
+      "data": {
+        "secretName": "*",
+        "generateSecretString": {
+          "secretStringTemplate": "*",
+          "generateStringKey": "*",
+          "excludePunctuation": true,
+          "passwordLength": "*"
+        }
+      }
+    }
+  ],
+  "/CrmDevStack/JwtSecret": [
+    {
+      "type": "aws:cdk:analytics:construct",
+      "data": {
+        "secretName": "*",
+        "generateSecretString": {
+          "excludePunctuation": true,
+          "passwordLength": "*"
+        }
+      }
+    }
+  ],
+  "/CrmDevStack/JwtRefreshSecret": [
+    {
+      "type": "aws:cdk:analytics:construct",
+      "data": {
+        "secretName": "*",
+        "generateSecretString": {
+          "excludePunctuation": true,
+          "passwordLength": "*"
+        }
+      }
+    }
+  ],
+  "/CrmDevStack/CrmDb": [
+    {
+      "type": "aws:cdk:analytics:construct",
+      "data": {
+        "engine": {
+          "engineType": "*",
+          "engineVersion": {
+            "fullVersion": "*",
+            "majorVersion": "*"
+          },
+          "parameterGroupFamily": "*",
+          "singleUserRotationApplication": "*",
+          "engineFamily": "*",
+          "defaultUsername": "*",
+          "supportedLogTypes": "*"
+        },
+        "credentials": "*",
+        "defaultDatabaseName": "*",
+        "serverlessV2MinCapacity": "*",
+        "serverlessV2MaxCapacity": "*",
+        "writer": "*",
+        "readers": "*",
+        "vpc": "*",
+        "vpcSubnets": {
+          "subnetType": "Isolated"
+        },
+        "securityGroups": [
+          "*"
+        ],
+        "storageEncrypted": true,
+        "backup": {
+          "retention": "*"
+        },
+        "removalPolicy": "destroy",
+        "deletionProtection": false
+      }
+    }
+  ],
+  "/CrmDevStack/CrmRedis": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "CrmRedis"
+    }
+  ],
+  "/CrmDevStack/AssetsBucket": [
+    {
+      "type": "aws:cdk:analytics:construct",
+      "data": {
+        "bucketName": "*",
+        "encryption": "S3_MANAGED",
+        "blockPublicAccess": "*",
+        "removalPolicy": "destroy",
+        "autoDeleteObjects": true,
+        "versioned": false
+      }
+    }
+  ],
+  "/CrmDevStack/Custom::S3AutoDeleteObjectsCustomResourceProvider": [
+    {
+      "type": "aws:cdk:is-custom-resource-handler-customResourceProvider",
+      "data": true
+    }
+  ],
+  "/CrmDevStack/CrmCluster": [
+    {
+      "type": "aws:cdk:analytics:construct",
+      "data": {
+        "vpc": "*",
+        "clusterName": "*",
+        "containerInsightsV2": "disabled"
+      }
+    }
+  ],
+  "/CrmDevStack/CrmAlb": [
+    {
+      "type": "aws:cdk:analytics:construct",
+      "data": "*"
+    },
+    {
+      "type": "aws:cdk:analytics:method",
+      "data": "*"
+    }
+  ],
+  "/CrmDevStack/ApiTaskDef": [
+    {
+      "type": "aws:cdk:analytics:construct",
+      "data": "*"
+    },
+    {
+      "type": "aws:cdk:analytics:construct",
+      "data": "*"
+    },
+    {
+      "type": "aws:cdk:analytics:method",
+      "data": "*"
+    },
+    {
+      "type": "aws:cdk:analytics:method",
+      "data": "*"
+    },
+    {
+      "type": "aws:cdk:analytics:method",
+      "data": "*"
+    },
+    {
+      "type": "aws:cdk:analytics:method",
+      "data": "*"
+    },
+    {
+      "type": "aws:cdk:analytics:method",
+      "data": "*"
+    },
+    {
+      "type": "aws:cdk:analytics:method",
+      "data": "*"
+    },
+    {
+      "type": "aws:cdk:analytics:method",
+      "data": "*"
+    },
+    {
+      "type": "aws:cdk:analytics:method",
+      "data": "*"
+    }
+  ],
+  "/CrmDevStack/ApiService": [
+    {
+      "type": "aws:cdk:analytics:construct",
+      "data": "*"
+    }
+  ],
+  "/CrmDevStack/WebTaskDef": [
+    {
+      "type": "aws:cdk:analytics:construct",
+      "data": "*"
+    },
+    {
+      "type": "aws:cdk:analytics:construct",
+      "data": "*"
+    },
+    {
+      "type": "aws:cdk:analytics:method",
+      "data": "*"
+    },
+    {
+      "type": "aws:cdk:analytics:method",
+      "data": "*"
+    },
+    {
+      "type": "aws:cdk:analytics:method",
+      "data": "*"
+    },
+    {
+      "type": "aws:cdk:analytics:method",
+      "data": "*"
+    }
+  ],
+  "/CrmDevStack/WebService": [
+    {
+      "type": "aws:cdk:analytics:construct",
+      "data": "*"
+    }
+  ],
+  "/CrmDevStack/MigrateTaskDef": [
+    {
+      "type": "aws:cdk:analytics:construct",
+      "data": "*"
+    },
+    {
+      "type": "aws:cdk:analytics:construct",
+      "data": "*"
+    },
+    {
+      "type": "aws:cdk:analytics:method",
+      "data": "*"
+    },
+    {
+      "type": "aws:cdk:analytics:method",
+      "data": "*"
+    },
+    {
+      "type": "aws:cdk:analytics:method",
+      "data": "*"
+    },
+    {
+      "type": "aws:cdk:analytics:method",
+      "data": "*"
+    },
+    {
+      "type": "aws:cdk:analytics:method",
+      "data": "*"
+    }
+  ],
+  "/CrmDevStack/AlarmTopic": [
+    {
+      "type": "aws:cdk:analytics:construct",
+      "data": {
+        "topicName": "*"
+      }
+    }
+  ],
+  "/CrmDevStack/Api5xxAlarm": [
+    {
+      "type": "aws:cdk:analytics:construct",
+      "data": {
+        "metric": {
+          "warnings": "*",
+          "warningsV2": "*"
+        },
+        "threshold": "*",
+        "evaluationPeriods": "*",
+        "alarmName": "*",
+        "alarmDescription": "*",
+        "treatMissingData": "notBreaching"
+      }
+    },
+    {
+      "type": "aws:cdk:analytics:method",
+      "data": {
+        "addAlarmAction": [
+          {}
+        ]
+      }
+    }
+  ],
+  "/CrmDevStack/ApiLatencyAlarm": [
+    {
+      "type": "aws:cdk:analytics:construct",
+      "data": {
+        "metric": {
+          "warnings": "*",
+          "warningsV2": "*"
+        },
+        "threshold": "*",
+        "evaluationPeriods": "*",
+        "alarmName": "*",
+        "alarmDescription": "*",
+        "treatMissingData": "notBreaching"
+      }
+    },
+    {
+      "type": "aws:cdk:analytics:method",
+      "data": {
+        "addAlarmAction": [
+          {}
+        ]
+      }
+    }
+  ],
+  "/CrmDevStack/AuroraCpuAlarm": [
+    {
+      "type": "aws:cdk:analytics:construct",
+      "data": {
+        "metric": {
+          "warnings": "*",
+          "warningsV2": "*"
+        },
+        "threshold": "*",
+        "evaluationPeriods": "*",
+        "alarmName": "*",
+        "alarmDescription": "*"
+      }
+    },
+    {
+      "type": "aws:cdk:analytics:method",
+      "data": {
+        "addAlarmAction": [
+          {}
+        ]
+      }
+    }
+  ],
+  "/CrmDevStack/AuroraConnectionsAlarm": [
+    {
+      "type": "aws:cdk:analytics:construct",
+      "data": {
+        "metric": {
+          "warnings": "*",
+          "warningsV2": "*"
+        },
+        "threshold": "*",
+        "evaluationPeriods": "*",
+        "alarmName": "*",
+        "alarmDescription": "*"
+      }
+    },
+    {
+      "type": "aws:cdk:analytics:method",
+      "data": {
+        "addAlarmAction": [
+          {}
+        ]
+      }
+    }
+  ],
+  "/CrmDevStack/ApiTaskCountAlarm": [
+    {
+      "type": "aws:cdk:analytics:construct",
+      "data": {
+        "metric": {
+          "warnings": "*",
+          "warningsV2": "*"
+        },
+        "threshold": "*",
+        "evaluationPeriods": "*",
+        "comparisonOperator": "*",
+        "alarmName": "*",
+        "alarmDescription": "*",
+        "treatMissingData": "breaching"
+      }
+    },
+    {
+      "type": "aws:cdk:analytics:method",
+      "data": {
+        "addAlarmAction": [
+          {}
+        ]
+      }
+    }
+  ],
+  "/CrmDevStack/AlbDnsName": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "AlbDnsName"
+    }
+  ],
+  "/CrmDevStack/ApiUrl": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "ApiUrl"
+    }
+  ],
+  "/CrmDevStack/EcrApiRepo": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "EcrApiRepo"
+    }
+  ],
+  "/CrmDevStack/EcrWebRepo": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "EcrWebRepo"
+    }
+  ],
+  "/CrmDevStack/ClusterName": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "ClusterName"
+    }
+  ],
+  "/CrmDevStack/DbEndpoint": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "DbEndpoint"
+    }
+  ],
+  "/CrmDevStack/PrivateSubnets": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "PrivateSubnets"
+    }
+  ],
+  "/CrmDevStack/MigrateTaskSG": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "MigrateTaskSG"
+    }
+  ],
+  "/CrmDevStack/AlarmTopicArn": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "AlarmTopicArn"
+    }
+  ],
+  "/CrmDevStack/BootstrapVersion": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "BootstrapVersion"
+    }
+  ],
+  "/CrmDevStack/CheckBootstrapVersion": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "CheckBootstrapVersion"
+    }
+  ],
+  "/CrmDevStack/CrmVpc/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "CrmVpcC63CEBEA"
+    }
+  ],
+  "/CrmDevStack/CrmVpc/PublicSubnet1": [
+    {
+      "type": "aws:cdk:analytics:construct",
+      "data": {
+        "availabilityZone": "*",
+        "vpcId": "*",
+        "cidrBlock": "*",
+        "mapPublicIpOnLaunch": true,
+        "ipv6CidrBlock": "*",
+        "assignIpv6AddressOnCreation": "*"
+      }
+    },
+    {
+      "type": "aws:cdk:analytics:construct",
+      "data": {
+        "availabilityZone": "*",
+        "vpcId": "*",
+        "cidrBlock": "*",
+        "mapPublicIpOnLaunch": true,
+        "ipv6CidrBlock": "*",
+        "assignIpv6AddressOnCreation": "*"
+      }
+    },
+    {
+      "type": "aws:cdk:analytics:method",
+      "data": {}
+    },
+    {
+      "type": "aws:cdk:analytics:method",
+      "data": {
+        "addNatGateway": [
+          "*"
+        ]
+      }
+    }
+  ],
+  "/CrmDevStack/CrmVpc/PublicSubnet2": [
+    {
+      "type": "aws:cdk:analytics:construct",
+      "data": {
+        "availabilityZone": "*",
+        "vpcId": "*",
+        "cidrBlock": "*",
+        "mapPublicIpOnLaunch": true,
+        "ipv6CidrBlock": "*",
+        "assignIpv6AddressOnCreation": "*"
+      }
+    },
+    {
+      "type": "aws:cdk:analytics:construct",
+      "data": {
+        "availabilityZone": "*",
+        "vpcId": "*",
+        "cidrBlock": "*",
+        "mapPublicIpOnLaunch": true,
+        "ipv6CidrBlock": "*",
+        "assignIpv6AddressOnCreation": "*"
+      }
+    },
+    {
+      "type": "aws:cdk:analytics:method",
+      "data": {}
+    }
+  ],
+  "/CrmDevStack/CrmVpc/PrivateSubnet1": [
+    {
+      "type": "aws:cdk:analytics:construct",
+      "data": {
+        "availabilityZone": "*",
+        "vpcId": "*",
+        "cidrBlock": "*",
+        "mapPublicIpOnLaunch": false,
+        "ipv6CidrBlock": "*",
+        "assignIpv6AddressOnCreation": "*"
+      }
+    },
+    {
+      "type": "aws:cdk:analytics:construct",
+      "data": {
+        "availabilityZone": "*",
+        "vpcId": "*",
+        "cidrBlock": "*",
+        "mapPublicIpOnLaunch": false,
+        "ipv6CidrBlock": "*",
+        "assignIpv6AddressOnCreation": "*"
+      }
+    },
+    {
+      "type": "aws:cdk:analytics:method",
+      "data": {}
+    }
+  ],
+  "/CrmDevStack/CrmVpc/PrivateSubnet2": [
+    {
+      "type": "aws:cdk:analytics:construct",
+      "data": {
+        "availabilityZone": "*",
+        "vpcId": "*",
+        "cidrBlock": "*",
+        "mapPublicIpOnLaunch": false,
+        "ipv6CidrBlock": "*",
+        "assignIpv6AddressOnCreation": "*"
+      }
+    },
+    {
+      "type": "aws:cdk:analytics:construct",
+      "data": {
+        "availabilityZone": "*",
+        "vpcId": "*",
+        "cidrBlock": "*",
+        "mapPublicIpOnLaunch": false,
+        "ipv6CidrBlock": "*",
+        "assignIpv6AddressOnCreation": "*"
+      }
+    },
+    {
+      "type": "aws:cdk:analytics:method",
+      "data": {}
+    }
+  ],
+  "/CrmDevStack/CrmVpc/IsolatedSubnet1": [
+    {
+      "type": "aws:cdk:analytics:construct",
+      "data": {
+        "availabilityZone": "*",
+        "vpcId": "*",
+        "cidrBlock": "*",
+        "mapPublicIpOnLaunch": false,
+        "ipv6CidrBlock": "*",
+        "assignIpv6AddressOnCreation": "*"
+      }
+    },
+    {
+      "type": "aws:cdk:analytics:construct",
+      "data": {
+        "availabilityZone": "*",
+        "vpcId": "*",
+        "cidrBlock": "*",
+        "mapPublicIpOnLaunch": false,
+        "ipv6CidrBlock": "*",
+        "assignIpv6AddressOnCreation": "*"
+      }
+    }
+  ],
+  "/CrmDevStack/CrmVpc/IsolatedSubnet2": [
+    {
+      "type": "aws:cdk:analytics:construct",
+      "data": {
+        "availabilityZone": "*",
+        "vpcId": "*",
+        "cidrBlock": "*",
+        "mapPublicIpOnLaunch": false,
+        "ipv6CidrBlock": "*",
+        "assignIpv6AddressOnCreation": "*"
+      }
+    },
+    {
+      "type": "aws:cdk:analytics:construct",
+      "data": {
+        "availabilityZone": "*",
+        "vpcId": "*",
+        "cidrBlock": "*",
+        "mapPublicIpOnLaunch": false,
+        "ipv6CidrBlock": "*",
+        "assignIpv6AddressOnCreation": "*"
+      }
+    }
+  ],
+  "/CrmDevStack/CrmVpc/IGW": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "CrmVpcIGW5312D5A6"
+    }
+  ],
+  "/CrmDevStack/CrmVpc/VPCGW": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "CrmVpcVPCGWC4D01F21"
+    }
+  ],
+  "/CrmDevStack/CrmVpc/default": [
+    {
+      "type": "aws:cdk:analytics:construct",
+      "data": {
+        "resourceType": "*",
+        "destination": "*",
+        "trafficType": "REJECT"
+      }
+    }
+  ],
+  "/CrmDevStack/CrmVpc/RestrictDefaultSecurityGroupCustomResource": [
+    {
+      "type": "aws:cdk:analytics:construct",
+      "data": "*"
+    }
+  ],
+  "/CrmDevStack/Custom::VpcRestrictDefaultSGCustomResourceProvider/Role": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "CustomVpcRestrictDefaultSGCustomResourceProviderRole26592FE0"
+    }
+  ],
+  "/CrmDevStack/Custom::VpcRestrictDefaultSGCustomResourceProvider/Handler": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "CustomVpcRestrictDefaultSGCustomResourceProviderHandlerDC833E5E"
+    }
+  ],
+  "/CrmDevStack/AlbSg/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "AlbSg1155C1BE"
+    }
+  ],
+  "/CrmDevStack/AlbSg/to CrmDevStackFargateSgA6399AB0:3001": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "AlbSgtoCrmDevStackFargateSgA6399AB030014E36AB88"
+    }
+  ],
+  "/CrmDevStack/AlbSg/to CrmDevStackFargateSgA6399AB0:3000": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "AlbSgtoCrmDevStackFargateSgA6399AB030002F0E08B5"
+    }
+  ],
+  "/CrmDevStack/FargateSg/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "FargateSg4CA74029"
+    }
+  ],
+  "/CrmDevStack/FargateSg/from CrmDevStackAlbSgEC8DD17E:3001": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "FargateSgfromCrmDevStackAlbSgEC8DD17E3001BCD058B2"
+    }
+  ],
+  "/CrmDevStack/FargateSg/from CrmDevStackAlbSgEC8DD17E:3000": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "FargateSgfromCrmDevStackAlbSgEC8DD17E300066735EC2"
+    }
+  ],
+  "/CrmDevStack/DbSg/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "DbSg495F8305"
+    }
+  ],
+  "/CrmDevStack/DbSg/from CrmDevStackFargateSgA6399AB0:5432": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "DbSgfromCrmDevStackFargateSgA6399AB054327B07C38B"
+    }
+  ],
+  "/CrmDevStack/RedisSg/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "RedisSgFB48DCCD"
+    }
+  ],
+  "/CrmDevStack/RedisSg/from CrmDevStackFargateSgA6399AB0:6379": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "RedisSgfromCrmDevStackFargateSgA6399AB0637922F2BB0A"
+    }
+  ],
+  "/CrmDevStack/DbSecret/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "DbSecret685A0FA5"
+    }
+  ],
+  "/CrmDevStack/DbSecret/Attachment": [
+    {
+      "type": "aws:cdk:analytics:construct",
+      "data": {
+        "secret": "*",
+        "target": "*"
+      }
+    }
+  ],
+  "/CrmDevStack/JwtSecret/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "JwtSecretB8834B39"
+    }
+  ],
+  "/CrmDevStack/JwtRefreshSecret/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "JwtRefreshSecret4736E8C7"
+    }
+  ],
+  "/CrmDevStack/CrmDb/Subnets": [
+    {
+      "type": "aws:cdk:analytics:construct",
+      "data": {
+        "description": "*",
+        "vpc": "*",
+        "vpcSubnets": {
+          "subnetType": "Isolated"
+        },
+        "removalPolicy": "*"
+      }
+    }
+  ],
+  "/CrmDevStack/CrmDb/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "CrmDb67725308"
+    }
+  ],
+  "/CrmDevStack/CrmDb/writer": [
+    {
+      "type": "aws:cdk:analytics:construct",
+      "data": "*"
+    }
+  ],
+  "/CrmDevStack/AssetsBucket/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "AssetsBucket5CB76180"
+    },
+    {
+      "type": "aws:cdk:analytics:mixin",
+      "data": {
+        "mixin": "aws-cdk-lib.aws_s3.mixins.BucketAutoDeleteObjects"
+      }
+    }
+  ],
+  "/CrmDevStack/AssetsBucket/Policy": [
+    {
+      "type": "aws:cdk:analytics:construct",
+      "data": {
+        "bucket": "*"
+      }
+    }
+  ],
+  "/CrmDevStack/AssetsBucket/AutoDeleteObjectsCustomResource": [
+    {
+      "type": "aws:cdk:analytics:construct",
+      "data": "*"
+    }
+  ],
+  "/CrmDevStack/Custom::S3AutoDeleteObjectsCustomResourceProvider/Role": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "CustomS3AutoDeleteObjectsCustomResourceProviderRole3B1BD092"
+    }
+  ],
+  "/CrmDevStack/Custom::S3AutoDeleteObjectsCustomResourceProvider/Handler": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "CustomS3AutoDeleteObjectsCustomResourceProviderHandler9D90184F"
+    }
+  ],
+  "/CrmDevStack/CrmCluster/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "CrmClusterCCD1126B"
+    }
+  ],
+  "/CrmDevStack/CrmAlb/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "CrmAlb32B97D8E"
+    }
+  ],
+  "/CrmDevStack/CrmAlb/HttpListener": [
+    {
+      "type": "aws:cdk:analytics:construct",
+      "data": "*"
+    },
+    {
+      "type": "aws:cdk:analytics:method",
+      "data": "*"
+    },
+    {
+      "type": "aws:cdk:analytics:method",
+      "data": "*"
+    },
+    {
+      "type": "aws:cdk:analytics:method",
+      "data": "*"
+    },
+    {
+      "type": "aws:cdk:analytics:method",
+      "data": "*"
+    },
+    {
+      "type": "aws:cdk:analytics:method",
+      "data": "*"
+    },
+    {
+      "type": "aws:cdk:analytics:method",
+      "data": "*"
+    }
+  ],
+  "/CrmDevStack/ApiTaskDef/TaskRole": [
+    {
+      "type": "aws:cdk:analytics:construct",
+      "data": {
+        "assumedBy": {
+          "principalAccount": "*",
+          "assumeRoleAction": "*"
+        }
+      }
+    },
+    {
+      "type": "aws:cdk:analytics:method",
+      "data": {
+        "addToPrincipalPolicy": [
+          {}
+        ]
+      }
+    },
+    {
+      "type": "aws:cdk:analytics:method",
+      "data": {
+        "attachInlinePolicy": [
+          "*"
+        ]
+      }
+    },
+    {
+      "type": "aws:cdk:analytics:method",
+      "data": {
+        "attachInlinePolicy": [
+          "*"
+        ]
+      }
+    },
+    {
+      "type": "aws:cdk:analytics:method",
+      "data": {
+        "addToPrincipalPolicy": [
+          {}
+        ]
+      }
+    },
+    {
+      "type": "aws:cdk:analytics:method",
+      "data": {
+        "addToPrincipalPolicy": [
+          {}
+        ]
+      }
+    },
+    {
+      "type": "aws:cdk:analytics:method",
+      "data": {
+        "addToPrincipalPolicy": [
+          {}
+        ]
+      }
+    }
+  ],
+  "/CrmDevStack/ApiTaskDef/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "ApiTaskDef37DBDBD0"
+    }
+  ],
+  "/CrmDevStack/ApiTaskDef/ExecutionRole": [
+    {
+      "type": "aws:cdk:analytics:construct",
+      "data": {
+        "assumedBy": {
+          "principalAccount": "*",
+          "assumeRoleAction": "*"
+        },
+        "roleName": "*"
+      }
+    },
+    {
+      "type": "aws:cdk:analytics:method",
+      "data": {
+        "addToPrincipalPolicy": [
+          {}
+        ]
+      }
+    },
+    {
+      "type": "aws:cdk:analytics:method",
+      "data": {
+        "attachInlinePolicy": [
+          "*"
+        ]
+      }
+    },
+    {
+      "type": "aws:cdk:analytics:method",
+      "data": {
+        "attachInlinePolicy": [
+          "*"
+        ]
+      }
+    },
+    {
+      "type": "aws:cdk:analytics:method",
+      "data": {
+        "addToPrincipalPolicy": [
+          {}
+        ]
+      }
+    },
+    {
+      "type": "aws:cdk:analytics:method",
+      "data": {
+        "addToPrincipalPolicy": [
+          {}
+        ]
+      }
+    },
+    {
+      "type": "aws:cdk:analytics:method",
+      "data": {
+        "addToPrincipalPolicy": [
+          {}
+        ]
+      }
+    },
+    {
+      "type": "aws:cdk:analytics:method",
+      "data": {
+        "addToPrincipalPolicy": [
+          {}
+        ]
+      }
+    },
+    {
+      "type": "aws:cdk:analytics:method",
+      "data": {
+        "addToPrincipalPolicy": [
+          {}
+        ]
+      }
+    },
+    {
+      "type": "aws:cdk:analytics:method",
+      "data": {
+        "addToPrincipalPolicy": [
+          {}
+        ]
+      }
+    }
+  ],
+  "/CrmDevStack/ApiService/Service": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "ApiServiceC9037CF0"
+    }
+  ],
+  "/CrmDevStack/ApiService/ScalingRole": [
+    {
+      "type": "aws:cdk:analytics:construct",
+      "data": "*"
+    }
+  ],
+  "/CrmDevStack/WebTaskDef/TaskRole": [
+    {
+      "type": "aws:cdk:analytics:construct",
+      "data": {
+        "assumedBy": {
+          "principalAccount": "*",
+          "assumeRoleAction": "*"
+        }
+      }
+    }
+  ],
+  "/CrmDevStack/WebTaskDef/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "WebTaskDefDC37DBDB"
+    }
+  ],
+  "/CrmDevStack/WebTaskDef/ExecutionRole": [
+    {
+      "type": "aws:cdk:analytics:construct",
+      "data": {
+        "assumedBy": {
+          "principalAccount": "*",
+          "assumeRoleAction": "*"
+        },
+        "roleName": "*"
+      }
+    },
+    {
+      "type": "aws:cdk:analytics:method",
+      "data": {
+        "addToPrincipalPolicy": [
+          {}
+        ]
+      }
+    },
+    {
+      "type": "aws:cdk:analytics:method",
+      "data": {
+        "attachInlinePolicy": [
+          "*"
+        ]
+      }
+    },
+    {
+      "type": "aws:cdk:analytics:method",
+      "data": {
+        "attachInlinePolicy": [
+          "*"
+        ]
+      }
+    },
+    {
+      "type": "aws:cdk:analytics:method",
+      "data": {
+        "addToPrincipalPolicy": [
+          {}
+        ]
+      }
+    },
+    {
+      "type": "aws:cdk:analytics:method",
+      "data": {
+        "addToPrincipalPolicy": [
+          {}
+        ]
+      }
+    }
+  ],
+  "/CrmDevStack/WebService/Service": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "WebService7F8A1763"
+    }
+  ],
+  "/CrmDevStack/MigrateTaskDef/TaskRole": [
+    {
+      "type": "aws:cdk:analytics:construct",
+      "data": {
+        "assumedBy": {
+          "principalAccount": "*",
+          "assumeRoleAction": "*"
+        }
+      }
+    },
+    {
+      "type": "aws:cdk:analytics:method",
+      "data": {
+        "addToPrincipalPolicy": [
+          {}
+        ]
+      }
+    },
+    {
+      "type": "aws:cdk:analytics:method",
+      "data": {
+        "attachInlinePolicy": [
+          "*"
+        ]
+      }
+    },
+    {
+      "type": "aws:cdk:analytics:method",
+      "data": {
+        "attachInlinePolicy": [
+          "*"
+        ]
+      }
+    }
+  ],
+  "/CrmDevStack/MigrateTaskDef/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "MigrateTaskDef5251B2F0"
+    }
+  ],
+  "/CrmDevStack/MigrateTaskDef/ExecutionRole": [
+    {
+      "type": "aws:cdk:analytics:construct",
+      "data": {
+        "assumedBy": {
+          "principalAccount": "*",
+          "assumeRoleAction": "*"
+        },
+        "roleName": "*"
+      }
+    },
+    {
+      "type": "aws:cdk:analytics:method",
+      "data": {
+        "addToPrincipalPolicy": [
+          {}
+        ]
+      }
+    },
+    {
+      "type": "aws:cdk:analytics:method",
+      "data": {
+        "attachInlinePolicy": [
+          "*"
+        ]
+      }
+    },
+    {
+      "type": "aws:cdk:analytics:method",
+      "data": {
+        "attachInlinePolicy": [
+          "*"
+        ]
+      }
+    },
+    {
+      "type": "aws:cdk:analytics:method",
+      "data": {
+        "addToPrincipalPolicy": [
+          {}
+        ]
+      }
+    },
+    {
+      "type": "aws:cdk:analytics:method",
+      "data": {
+        "addToPrincipalPolicy": [
+          {}
+        ]
+      }
+    },
+    {
+      "type": "aws:cdk:analytics:method",
+      "data": {
+        "addToPrincipalPolicy": [
+          {}
+        ]
+      }
+    },
+    {
+      "type": "aws:cdk:analytics:method",
+      "data": {
+        "addToPrincipalPolicy": [
+          {}
+        ]
+      }
+    }
+  ],
+  "/CrmDevStack/AlarmTopic/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "AlarmTopicD01E77F9"
+    }
+  ],
+  "/CrmDevStack/Api5xxAlarm/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "Api5xxAlarm31F257DC"
+    }
+  ],
+  "/CrmDevStack/ApiLatencyAlarm/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "ApiLatencyAlarm453002C0"
+    }
+  ],
+  "/CrmDevStack/AuroraCpuAlarm/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "AuroraCpuAlarm999C031F"
+    }
+  ],
+  "/CrmDevStack/AuroraConnectionsAlarm/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "AuroraConnectionsAlarm320D1F2B"
+    }
+  ],
+  "/CrmDevStack/ApiTaskCountAlarm/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "ApiTaskCountAlarmD75D3244"
+    }
+  ],
+  "/CrmDevStack/CDKMetadata/Default": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "CDKMetadata"
+    }
+  ],
+  "/CrmDevStack/CrmVpc/PublicSubnet1/Subnet": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "CrmVpcPublicSubnet1Subnet098180E4"
+    }
+  ],
+  "/CrmDevStack/CrmVpc/PublicSubnet1/RouteTable": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "CrmVpcPublicSubnet1RouteTableE4CF5A1E"
+    }
+  ],
+  "/CrmDevStack/CrmVpc/PublicSubnet1/RouteTableAssociation": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "CrmVpcPublicSubnet1RouteTableAssociation7004AC8B"
+    }
+  ],
+  "/CrmDevStack/CrmVpc/PublicSubnet1/DefaultRoute": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "CrmVpcPublicSubnet1DefaultRoute01E75892"
+    }
+  ],
+  "/CrmDevStack/CrmVpc/PublicSubnet1/EIP": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "CrmVpcPublicSubnet1EIP1C42109B"
+    }
+  ],
+  "/CrmDevStack/CrmVpc/PublicSubnet1/NATGateway": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "CrmVpcPublicSubnet1NATGateway27FA599D"
+    }
+  ],
+  "/CrmDevStack/CrmVpc/PublicSubnet2/Subnet": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "CrmVpcPublicSubnet2Subnet69FA8367"
+    }
+  ],
+  "/CrmDevStack/CrmVpc/PublicSubnet2/RouteTable": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "CrmVpcPublicSubnet2RouteTableA278B63B"
+    }
+  ],
+  "/CrmDevStack/CrmVpc/PublicSubnet2/RouteTableAssociation": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "CrmVpcPublicSubnet2RouteTableAssociation36EAFE14"
+    }
+  ],
+  "/CrmDevStack/CrmVpc/PublicSubnet2/DefaultRoute": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "CrmVpcPublicSubnet2DefaultRoute6A7441E5"
+    }
+  ],
+  "/CrmDevStack/CrmVpc/PrivateSubnet1/Subnet": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "CrmVpcPrivateSubnet1SubnetEB7A324A"
+    }
+  ],
+  "/CrmDevStack/CrmVpc/PrivateSubnet1/RouteTable": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "CrmVpcPrivateSubnet1RouteTableC04730D8"
+    }
+  ],
+  "/CrmDevStack/CrmVpc/PrivateSubnet1/RouteTableAssociation": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "CrmVpcPrivateSubnet1RouteTableAssociationE58B653D"
+    }
+  ],
+  "/CrmDevStack/CrmVpc/PrivateSubnet1/DefaultRoute": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "CrmVpcPrivateSubnet1DefaultRoute2CA747F4"
+    }
+  ],
+  "/CrmDevStack/CrmVpc/PrivateSubnet2/Subnet": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "CrmVpcPrivateSubnet2SubnetD95E14B1"
+    }
+  ],
+  "/CrmDevStack/CrmVpc/PrivateSubnet2/RouteTable": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "CrmVpcPrivateSubnet2RouteTable1A4470AD"
+    }
+  ],
+  "/CrmDevStack/CrmVpc/PrivateSubnet2/RouteTableAssociation": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "CrmVpcPrivateSubnet2RouteTableAssociationD24F2E47"
+    }
+  ],
+  "/CrmDevStack/CrmVpc/PrivateSubnet2/DefaultRoute": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "CrmVpcPrivateSubnet2DefaultRoute808AA382"
+    }
+  ],
+  "/CrmDevStack/CrmVpc/IsolatedSubnet1/Subnet": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "CrmVpcIsolatedSubnet1Subnet94FCE84E"
+    }
+  ],
+  "/CrmDevStack/CrmVpc/IsolatedSubnet1/RouteTable": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "CrmVpcIsolatedSubnet1RouteTable46047026"
+    }
+  ],
+  "/CrmDevStack/CrmVpc/IsolatedSubnet1/RouteTableAssociation": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "CrmVpcIsolatedSubnet1RouteTableAssociationC140C10C"
+    }
+  ],
+  "/CrmDevStack/CrmVpc/IsolatedSubnet2/Subnet": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "CrmVpcIsolatedSubnet2SubnetE8205160"
+    }
+  ],
+  "/CrmDevStack/CrmVpc/IsolatedSubnet2/RouteTable": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "CrmVpcIsolatedSubnet2RouteTable4AACFC75"
+    }
+  ],
+  "/CrmDevStack/CrmVpc/IsolatedSubnet2/RouteTableAssociation": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "CrmVpcIsolatedSubnet2RouteTableAssociationECDEB4E2"
+    }
+  ],
+  "/CrmDevStack/CrmVpc/default/IAMRole": [
+    {
+      "type": "aws:cdk:analytics:construct",
+      "data": {
+        "roleName": "*",
+        "assumedBy": {
+          "principalAccount": "*",
+          "assumeRoleAction": "*"
+        }
+      }
+    },
+    {
+      "type": "aws:cdk:analytics:method",
+      "data": {
+        "addToPrincipalPolicy": [
+          {}
+        ]
+      }
+    },
+    {
+      "type": "aws:cdk:analytics:method",
+      "data": {
+        "attachInlinePolicy": [
+          "*"
+        ]
+      }
+    },
+    {
+      "type": "aws:cdk:analytics:method",
+      "data": {
+        "attachInlinePolicy": [
+          "*"
+        ]
+      }
+    }
+  ],
+  "/CrmDevStack/CrmVpc/default/LogGroup": [
+    {
+      "type": "aws:cdk:analytics:construct",
+      "data": "*"
+    }
+  ],
+  "/CrmDevStack/CrmVpc/default/FlowLog": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "CrmVpcdefaultFlowLogDE28750A"
+    }
+  ],
+  "/CrmDevStack/CrmVpc/RestrictDefaultSecurityGroupCustomResource/Default": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "CrmVpcRestrictDefaultSecurityGroupCustomResourceDE223F5C"
+    }
+  ],
+  "/CrmDevStack/DbSecret/Attachment/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "DbSecretAttachment0609CE05"
+    }
+  ],
+  "/CrmDevStack/CrmDb/Subnets/Default": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "CrmDbSubnetsD60E3110"
+    }
+  ],
+  "/CrmDevStack/CrmDb/writer/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "CrmDbwriter0C65F5FE"
+    }
+  ],
+  "/CrmDevStack/AssetsBucket/Policy/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "AssetsBucketPolicyFFACF6C4"
+    },
+    {
+      "type": "aws:cdk:analytics:mixin",
+      "data": {
+        "mixin": "aws-cdk-lib.aws_s3.mixins.BucketPolicyStatements"
+      }
+    }
+  ],
+  "/CrmDevStack/AssetsBucket/AutoDeleteObjectsCustomResource/Default": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "AssetsBucketAutoDeleteObjectsCustomResource51BA1286"
+    }
+  ],
+  "/CrmDevStack/CrmAlb/HttpListener/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "CrmAlbHttpListener1BA459CD"
+    }
+  ],
+  "/CrmDevStack/ApiTaskDef/TaskRole/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "ApiTaskDefTaskRole76FB19FA"
+    }
+  ],
+  "/CrmDevStack/ApiTaskDef/TaskRole/DefaultPolicy": [
+    {
+      "type": "aws:cdk:analytics:construct",
+      "data": "*"
+    },
+    {
+      "type": "aws:cdk:analytics:method",
+      "data": {
+        "attachToRole": [
+          "*"
+        ]
+      }
+    },
+    {
+      "type": "aws:cdk:analytics:method",
+      "data": {
+        "attachToRole": [
+          "*"
+        ]
+      }
+    },
+    {
+      "type": "aws:cdk:analytics:method",
+      "data": {
+        "addStatements": [
+          {}
+        ]
+      }
+    },
+    {
+      "type": "aws:cdk:analytics:method",
+      "data": {
+        "addStatements": [
+          {}
+        ]
+      }
+    },
+    {
+      "type": "aws:cdk:analytics:method",
+      "data": {
+        "addStatements": [
+          {}
+        ]
+      }
+    },
+    {
+      "type": "aws:cdk:analytics:method",
+      "data": {
+        "addStatements": [
+          {}
+        ]
+      }
+    }
+  ],
+  "/CrmDevStack/ApiTaskDef/api/LogGroup": [
+    {
+      "type": "aws:cdk:analytics:construct",
+      "data": {
+        "retention": 30
+      }
+    }
+  ],
+  "/CrmDevStack/ApiTaskDef/ExecutionRole/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "ApiTaskDefExecutionRoleE6ABB053"
+    }
+  ],
+  "/CrmDevStack/ApiTaskDef/ExecutionRole/DefaultPolicy": [
+    {
+      "type": "aws:cdk:analytics:construct",
+      "data": "*"
+    },
+    {
+      "type": "aws:cdk:analytics:method",
+      "data": {
+        "attachToRole": [
+          "*"
+        ]
+      }
+    },
+    {
+      "type": "aws:cdk:analytics:method",
+      "data": {
+        "attachToRole": [
+          "*"
+        ]
+      }
+    },
+    {
+      "type": "aws:cdk:analytics:method",
+      "data": {
+        "addStatements": [
+          {}
+        ]
+      }
+    },
+    {
+      "type": "aws:cdk:analytics:method",
+      "data": {
+        "addStatements": [
+          {}
+        ]
+      }
+    },
+    {
+      "type": "aws:cdk:analytics:method",
+      "data": {
+        "addStatements": [
+          {}
+        ]
+      }
+    },
+    {
+      "type": "aws:cdk:analytics:method",
+      "data": {
+        "addStatements": [
+          {}
+        ]
+      }
+    },
+    {
+      "type": "aws:cdk:analytics:method",
+      "data": {
+        "addStatements": [
+          {}
+        ]
+      }
+    },
+    {
+      "type": "aws:cdk:analytics:method",
+      "data": {
+        "addStatements": [
+          {}
+        ]
+      }
+    },
+    {
+      "type": "aws:cdk:analytics:method",
+      "data": {
+        "addStatements": [
+          {}
+        ]
+      }
+    }
+  ],
+  "/CrmDevStack/ApiService/TaskCount/Target": [
+    {
+      "type": "aws:cdk:analytics:construct",
+      "data": {
+        "serviceNamespace": "ecs",
+        "scalableDimension": "*",
+        "resourceId": "*",
+        "role": "*",
+        "minCapacity": "*",
+        "maxCapacity": "*"
+      }
+    },
+    {
+      "type": "aws:cdk:analytics:method",
+      "data": {
+        "scaleToTrackMetric": [
+          "*",
+          {
+            "predefinedMetric": "*",
+            "policyName": "*",
+            "disableScaleIn": "*",
+            "targetValue": "*",
+            "scaleInCooldown": "*"
+          }
+        ]
+      }
+    }
+  ],
+  "/CrmDevStack/WebTaskDef/TaskRole/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "WebTaskDefTaskRole73B79392"
+    }
+  ],
+  "/CrmDevStack/WebTaskDef/web/LogGroup": [
+    {
+      "type": "aws:cdk:analytics:construct",
+      "data": {
+        "retention": 30
+      }
+    }
+  ],
+  "/CrmDevStack/WebTaskDef/ExecutionRole/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "WebTaskDefExecutionRoleA6D04B61"
+    }
+  ],
+  "/CrmDevStack/WebTaskDef/ExecutionRole/DefaultPolicy": [
+    {
+      "type": "aws:cdk:analytics:construct",
+      "data": "*"
+    },
+    {
+      "type": "aws:cdk:analytics:method",
+      "data": {
+        "attachToRole": [
+          "*"
+        ]
+      }
+    },
+    {
+      "type": "aws:cdk:analytics:method",
+      "data": {
+        "attachToRole": [
+          "*"
+        ]
+      }
+    },
+    {
+      "type": "aws:cdk:analytics:method",
+      "data": {
+        "addStatements": [
+          {}
+        ]
+      }
+    },
+    {
+      "type": "aws:cdk:analytics:method",
+      "data": {
+        "addStatements": [
+          {}
+        ]
+      }
+    },
+    {
+      "type": "aws:cdk:analytics:method",
+      "data": {
+        "addStatements": [
+          {}
+        ]
+      }
+    }
+  ],
+  "/CrmDevStack/MigrateTaskDef/TaskRole/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "MigrateTaskDefTaskRole6B6B04B0"
+    }
+  ],
+  "/CrmDevStack/MigrateTaskDef/TaskRole/DefaultPolicy": [
+    {
+      "type": "aws:cdk:analytics:construct",
+      "data": "*"
+    },
+    {
+      "type": "aws:cdk:analytics:method",
+      "data": {
+        "attachToRole": [
+          "*"
+        ]
+      }
+    },
+    {
+      "type": "aws:cdk:analytics:method",
+      "data": {
+        "attachToRole": [
+          "*"
+        ]
+      }
+    },
+    {
+      "type": "aws:cdk:analytics:method",
+      "data": {
+        "addStatements": [
+          {}
+        ]
+      }
+    }
+  ],
+  "/CrmDevStack/MigrateTaskDef/migrate/LogGroup": [
+    {
+      "type": "aws:cdk:analytics:construct",
+      "data": {
+        "retention": 7
+      }
+    }
+  ],
+  "/CrmDevStack/MigrateTaskDef/ExecutionRole/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "MigrateTaskDefExecutionRoleAF88259F"
+    }
+  ],
+  "/CrmDevStack/MigrateTaskDef/ExecutionRole/DefaultPolicy": [
+    {
+      "type": "aws:cdk:analytics:construct",
+      "data": "*"
+    },
+    {
+      "type": "aws:cdk:analytics:method",
+      "data": {
+        "attachToRole": [
+          "*"
+        ]
+      }
+    },
+    {
+      "type": "aws:cdk:analytics:method",
+      "data": {
+        "attachToRole": [
+          "*"
+        ]
+      }
+    },
+    {
+      "type": "aws:cdk:analytics:method",
+      "data": {
+        "addStatements": [
+          {}
+        ]
+      }
+    },
+    {
+      "type": "aws:cdk:analytics:method",
+      "data": {
+        "addStatements": [
+          {}
+        ]
+      }
+    },
+    {
+      "type": "aws:cdk:analytics:method",
+      "data": {
+        "addStatements": [
+          {}
+        ]
+      }
+    },
+    {
+      "type": "aws:cdk:analytics:method",
+      "data": {
+        "addStatements": [
+          {}
+        ]
+      }
+    },
+    {
+      "type": "aws:cdk:analytics:method",
+      "data": {
+        "addStatements": [
+          {}
+        ]
+      }
+    }
+  ],
+  "/CrmDevStack/CrmVpc/default/IAMRole/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "CrmVpcdefaultIAMRole4247BB69"
+    }
+  ],
+  "/CrmDevStack/CrmVpc/default/IAMRole/DefaultPolicy": [
+    {
+      "type": "aws:cdk:analytics:construct",
+      "data": "*"
+    },
+    {
+      "type": "aws:cdk:analytics:method",
+      "data": {
+        "attachToRole": [
+          "*"
+        ]
+      }
+    },
+    {
+      "type": "aws:cdk:analytics:method",
+      "data": {
+        "attachToRole": [
+          "*"
+        ]
+      }
+    },
+    {
+      "type": "aws:cdk:analytics:method",
+      "data": {
+        "addStatements": [
+          {}
+        ]
+      }
+    }
+  ],
+  "/CrmDevStack/CrmVpc/default/LogGroup/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "CrmVpcdefaultLogGroup4BD46EB3"
+    }
+  ],
+  "/CrmDevStack/CrmAlb/HttpListener/ApiTargetGroup/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "CrmAlbHttpListenerApiTargetGroup149FE0B4"
+    }
+  ],
+  "/CrmDevStack/CrmAlb/HttpListener/ApiTargetRule/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "CrmAlbHttpListenerApiTargetRule269C5FD0"
+    }
+  ],
+  "/CrmDevStack/CrmAlb/HttpListener/WebTargetGroup/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "CrmAlbHttpListenerWebTargetGroup80B20251"
+    }
+  ],
+  "/CrmDevStack/CrmAlb/HttpListener/WebTargetRule/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "CrmAlbHttpListenerWebTargetRule2528F907"
+    }
+  ],
+  "/CrmDevStack/ApiTaskDef/TaskRole/DefaultPolicy/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "ApiTaskDefTaskRoleDefaultPolicy66F6BAC0"
+    }
+  ],
+  "/CrmDevStack/ApiTaskDef/api/LogGroup/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "ApiTaskDefapiLogGroup9FDF1262"
+    }
+  ],
+  "/CrmDevStack/ApiTaskDef/ExecutionRole/DefaultPolicy/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "ApiTaskDefExecutionRoleDefaultPolicy358EAD94"
+    }
+  ],
+  "/CrmDevStack/ApiService/TaskCount/Target/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "ApiServiceTaskCountTargetBFC64025"
+    }
+  ],
+  "/CrmDevStack/WebTaskDef/web/LogGroup/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "WebTaskDefwebLogGroup2BF12288"
+    }
+  ],
+  "/CrmDevStack/WebTaskDef/ExecutionRole/DefaultPolicy/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "WebTaskDefExecutionRoleDefaultPolicyABD5D4E0"
+    }
+  ],
+  "/CrmDevStack/MigrateTaskDef/TaskRole/DefaultPolicy/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "MigrateTaskDefTaskRoleDefaultPolicy4F587FCF"
+    }
+  ],
+  "/CrmDevStack/MigrateTaskDef/migrate/LogGroup/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "MigrateTaskDefmigrateLogGroup13CD1321"
+    }
+  ],
+  "/CrmDevStack/MigrateTaskDef/ExecutionRole/DefaultPolicy/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "MigrateTaskDefExecutionRoleDefaultPolicyA34C58EF"
+    }
+  ],
+  "/CrmDevStack/CrmVpc/default/IAMRole/DefaultPolicy/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "CrmVpcdefaultIAMRoleDefaultPolicy66F0C171"
+    }
+  ],
+  "/CrmDevStack/ApiService/TaskCount/Target/ApiCpuScaling/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "ApiServiceTaskCountTargetApiCpuScaling8D795804"
+    }
+  ]
+}

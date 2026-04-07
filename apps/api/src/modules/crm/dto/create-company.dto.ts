@@ -81,4 +81,9 @@ export class CreateCompanyDto {
   @IsOptional()
   @IsObject()
   customProps?: Record<string, any>;
+
+  @ApiPropertyOptional({ description: 'Lifecycle stage' })
+  @IsOptional()
+  @IsString()
+  lifecycleStage?: string;
 }

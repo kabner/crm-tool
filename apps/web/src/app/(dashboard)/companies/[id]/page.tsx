@@ -1,14 +1,13 @@
-"use client";
+'use client';
 
-import { useState, useCallback } from "react";
-import { useParams, useRouter } from "next/navigation";
-import Link from "next/link";
-import { format } from "date-fns";
+import { useState, useMemo, useCallback } from 'react';
+import { useParams, useRouter } from 'next/navigation';
+import Link from 'next/link';
+import { format } from 'date-fns';
 import {
   ArrowLeft,
   Building2,
   Globe,
-  Phone,
   MapPin,
   Pencil,
   Trash2,
@@ -16,17 +15,19 @@ import {
   Plus,
   Search,
   X,
-} from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+} from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Skeleton } from "@/components/ui/skeleton";
+} from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Skeleton } from '@/components/ui/skeleton';
+import { PhoneDisplay } from '@/components/ui/phone-display';
+import { FavoriteButton } from '@/components/favorite-button';
 import {
   useCompany,
   useCompanyContacts,
@@ -34,9 +35,23 @@ import {
   useDeleteCompany,
   useAddContactToCompany,
   useRemoveContactFromCompany,
-} from "@/hooks/use-companies";
-import { useContacts } from "@/hooks/use-contacts";
-import { CompanyForm, type CompanyFormValues } from "../components/company-form";
+} from '@/hooks/use-companies';
+import { useContacts } from '@/hooks/use-contacts';
+import { useFavorites, useToggleFavorite } from '@/hooks/use-favorites';
+import { CompanyForm, type CompanyFormValues } from '../components/company-form';
+
+const LIFECYCLE_STAGE_VARIANT: Record<
+  string,
+  'default' | 'secondary' | 'outline' | 'destructive'
+> = {
+  subscriber: 'outline',
+  lead: 'secondary',
+  mql: 'secondary',
+  sql: 'default',
+  opportunity: 'default',
+  customer: 'default',
+  evangelist: 'default',
+};
 
 export default function CompanyDetailPage() {
   const params = useParams();
@@ -45,8 +60,8 @@ export default function CompanyDetailPage() {
 
   const [isEditing, setIsEditing] = useState(false);
   const [showAddContact, setShowAddContact] = useState(false);
-  const [contactSearch, setContactSearch] = useState("");
-  const [debouncedContactSearch, setDebouncedContactSearch] = useState("");
+  const [contactSearch, setContactSearch] = useState('');
+  const [debouncedContactSearch, setDebouncedContactSearch] = useState('');
 
   const { data: company, isLoading } = useCompany(id);
   const { data: contacts, isLoading: contactsLoading } =
@@ -55,6 +70,8 @@ export default function CompanyDetailPage() {
   const deleteCompany = useDeleteCompany();
   const addContact = useAddContactToCompany();
   const removeContact = useRemoveContactFromCompany();
+  const { data: favorites } = useFavorites('company');
+  const toggleFavorite = useToggleFavorite();
 
   const { data: searchResults } = useContacts({
     search: debouncedContactSearch || undefined,
@@ -62,6 +79,15 @@ export default function CompanyDetailPage() {
   });
 
   const [debounceTimer] = useState<{ current: ReturnType<typeof setTimeout> | null }>({ current: null });
+
+  const favoriteIds = useMemo(() => {
+    if (!favorites) return new Set<string>();
+    return new Set(favorites.map((f) => f.entityId));
+  }, [favorites]);
+
+  const handleToggleFavorite = useCallback(() => {
+    toggleFavorite.mutate({ entityType: 'company', entityId: id });
+  }, [toggleFavorite, id]);
 
   const handleContactSearchChange = useCallback(
     (value: string) => {
@@ -77,12 +103,12 @@ export default function CompanyDetailPage() {
   const handleAddContact = async (contactId: string) => {
     await addContact.mutateAsync({ companyId: id, contactId });
     setShowAddContact(false);
-    setContactSearch("");
-    setDebouncedContactSearch("");
+    setContactSearch('');
+    setDebouncedContactSearch('');
   };
 
   const handleRemoveContact = async (contactId: string) => {
-    if (!confirm("Remove this contact from the company?")) return;
+    if (!confirm('Remove this contact from the company?')) return;
     await removeContact.mutateAsync({ companyId: id, contactId });
   };
 
@@ -94,20 +120,44 @@ export default function CompanyDetailPage() {
   };
 
   const handleDelete = async () => {
-    if (!confirm("Are you sure you want to delete this company?")) return;
+    if (!confirm('Are you sure you want to delete this company?')) return;
     await deleteCompany.mutateAsync(id);
-    router.push("/companies");
+    router.push('/companies');
   };
 
   if (isLoading) {
     return (
       <div className="space-y-6">
-        <Skeleton className="h-8 w-48" />
-        <div className="grid gap-6 lg:grid-cols-3">
+        <div className="flex items-center gap-4">
+          <Skeleton className="h-10 w-10" />
+          <Skeleton className="h-8 w-48" />
+        </div>
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
           <div className="lg:col-span-2">
-            <Skeleton className="h-64 w-full rounded-lg" />
+            <Card>
+              <CardHeader>
+                <Skeleton className="h-6 w-32" />
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {Array.from({ length: 6 }).map((_, i) => (
+                  <div key={i} className="space-y-1">
+                    <Skeleton className="h-4 w-20" />
+                    <Skeleton className="h-4 w-48" />
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
           </div>
-          <Skeleton className="h-64 w-full rounded-lg" />
+          <div>
+            <Card>
+              <CardHeader>
+                <Skeleton className="h-6 w-24" />
+              </CardHeader>
+              <CardContent>
+                <Skeleton className="h-4 w-32" />
+              </CardContent>
+            </Card>
+          </div>
         </div>
       </div>
     );
@@ -115,15 +165,12 @@ export default function CompanyDetailPage() {
 
   if (!company) {
     return (
-      <div className="space-y-4">
-        <Link
-          href="/companies"
-          className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground"
-        >
-          <ArrowLeft className="mr-1 h-4 w-4" />
-          Back to companies
-        </Link>
-        <p>Company not found.</p>
+      <div className="space-y-6">
+        <Button variant="ghost" onClick={() => router.push('/companies')}>
+          <ArrowLeft className="mr-2 h-4 w-4" />
+          Back to Companies
+        </Button>
+        <p className="text-muted-foreground">Company not found.</p>
       </div>
     );
   }
@@ -132,31 +179,37 @@ export default function CompanyDetailPage() {
   const formattedAddress = address
     ? [address.street, address.city, address.state, address.zip, address.country]
         .filter(Boolean)
-        .join(", ")
+        .join(', ')
     : null;
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <Link
-            href="/companies"
-            className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground"
-          >
-            <ArrowLeft className="mr-1 h-4 w-4" />
-            Back to companies
-          </Link>
+          <Button variant="ghost" size="icon" onClick={() => router.push('/companies')}>
+            <ArrowLeft className="h-4 w-4" />
+          </Button>
+          <h1 className="text-3xl font-bold tracking-tight">{company.name}</h1>
+          <FavoriteButton
+            isFavorite={favoriteIds.has(id)}
+            onToggle={handleToggleFavorite}
+          />
         </div>
-        <div className="flex gap-2">
+        <div className="flex items-center gap-2">
           <Button
             variant="outline"
             size="sm"
             onClick={() => setIsEditing(!isEditing)}
           >
             <Pencil className="mr-2 h-4 w-4" />
-            {isEditing ? "Cancel" : "Edit"}
+            {isEditing ? 'Cancel' : 'Edit'}
           </Button>
-          <Button variant="destructive" size="sm" onClick={handleDelete}>
+          <Button
+            variant="destructive"
+            size="sm"
+            onClick={handleDelete}
+            disabled={deleteCompany.isPending}
+          >
             <Trash2 className="mr-2 h-4 w-4" />
             Delete
           </Button>
@@ -172,15 +225,17 @@ export default function CompanyDetailPage() {
             <CompanyForm
               defaultValues={{
                 name: company.name,
-                domain: company.domain ?? "",
-                industry: company.industry ?? "",
-                size: company.size ?? "",
-                phone: company.phone ?? "",
+                domain: company.domain ?? '',
+                industry: company.industry ?? '',
+                size: company.size ?? '',
+                phone: company.phone ?? '',
+                lifecycleStage: company.lifecycleStage ?? '',
                 address: company.address ?? undefined,
               }}
               onSubmit={handleUpdate}
               isSubmitting={updateCompany.isPending}
               submitLabel="Update Company"
+              onCancel={() => setIsEditing(false)}
             />
           </CardContent>
         </Card>
@@ -203,59 +258,124 @@ export default function CompanyDetailPage() {
                 </div>
               </div>
             </CardHeader>
-            <CardContent className="space-y-4">
-              {company.domain && (
-                <div className="flex items-center gap-2 text-sm">
-                  <Globe className="h-4 w-4 text-muted-foreground" />
-                  <a
-                    href={`https://${company.domain}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-primary hover:underline"
-                  >
-                    {company.domain}
-                  </a>
-                </div>
-              )}
+            <CardContent>
+              <dl className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                {company.domain && (
+                  <div>
+                    <dt className="text-sm font-medium text-muted-foreground">
+                      Domain
+                    </dt>
+                    <dd className="mt-1 flex items-center gap-2 text-sm">
+                      <Globe className="h-4 w-4 text-muted-foreground" />
+                      <a
+                        href={`https://${company.domain}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-primary hover:underline"
+                      >
+                        {company.domain}
+                      </a>
+                    </dd>
+                  </div>
+                )}
 
-              {company.phone && (
-                <div className="flex items-center gap-2 text-sm">
-                  <Phone className="h-4 w-4 text-muted-foreground" />
-                  <span>{company.phone}</span>
+                <div>
+                  <dt className="text-sm font-medium text-muted-foreground">
+                    Phone
+                  </dt>
+                  <dd className="mt-1 text-sm">
+                    <PhoneDisplay phone={company.phone} />
+                  </dd>
                 </div>
-              )}
 
-              {formattedAddress && (
-                <div className="flex items-center gap-2 text-sm">
-                  <MapPin className="h-4 w-4 text-muted-foreground" />
-                  <span>{formattedAddress}</span>
+                {formattedAddress && (
+                  <div>
+                    <dt className="text-sm font-medium text-muted-foreground">
+                      Address
+                    </dt>
+                    <dd className="mt-1 flex items-center gap-2 text-sm">
+                      <MapPin className="h-4 w-4 text-muted-foreground" />
+                      <span>{formattedAddress}</span>
+                    </dd>
+                  </div>
+                )}
+
+                {company.size && (
+                  <div>
+                    <dt className="text-sm font-medium text-muted-foreground">
+                      Size
+                    </dt>
+                    <dd className="mt-1 flex items-center gap-2 text-sm">
+                      <Users className="h-4 w-4 text-muted-foreground" />
+                      <span>{company.size} employees</span>
+                    </dd>
+                  </div>
+                )}
+
+                <div>
+                  <dt className="text-sm font-medium text-muted-foreground">
+                    Lifecycle Stage
+                  </dt>
+                  <dd className="mt-1">
+                    {company.lifecycleStage ? (
+                      <Badge
+                        variant={
+                          LIFECYCLE_STAGE_VARIANT[company.lifecycleStage] ?? 'outline'
+                        }
+                      >
+                        {company.lifecycleStage}
+                      </Badge>
+                    ) : (
+                      <span className="text-sm text-muted-foreground">-</span>
+                    )}
+                  </dd>
                 </div>
-              )}
 
-              {company.size && (
-                <div className="flex items-center gap-2 text-sm">
-                  <Users className="h-4 w-4 text-muted-foreground" />
-                  <span>{company.size} employees</span>
+                <div>
+                  <dt className="text-sm font-medium text-muted-foreground">
+                    Created By
+                  </dt>
+                  <dd className="mt-1 text-sm">
+                    {company.createdBy
+                      ? `${company.createdBy.firstName} ${company.createdBy.lastName}`
+                      : 'System'}
+                  </dd>
                 </div>
-              )}
 
-              {company.parent && (
-                <div className="text-sm">
-                  <span className="text-muted-foreground">Parent company: </span>
-                  <Link
-                    href={`/companies/${company.parent.id}`}
-                    className="text-primary hover:underline"
-                  >
-                    {company.parent.name}
-                  </Link>
+                {company.parent && (
+                  <div>
+                    <dt className="text-sm font-medium text-muted-foreground">
+                      Parent Company
+                    </dt>
+                    <dd className="mt-1 text-sm">
+                      <Link
+                        href={`/companies/${company.parent.id}`}
+                        className="text-primary hover:underline"
+                      >
+                        {company.parent.name}
+                      </Link>
+                    </dd>
+                  </div>
+                )}
+
+                <div>
+                  <dt className="text-sm font-medium text-muted-foreground">
+                    Created
+                  </dt>
+                  <dd className="mt-1 text-sm">
+                    {format(new Date(company.createdAt), 'MMM d, yyyy')}
+                  </dd>
                 </div>
-              )}
 
-              <div className="pt-2 text-xs text-muted-foreground">
-                Created {format(new Date(company.createdAt), "MMM d, yyyy")}
-                {" / "}
-                Updated {format(new Date(company.updatedAt), "MMM d, yyyy")}
-              </div>
+                <div>
+                  <dt className="text-sm font-medium text-muted-foreground">
+                    Updated
+                  </dt>
+                  <dd className="mt-1 text-sm">
+                    {format(new Date(company.updatedAt), 'MMM d, yyyy')}
+                  </dd>
+                </div>
+              </dl>
             </CardContent>
           </Card>
 

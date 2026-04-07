@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
+  Home,
   LayoutDashboard,
   Users,
   Building2,
@@ -30,7 +31,6 @@ import {
   Receipt,
   RefreshCw,
   DollarSign,
-  Target,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import * as Avatar from "@radix-ui/react-avatar";
@@ -49,6 +49,7 @@ const navSections: NavSection[] = [
   {
     section: "CRM",
     items: [
+      { label: "Home", href: "/home", icon: Home },
       { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
       { label: "Contacts", href: "/contacts", icon: Users },
       { label: "Companies", href: "/companies", icon: Building2 },
@@ -57,7 +58,7 @@ const navSections: NavSection[] = [
   {
     section: "Sales",
     items: [
-      { label: "Deals", href: "/deals", icon: Handshake },
+      { label: "Pipelines", href: "/deals", icon: Handshake },
       { label: "Sequences", href: "/sequences", icon: GitBranch },
       { label: "Lists", href: "/lists", icon: ListFilter },
     ],
@@ -104,8 +105,7 @@ const navSections: NavSection[] = [
   {
     section: "Settings",
     items: [
-      { label: "Integrations", href: "/settings/integrations", icon: Settings },
-      { label: "Lead Scoring", href: "/settings/lead-scoring", icon: Target },
+      { label: "Settings", href: "/settings", icon: Settings },
     ],
   },
 ];

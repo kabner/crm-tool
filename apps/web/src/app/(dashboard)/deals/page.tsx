@@ -10,13 +10,11 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import {
   useDeals,
-  useDefaultPipeline,
   usePipelines,
   usePipelineSummary,
   useCreateDeal,
   useMoveDealStage,
   useUpdateDeal,
-  type DealFilters,
 } from "@/hooks/use-deals";
 import { PipelineBoard } from "./components/pipeline-board";
 import { DealsTable } from "./components/deals-table";
@@ -64,21 +62,28 @@ export default function DealsPage() {
   const [filterCloseDateTo, setFilterCloseDateTo] = useState("");
 
   const { data: pipelines } = usePipelines();
-  const { data: defaultPipeline } = useDefaultPipeline();
   const createDeal = useCreateDeal();
 
-  // Set default pipeline on load
+  // Default to first real pipeline in board view
   useEffect(() => {
-    if (!selectedPipelineId && defaultPipeline) {
-      setSelectedPipelineId(defaultPipeline.id);
-    } else if (!selectedPipelineId && pipelines && pipelines.length > 0) {
-      const def = pipelines.find((p) => p.isDefault);
-      setSelectedPipelineId(def?.id ?? pipelines[0]!.id);
+    if (!selectedPipelineId && pipelines && pipelines.length > 0) {
+      const defaultPipeline = pipelines.find((p: any) => p.isDefault) ?? pipelines[0];
+      if (defaultPipeline) setSelectedPipelineId(defaultPipeline.id);
+      setViewMode("board");
     }
-  }, [defaultPipeline, pipelines, selectedPipelineId]);
+  }, [selectedPipelineId, pipelines]);
+
+  const isAllOpportunities = selectedPipelineId === "all";
+
+  // Force list view when "All Opportunities" is selected
+  useEffect(() => {
+    if (isAllOpportunities && viewMode === "board") {
+      setViewMode("list");
+    }
+  }, [isAllOpportunities, viewMode]);
 
   const { data: summary, isLoading: summaryLoading } =
-    usePipelineSummary(selectedPipelineId);
+    usePipelineSummary(isAllOpportunities ? "" : selectedPipelineId);
 
   const hasActiveFilters = !!(filterOwner || filterMinAmount || filterMaxAmount || filterCloseDateFrom || filterCloseDateTo);
 
@@ -94,7 +99,7 @@ export default function DealsPage() {
     page,
     limit: 20,
     search: debouncedSearch || undefined,
-    pipelineId: selectedPipelineId || undefined,
+    pipelineId: isAllOpportunities ? undefined : selectedPipelineId || undefined,
     ownerId: filterOwner === "mine" ? "me" : undefined,
     minAmount: filterMinAmount ? Number(filterMinAmount) : undefined,
     maxAmount: filterMaxAmount ? Number(filterMaxAmount) : undefined,
@@ -167,23 +172,25 @@ export default function DealsPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Deals</h1>
+          <h1 className="text-3xl font-bold tracking-tight">Pipelines</h1>
           <p className="text-muted-foreground">
-            Track and manage your sales pipeline.
+            Track and manage your sales pipelines.
           </p>
         </div>
         <div className="flex items-center gap-3">
           {/* View mode toggle */}
           <div className="flex rounded-md border border-border">
             <button
-              onClick={() => setViewMode("board")}
+              onClick={() => !isAllOpportunities && setViewMode("board")}
               className={cn(
                 "flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium transition-colors",
                 viewMode === "board"
                   ? "bg-primary text-primary-foreground"
                   : "text-muted-foreground hover:text-foreground hover:bg-muted",
+                isAllOpportunities && "opacity-50 cursor-not-allowed",
                 "rounded-l-md",
               )}
+              title={isAllOpportunities ? "Board view is not available for All Opportunities" : undefined}
             >
               <LayoutGrid className="h-4 w-4" />
               Board
@@ -209,17 +216,24 @@ export default function DealsPage() {
         </div>
       </div>
 
-      {/* Pipeline selector (if multiple) */}
-      {pipelines && pipelines.length > 1 && (
+      {/* Pipeline selector */}
+      {pipelines && (
         <div className="flex items-center gap-2">
           <label className="text-sm font-medium text-muted-foreground">
             Pipeline:
           </label>
           <select
             value={selectedPipelineId}
-            onChange={(e) => setSelectedPipelineId(e.target.value)}
+            onChange={(e) => {
+              const value = e.target.value;
+              setSelectedPipelineId(value);
+              if (value === "all") {
+                setViewMode("list");
+              }
+            }}
             className="flex h-9 rounded-md border border-input bg-background px-3 py-1 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
           >
+            <option value="all">All Opportunities</option>
             {pipelines.map((pipeline) => (
               <option key={pipeline.id} value={pipeline.id}>
                 {pipeline.name}
@@ -319,7 +333,7 @@ export default function DealsPage() {
       )}
 
       {/* Pipeline summary */}
-      {selectedPipelineId && (
+      {selectedPipelineId && !isAllOpportunities && (
         <div className="grid grid-cols-3 gap-4">
           <Card>
             <CardContent className="p-4">
@@ -388,7 +402,7 @@ export default function DealsPage() {
 
       {/* Content */}
       {viewMode === "board" ? (
-        selectedPipelineId ? (
+        selectedPipelineId && !isAllOpportunities ? (
           <PipelineBoard
             pipelineId={selectedPipelineId}
             onDealClick={handleDealClick}

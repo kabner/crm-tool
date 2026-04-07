@@ -2,6 +2,7 @@ import {
   IsString,
   IsEmail,
   IsOptional,
+  IsNotEmpty,
   IsArray,
   IsObject,
   IsUUID,
@@ -32,10 +33,10 @@ export class CreateContactDto {
   @IsOptional()
   jobTitle?: string;
 
-  @ApiPropertyOptional({ description: 'Lifecycle stage', default: 'lead' })
-  @IsString()
-  @IsOptional()
-  lifecycleStage?: string;
+  @ApiProperty({ description: 'Primary company ID' })
+  @IsUUID()
+  @IsNotEmpty()
+  companyId: string;
 
   @ApiPropertyOptional({ description: 'Lead status' })
   @IsString()

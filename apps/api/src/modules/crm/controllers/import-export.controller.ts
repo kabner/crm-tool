@@ -104,7 +104,7 @@ export class ImportExportController {
   @ApiResponse({ status: 200, description: 'Import results' })
   async importContacts(
     @CurrentUser('tenantId') tenantId: string,
-    @CurrentUser('id') userId: string,
+    @CurrentUser('userId') userId: string,
     @UploadedFile() file: Express.Multer.File,
     @Body()
     body: {
