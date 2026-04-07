@@ -68,7 +68,7 @@ export function EmojiReactions({ reactions, onToggle }: EmojiReactionsProps) {
         </button>
 
         {showPicker && (
-          <div className="absolute bottom-8 left-0 z-50 grid grid-cols-8 gap-1 rounded-lg border border-border bg-popover p-2 shadow-lg">
+          <div className="absolute bottom-8 left-0 z-50 grid w-[280px] grid-cols-6 gap-1 rounded-lg border border-border bg-popover p-3 shadow-lg">
             {ALL_EMOJIS.map((emoji) => (
               <button
                 key={emoji}
@@ -76,7 +76,7 @@ export function EmojiReactions({ reactions, onToggle }: EmojiReactionsProps) {
                   onToggle(emoji);
                   setShowPicker(false);
                 }}
-                className="flex h-8 w-8 items-center justify-center rounded-md text-base transition-colors hover:bg-muted"
+                className="flex h-9 w-9 items-center justify-center rounded-md text-lg transition-colors hover:bg-muted"
               >
                 {emoji}
               </button>
