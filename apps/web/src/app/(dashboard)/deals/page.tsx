@@ -67,8 +67,8 @@ export default function DealsPage() {
   // Default to first real pipeline in board view
   useEffect(() => {
     if (!selectedPipelineId && pipelines && pipelines.length > 0) {
-      const defaultPipeline = pipelines.find((p: any) => p.isDefault) || pipelines[0];
-      setSelectedPipelineId(defaultPipeline.id);
+      const defaultPipeline = pipelines.find((p: any) => p.isDefault) ?? pipelines[0];
+      if (defaultPipeline) setSelectedPipelineId(defaultPipeline.id);
       setViewMode("board");
     }
   }, [selectedPipelineId, pipelines]);
