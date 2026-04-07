@@ -30,7 +30,7 @@ export class UserSettingsController {
   @ApiParam({ name: 'section', type: 'string' })
   @ApiResponse({ status: 200, description: 'Settings object' })
   get(
-    @CurrentUser('id') userId: string,
+    @CurrentUser('userId') userId: string,
     @Param('section') section: string,
   ) {
     return this.userSettingsService.get(userId, section);
@@ -42,7 +42,7 @@ export class UserSettingsController {
   @ApiResponse({ status: 200, description: 'Settings saved' })
   upsert(
     @CurrentUser('tenantId') tenantId: string,
-    @CurrentUser('id') userId: string,
+    @CurrentUser('userId') userId: string,
     @Param('section') section: string,
     @Body() dto: UpsertUserSettingDto,
   ) {

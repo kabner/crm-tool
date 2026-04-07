@@ -29,7 +29,7 @@ export class FavoritesController {
   @ApiResponse({ status: 201, description: 'Favorite toggled' })
   toggle(
     @CurrentUser('tenantId') tenantId: string,
-    @CurrentUser('id') userId: string,
+    @CurrentUser('userId') userId: string,
     @Body() dto: CreateFavoriteDto,
   ) {
     return this.favoritesService.toggle(tenantId, userId, dto.entityType, dto.entityId);
@@ -40,7 +40,7 @@ export class FavoritesController {
   @ApiResponse({ status: 200, description: 'List of favorites' })
   findAll(
     @CurrentUser('tenantId') tenantId: string,
-    @CurrentUser('id') userId: string,
+    @CurrentUser('userId') userId: string,
     @Query('entityType') entityType?: string,
   ) {
     return this.favoritesService.findAll(tenantId, userId, entityType);

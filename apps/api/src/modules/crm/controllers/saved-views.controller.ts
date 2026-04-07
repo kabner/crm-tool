@@ -43,7 +43,7 @@ export class SavedViewsController {
   @ApiResponse({ status: 200, description: 'List of saved views' })
   async findAll(
     @CurrentUser('tenantId') tenantId: string,
-    @CurrentUser('id') userId: string,
+    @CurrentUser('userId') userId: string,
     @Query('objectType') objectType: string,
   ) {
     return this.savedViewsService.findAll(tenantId, userId, objectType);
@@ -66,7 +66,7 @@ export class SavedViewsController {
   @ApiResponse({ status: 201, description: 'View created' })
   async create(
     @CurrentUser('tenantId') tenantId: string,
-    @CurrentUser('id') userId: string,
+    @CurrentUser('userId') userId: string,
     @Body() dto: CreateSavedViewDto,
   ) {
     return this.savedViewsService.create(tenantId, userId, dto);
@@ -79,7 +79,7 @@ export class SavedViewsController {
   @ApiResponse({ status: 404, description: 'View not found' })
   async update(
     @CurrentUser('tenantId') tenantId: string,
-    @CurrentUser('id') userId: string,
+    @CurrentUser('userId') userId: string,
     @Param('id', ParseUUIDPipe) id: string,
     @Body() dto: UpdateSavedViewDto,
   ) {
@@ -94,7 +94,7 @@ export class SavedViewsController {
   @ApiResponse({ status: 404, description: 'View not found' })
   async remove(
     @CurrentUser('tenantId') tenantId: string,
-    @CurrentUser('id') userId: string,
+    @CurrentUser('userId') userId: string,
     @Param('id', ParseUUIDPipe) id: string,
   ) {
     return this.savedViewsService.remove(tenantId, userId, id);
@@ -107,7 +107,7 @@ export class SavedViewsController {
   @ApiResponse({ status: 404, description: 'View not found' })
   async setDefault(
     @CurrentUser('tenantId') tenantId: string,
-    @CurrentUser('id') userId: string,
+    @CurrentUser('userId') userId: string,
     @Param('id', ParseUUIDPipe) id: string,
     @Body('objectType') objectType: string,
   ) {

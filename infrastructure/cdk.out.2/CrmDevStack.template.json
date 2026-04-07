@@ -1,0 +1,2799 @@
+{
+ "Resources": {
+  "CrmVpcC63CEBEA": {
+   "Type": "AWS::EC2::VPC",
+   "Properties": {
+    "CidrBlock": "10.1.0.0/16",
+    "EnableDnsHostnames": true,
+    "EnableDnsSupport": true,
+    "InstanceTenancy": "default",
+    "Tags": [
+     {
+      "Key": "Name",
+      "Value": "CrmDevStack/CrmVpc"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "CrmDevStack/CrmVpc/Resource"
+   }
+  },
+  "CrmVpcPublicSubnet1Subnet098180E4": {
+   "Type": "AWS::EC2::Subnet",
+   "Properties": {
+    "AvailabilityZone": "us-east-1a",
+    "CidrBlock": "10.1.0.0/24",
+    "MapPublicIpOnLaunch": true,
+    "Tags": [
+     {
+      "Key": "aws-cdk:subnet-name",
+      "Value": "Public"
+     },
+     {
+      "Key": "aws-cdk:subnet-type",
+      "Value": "Public"
+     },
+     {
+      "Key": "Name",
+      "Value": "CrmDevStack/CrmVpc/PublicSubnet1"
+     }
+    ],
+    "VpcId": {
+     "Ref": "CrmVpcC63CEBEA"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "CrmDevStack/CrmVpc/PublicSubnet1/Subnet"
+   }
+  },
+  "CrmVpcPublicSubnet1RouteTableE4CF5A1E": {
+   "Type": "AWS::EC2::RouteTable",
+   "Properties": {
+    "Tags": [
+     {
+      "Key": "Name",
+      "Value": "CrmDevStack/CrmVpc/PublicSubnet1"
+     }
+    ],
+    "VpcId": {
+     "Ref": "CrmVpcC63CEBEA"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "CrmDevStack/CrmVpc/PublicSubnet1/RouteTable"
+   }
+  },
+  "CrmVpcPublicSubnet1RouteTableAssociation7004AC8B": {
+   "Type": "AWS::EC2::SubnetRouteTableAssociation",
+   "Properties": {
+    "RouteTableId": {
+     "Ref": "CrmVpcPublicSubnet1RouteTableE4CF5A1E"
+    },
+    "SubnetId": {
+     "Ref": "CrmVpcPublicSubnet1Subnet098180E4"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "CrmDevStack/CrmVpc/PublicSubnet1/RouteTableAssociation"
+   }
+  },
+  "CrmVpcPublicSubnet1DefaultRoute01E75892": {
+   "Type": "AWS::EC2::Route",
+   "Properties": {
+    "DestinationCidrBlock": "0.0.0.0/0",
+    "GatewayId": {
+     "Ref": "CrmVpcIGW5312D5A6"
+    },
+    "RouteTableId": {
+     "Ref": "CrmVpcPublicSubnet1RouteTableE4CF5A1E"
+    }
+   },
+   "DependsOn": [
+    "CrmVpcVPCGWC4D01F21"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "CrmDevStack/CrmVpc/PublicSubnet1/DefaultRoute"
+   }
+  },
+  "CrmVpcPublicSubnet1EIP1C42109B": {
+   "Type": "AWS::EC2::EIP",
+   "Properties": {
+    "Domain": "vpc",
+    "Tags": [
+     {
+      "Key": "Name",
+      "Value": "CrmDevStack/CrmVpc/PublicSubnet1"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "CrmDevStack/CrmVpc/PublicSubnet1/EIP"
+   }
+  },
+  "CrmVpcPublicSubnet1NATGateway27FA599D": {
+   "Type": "AWS::EC2::NatGateway",
+   "Properties": {
+    "AllocationId": {
+     "Fn::GetAtt": [
+      "CrmVpcPublicSubnet1EIP1C42109B",
+      "AllocationId"
+     ]
+    },
+    "SubnetId": {
+     "Ref": "CrmVpcPublicSubnet1Subnet098180E4"
+    },
+    "Tags": [
+     {
+      "Key": "Name",
+      "Value": "CrmDevStack/CrmVpc/PublicSubnet1"
+     }
+    ]
+   },
+   "DependsOn": [
+    "CrmVpcPublicSubnet1DefaultRoute01E75892",
+    "CrmVpcPublicSubnet1RouteTableAssociation7004AC8B"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "CrmDevStack/CrmVpc/PublicSubnet1/NATGateway"
+   }
+  },
+  "CrmVpcPublicSubnet2Subnet69FA8367": {
+   "Type": "AWS::EC2::Subnet",
+   "Properties": {
+    "AvailabilityZone": "us-east-1b",
+    "CidrBlock": "10.1.1.0/24",
+    "MapPublicIpOnLaunch": true,
+    "Tags": [
+     {
+      "Key": "aws-cdk:subnet-name",
+      "Value": "Public"
+     },
+     {
+      "Key": "aws-cdk:subnet-type",
+      "Value": "Public"
+     },
+     {
+      "Key": "Name",
+      "Value": "CrmDevStack/CrmVpc/PublicSubnet2"
+     }
+    ],
+    "VpcId": {
+     "Ref": "CrmVpcC63CEBEA"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "CrmDevStack/CrmVpc/PublicSubnet2/Subnet"
+   }
+  },
+  "CrmVpcPublicSubnet2RouteTableA278B63B": {
+   "Type": "AWS::EC2::RouteTable",
+   "Properties": {
+    "Tags": [
+     {
+      "Key": "Name",
+      "Value": "CrmDevStack/CrmVpc/PublicSubnet2"
+     }
+    ],
+    "VpcId": {
+     "Ref": "CrmVpcC63CEBEA"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "CrmDevStack/CrmVpc/PublicSubnet2/RouteTable"
+   }
+  },
+  "CrmVpcPublicSubnet2RouteTableAssociation36EAFE14": {
+   "Type": "AWS::EC2::SubnetRouteTableAssociation",
+   "Properties": {
+    "RouteTableId": {
+     "Ref": "CrmVpcPublicSubnet2RouteTableA278B63B"
+    },
+    "SubnetId": {
+     "Ref": "CrmVpcPublicSubnet2Subnet69FA8367"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "CrmDevStack/CrmVpc/PublicSubnet2/RouteTableAssociation"
+   }
+  },
+  "CrmVpcPublicSubnet2DefaultRoute6A7441E5": {
+   "Type": "AWS::EC2::Route",
+   "Properties": {
+    "DestinationCidrBlock": "0.0.0.0/0",
+    "GatewayId": {
+     "Ref": "CrmVpcIGW5312D5A6"
+    },
+    "RouteTableId": {
+     "Ref": "CrmVpcPublicSubnet2RouteTableA278B63B"
+    }
+   },
+   "DependsOn": [
+    "CrmVpcVPCGWC4D01F21"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "CrmDevStack/CrmVpc/PublicSubnet2/DefaultRoute"
+   }
+  },
+  "CrmVpcPrivateSubnet1SubnetEB7A324A": {
+   "Type": "AWS::EC2::Subnet",
+   "Properties": {
+    "AvailabilityZone": "us-east-1a",
+    "CidrBlock": "10.1.2.0/24",
+    "MapPublicIpOnLaunch": false,
+    "Tags": [
+     {
+      "Key": "aws-cdk:subnet-name",
+      "Value": "Private"
+     },
+     {
+      "Key": "aws-cdk:subnet-type",
+      "Value": "Private"
+     },
+     {
+      "Key": "Name",
+      "Value": "CrmDevStack/CrmVpc/PrivateSubnet1"
+     }
+    ],
+    "VpcId": {
+     "Ref": "CrmVpcC63CEBEA"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "CrmDevStack/CrmVpc/PrivateSubnet1/Subnet"
+   }
+  },
+  "CrmVpcPrivateSubnet1RouteTableC04730D8": {
+   "Type": "AWS::EC2::RouteTable",
+   "Properties": {
+    "Tags": [
+     {
+      "Key": "Name",
+      "Value": "CrmDevStack/CrmVpc/PrivateSubnet1"
+     }
+    ],
+    "VpcId": {
+     "Ref": "CrmVpcC63CEBEA"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "CrmDevStack/CrmVpc/PrivateSubnet1/RouteTable"
+   }
+  },
+  "CrmVpcPrivateSubnet1RouteTableAssociationE58B653D": {
+   "Type": "AWS::EC2::SubnetRouteTableAssociation",
+   "Properties": {
+    "RouteTableId": {
+     "Ref": "CrmVpcPrivateSubnet1RouteTableC04730D8"
+    },
+    "SubnetId": {
+     "Ref": "CrmVpcPrivateSubnet1SubnetEB7A324A"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "CrmDevStack/CrmVpc/PrivateSubnet1/RouteTableAssociation"
+   }
+  },
+  "CrmVpcPrivateSubnet1DefaultRoute2CA747F4": {
+   "Type": "AWS::EC2::Route",
+   "Properties": {
+    "DestinationCidrBlock": "0.0.0.0/0",
+    "NatGatewayId": {
+     "Ref": "CrmVpcPublicSubnet1NATGateway27FA599D"
+    },
+    "RouteTableId": {
+     "Ref": "CrmVpcPrivateSubnet1RouteTableC04730D8"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "CrmDevStack/CrmVpc/PrivateSubnet1/DefaultRoute"
+   }
+  },
+  "CrmVpcPrivateSubnet2SubnetD95E14B1": {
+   "Type": "AWS::EC2::Subnet",
+   "Properties": {
+    "AvailabilityZone": "us-east-1b",
+    "CidrBlock": "10.1.3.0/24",
+    "MapPublicIpOnLaunch": false,
+    "Tags": [
+     {
+      "Key": "aws-cdk:subnet-name",
+      "Value": "Private"
+     },
+     {
+      "Key": "aws-cdk:subnet-type",
+      "Value": "Private"
+     },
+     {
+      "Key": "Name",
+      "Value": "CrmDevStack/CrmVpc/PrivateSubnet2"
+     }
+    ],
+    "VpcId": {
+     "Ref": "CrmVpcC63CEBEA"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "CrmDevStack/CrmVpc/PrivateSubnet2/Subnet"
+   }
+  },
+  "CrmVpcPrivateSubnet2RouteTable1A4470AD": {
+   "Type": "AWS::EC2::RouteTable",
+   "Properties": {
+    "Tags": [
+     {
+      "Key": "Name",
+      "Value": "CrmDevStack/CrmVpc/PrivateSubnet2"
+     }
+    ],
+    "VpcId": {
+     "Ref": "CrmVpcC63CEBEA"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "CrmDevStack/CrmVpc/PrivateSubnet2/RouteTable"
+   }
+  },
+  "CrmVpcPrivateSubnet2RouteTableAssociationD24F2E47": {
+   "Type": "AWS::EC2::SubnetRouteTableAssociation",
+   "Properties": {
+    "RouteTableId": {
+     "Ref": "CrmVpcPrivateSubnet2RouteTable1A4470AD"
+    },
+    "SubnetId": {
+     "Ref": "CrmVpcPrivateSubnet2SubnetD95E14B1"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "CrmDevStack/CrmVpc/PrivateSubnet2/RouteTableAssociation"
+   }
+  },
+  "CrmVpcPrivateSubnet2DefaultRoute808AA382": {
+   "Type": "AWS::EC2::Route",
+   "Properties": {
+    "DestinationCidrBlock": "0.0.0.0/0",
+    "NatGatewayId": {
+     "Ref": "CrmVpcPublicSubnet1NATGateway27FA599D"
+    },
+    "RouteTableId": {
+     "Ref": "CrmVpcPrivateSubnet2RouteTable1A4470AD"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "CrmDevStack/CrmVpc/PrivateSubnet2/DefaultRoute"
+   }
+  },
+  "CrmVpcIsolatedSubnet1Subnet94FCE84E": {
+   "Type": "AWS::EC2::Subnet",
+   "Properties": {
+    "AvailabilityZone": "us-east-1a",
+    "CidrBlock": "10.1.4.0/24",
+    "MapPublicIpOnLaunch": false,
+    "Tags": [
+     {
+      "Key": "aws-cdk:subnet-name",
+      "Value": "Isolated"
+     },
+     {
+      "Key": "aws-cdk:subnet-type",
+      "Value": "Isolated"
+     },
+     {
+      "Key": "Name",
+      "Value": "CrmDevStack/CrmVpc/IsolatedSubnet1"
+     }
+    ],
+    "VpcId": {
+     "Ref": "CrmVpcC63CEBEA"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "CrmDevStack/CrmVpc/IsolatedSubnet1/Subnet"
+   }
+  },
+  "CrmVpcIsolatedSubnet1RouteTable46047026": {
+   "Type": "AWS::EC2::RouteTable",
+   "Properties": {
+    "Tags": [
+     {
+      "Key": "Name",
+      "Value": "CrmDevStack/CrmVpc/IsolatedSubnet1"
+     }
+    ],
+    "VpcId": {
+     "Ref": "CrmVpcC63CEBEA"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "CrmDevStack/CrmVpc/IsolatedSubnet1/RouteTable"
+   }
+  },
+  "CrmVpcIsolatedSubnet1RouteTableAssociationC140C10C": {
+   "Type": "AWS::EC2::SubnetRouteTableAssociation",
+   "Properties": {
+    "RouteTableId": {
+     "Ref": "CrmVpcIsolatedSubnet1RouteTable46047026"
+    },
+    "SubnetId": {
+     "Ref": "CrmVpcIsolatedSubnet1Subnet94FCE84E"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "CrmDevStack/CrmVpc/IsolatedSubnet1/RouteTableAssociation"
+   }
+  },
+  "CrmVpcIsolatedSubnet2SubnetE8205160": {
+   "Type": "AWS::EC2::Subnet",
+   "Properties": {
+    "AvailabilityZone": "us-east-1b",
+    "CidrBlock": "10.1.5.0/24",
+    "MapPublicIpOnLaunch": false,
+    "Tags": [
+     {
+      "Key": "aws-cdk:subnet-name",
+      "Value": "Isolated"
+     },
+     {
+      "Key": "aws-cdk:subnet-type",
+      "Value": "Isolated"
+     },
+     {
+      "Key": "Name",
+      "Value": "CrmDevStack/CrmVpc/IsolatedSubnet2"
+     }
+    ],
+    "VpcId": {
+     "Ref": "CrmVpcC63CEBEA"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "CrmDevStack/CrmVpc/IsolatedSubnet2/Subnet"
+   }
+  },
+  "CrmVpcIsolatedSubnet2RouteTable4AACFC75": {
+   "Type": "AWS::EC2::RouteTable",
+   "Properties": {
+    "Tags": [
+     {
+      "Key": "Name",
+      "Value": "CrmDevStack/CrmVpc/IsolatedSubnet2"
+     }
+    ],
+    "VpcId": {
+     "Ref": "CrmVpcC63CEBEA"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "CrmDevStack/CrmVpc/IsolatedSubnet2/RouteTable"
+   }
+  },
+  "CrmVpcIsolatedSubnet2RouteTableAssociationECDEB4E2": {
+   "Type": "AWS::EC2::SubnetRouteTableAssociation",
+   "Properties": {
+    "RouteTableId": {
+     "Ref": "CrmVpcIsolatedSubnet2RouteTable4AACFC75"
+    },
+    "SubnetId": {
+     "Ref": "CrmVpcIsolatedSubnet2SubnetE8205160"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "CrmDevStack/CrmVpc/IsolatedSubnet2/RouteTableAssociation"
+   }
+  },
+  "CrmVpcIGW5312D5A6": {
+   "Type": "AWS::EC2::InternetGateway",
+   "Properties": {
+    "Tags": [
+     {
+      "Key": "Name",
+      "Value": "CrmDevStack/CrmVpc"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "CrmDevStack/CrmVpc/IGW"
+   }
+  },
+  "CrmVpcVPCGWC4D01F21": {
+   "Type": "AWS::EC2::VPCGatewayAttachment",
+   "Properties": {
+    "InternetGatewayId": {
+     "Ref": "CrmVpcIGW5312D5A6"
+    },
+    "VpcId": {
+     "Ref": "CrmVpcC63CEBEA"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "CrmDevStack/CrmVpc/VPCGW"
+   }
+  },
+  "CrmVpcdefaultIAMRole4247BB69": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "vpc-flow-logs.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "Tags": [
+     {
+      "Key": "Name",
+      "Value": "CrmDevStack/CrmVpc/default"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "CrmDevStack/CrmVpc/default/IAMRole/Resource"
+   }
+  },
+  "CrmVpcdefaultIAMRoleDefaultPolicy66F0C171": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "logs:CreateLogStream",
+        "logs:DescribeLogStreams",
+        "logs:PutLogEvents"
+       ],
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::GetAtt": [
+         "CrmVpcdefaultLogGroup4BD46EB3",
+         "Arn"
+        ]
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "CrmVpcdefaultIAMRoleDefaultPolicy66F0C171",
+    "Roles": [
+     {
+      "Ref": "CrmVpcdefaultIAMRole4247BB69"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "CrmDevStack/CrmVpc/default/IAMRole/DefaultPolicy/Resource"
+   }
+  },
+  "CrmVpcdefaultLogGroup4BD46EB3": {
+   "Type": "AWS::Logs::LogGroup",
+   "Properties": {
+    "RetentionInDays": 731,
+    "Tags": [
+     {
+      "Key": "Name",
+      "Value": "CrmDevStack/CrmVpc/default"
+     }
+    ]
+   },
+   "UpdateReplacePolicy": "Retain",
+   "DeletionPolicy": "Retain",
+   "Metadata": {
+    "aws:cdk:path": "CrmDevStack/CrmVpc/default/LogGroup/Resource"
+   }
+  },
+  "CrmVpcdefaultFlowLogDE28750A": {
+   "Type": "AWS::EC2::FlowLog",
+   "Properties": {
+    "DeliverLogsPermissionArn": {
+     "Fn::GetAtt": [
+      "CrmVpcdefaultIAMRole4247BB69",
+      "Arn"
+     ]
+    },
+    "LogDestinationType": "cloud-watch-logs",
+    "LogGroupName": {
+     "Ref": "CrmVpcdefaultLogGroup4BD46EB3"
+    },
+    "ResourceId": {
+     "Ref": "CrmVpcC63CEBEA"
+    },
+    "ResourceType": "VPC",
+    "Tags": [
+     {
+      "Key": "Name",
+      "Value": "CrmDevStack/CrmVpc/default"
+     }
+    ],
+    "TrafficType": "REJECT"
+   },
+   "Metadata": {
+    "aws:cdk:path": "CrmDevStack/CrmVpc/default/FlowLog"
+   }
+  },
+  "CrmVpcRestrictDefaultSecurityGroupCustomResourceDE223F5C": {
+   "Type": "Custom::VpcRestrictDefaultSG",
+   "Properties": {
+    "ServiceToken": {
+     "Fn::GetAtt": [
+      "CustomVpcRestrictDefaultSGCustomResourceProviderHandlerDC833E5E",
+      "Arn"
+     ]
+    },
+    "DefaultSecurityGroupId": {
+     "Fn::GetAtt": [
+      "CrmVpcC63CEBEA",
+      "DefaultSecurityGroup"
+     ]
+    },
+    "Account": "187038415272"
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "CrmDevStack/CrmVpc/RestrictDefaultSecurityGroupCustomResource/Default"
+   }
+  },
+  "CustomVpcRestrictDefaultSGCustomResourceProviderRole26592FE0": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Version": "2012-10-17",
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "lambda.amazonaws.com"
+       }
+      }
+     ]
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Sub": "arn:${AWS::Partition}:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+     }
+    ],
+    "Policies": [
+     {
+      "PolicyName": "Inline",
+      "PolicyDocument": {
+       "Version": "2012-10-17",
+       "Statement": [
+        {
+         "Effect": "Allow",
+         "Action": [
+          "ec2:AuthorizeSecurityGroupIngress",
+          "ec2:AuthorizeSecurityGroupEgress",
+          "ec2:RevokeSecurityGroupIngress",
+          "ec2:RevokeSecurityGroupEgress"
+         ],
+         "Resource": [
+          {
+           "Fn::Join": [
+            "",
+            [
+             "arn:aws:ec2:us-east-1:187038415272:security-group/",
+             {
+              "Fn::GetAtt": [
+               "CrmVpcC63CEBEA",
+               "DefaultSecurityGroup"
+              ]
+             }
+            ]
+           ]
+          }
+         ]
+        }
+       ]
+      }
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "CrmDevStack/Custom::VpcRestrictDefaultSGCustomResourceProvider/Role"
+   }
+  },
+  "CustomVpcRestrictDefaultSGCustomResourceProviderHandlerDC833E5E": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Code": {
+     "S3Bucket": "cdk-hnb659fds-assets-187038415272-us-east-1",
+     "S3Key": "7fa1e366ee8a9ded01fc355f704cff92bfd179574e6f9cfee800a3541df1b200.zip"
+    },
+    "Timeout": 900,
+    "MemorySize": 128,
+    "Handler": "__entrypoint__.handler",
+    "Role": {
+     "Fn::GetAtt": [
+      "CustomVpcRestrictDefaultSGCustomResourceProviderRole26592FE0",
+      "Arn"
+     ]
+    },
+    "Runtime": "nodejs22.x",
+    "Description": "Lambda function for removing all inbound/outbound rules from the VPC default security group"
+   },
+   "DependsOn": [
+    "CustomVpcRestrictDefaultSGCustomResourceProviderRole26592FE0"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "CrmDevStack/Custom::VpcRestrictDefaultSGCustomResourceProvider/Handler",
+    "aws:asset:path": "asset.7fa1e366ee8a9ded01fc355f704cff92bfd179574e6f9cfee800a3541df1b200",
+    "aws:asset:property": "Code"
+   }
+  },
+  "AlbSg1155C1BE": {
+   "Type": "AWS::EC2::SecurityGroup",
+   "Properties": {
+    "GroupDescription": "ALB security group",
+    "SecurityGroupIngress": [
+     {
+      "CidrIp": "0.0.0.0/0",
+      "Description": "HTTP",
+      "FromPort": 80,
+      "IpProtocol": "tcp",
+      "ToPort": 80
+     },
+     {
+      "CidrIp": "0.0.0.0/0",
+      "Description": "HTTPS",
+      "FromPort": 443,
+      "IpProtocol": "tcp",
+      "ToPort": 443
+     }
+    ],
+    "VpcId": {
+     "Ref": "CrmVpcC63CEBEA"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "CrmDevStack/AlbSg/Resource"
+   }
+  },
+  "AlbSgtoCrmDevStackFargateSgA6399AB030014E36AB88": {
+   "Type": "AWS::EC2::SecurityGroupEgress",
+   "Properties": {
+    "Description": "To API",
+    "DestinationSecurityGroupId": {
+     "Fn::GetAtt": [
+      "FargateSg4CA74029",
+      "GroupId"
+     ]
+    },
+    "FromPort": 3001,
+    "GroupId": {
+     "Fn::GetAtt": [
+      "AlbSg1155C1BE",
+      "GroupId"
+     ]
+    },
+    "IpProtocol": "tcp",
+    "ToPort": 3001
+   },
+   "Metadata": {
+    "aws:cdk:path": "CrmDevStack/AlbSg/to CrmDevStackFargateSgA6399AB0:3001"
+   }
+  },
+  "AlbSgtoCrmDevStackFargateSgA6399AB030002F0E08B5": {
+   "Type": "AWS::EC2::SecurityGroupEgress",
+   "Properties": {
+    "Description": "To Web",
+    "DestinationSecurityGroupId": {
+     "Fn::GetAtt": [
+      "FargateSg4CA74029",
+      "GroupId"
+     ]
+    },
+    "FromPort": 3000,
+    "GroupId": {
+     "Fn::GetAtt": [
+      "AlbSg1155C1BE",
+      "GroupId"
+     ]
+    },
+    "IpProtocol": "tcp",
+    "ToPort": 3000
+   },
+   "Metadata": {
+    "aws:cdk:path": "CrmDevStack/AlbSg/to CrmDevStackFargateSgA6399AB0:3000"
+   }
+  },
+  "FargateSg4CA74029": {
+   "Type": "AWS::EC2::SecurityGroup",
+   "Properties": {
+    "GroupDescription": "Fargate tasks security group",
+    "SecurityGroupEgress": [
+     {
+      "CidrIp": "0.0.0.0/0",
+      "Description": "Allow all outbound traffic by default",
+      "IpProtocol": "-1"
+     }
+    ],
+    "VpcId": {
+     "Ref": "CrmVpcC63CEBEA"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "CrmDevStack/FargateSg/Resource"
+   }
+  },
+  "FargateSgfromCrmDevStackAlbSgEC8DD17E3001BCD058B2": {
+   "Type": "AWS::EC2::SecurityGroupIngress",
+   "Properties": {
+    "Description": "API from ALB",
+    "FromPort": 3001,
+    "GroupId": {
+     "Fn::GetAtt": [
+      "FargateSg4CA74029",
+      "GroupId"
+     ]
+    },
+    "IpProtocol": "tcp",
+    "SourceSecurityGroupId": {
+     "Fn::GetAtt": [
+      "AlbSg1155C1BE",
+      "GroupId"
+     ]
+    },
+    "ToPort": 3001
+   },
+   "Metadata": {
+    "aws:cdk:path": "CrmDevStack/FargateSg/from CrmDevStackAlbSgEC8DD17E:3001"
+   }
+  },
+  "FargateSgfromCrmDevStackAlbSgEC8DD17E300066735EC2": {
+   "Type": "AWS::EC2::SecurityGroupIngress",
+   "Properties": {
+    "Description": "Web from ALB",
+    "FromPort": 3000,
+    "GroupId": {
+     "Fn::GetAtt": [
+      "FargateSg4CA74029",
+      "GroupId"
+     ]
+    },
+    "IpProtocol": "tcp",
+    "SourceSecurityGroupId": {
+     "Fn::GetAtt": [
+      "AlbSg1155C1BE",
+      "GroupId"
+     ]
+    },
+    "ToPort": 3000
+   },
+   "Metadata": {
+    "aws:cdk:path": "CrmDevStack/FargateSg/from CrmDevStackAlbSgEC8DD17E:3000"
+   }
+  },
+  "DbSg495F8305": {
+   "Type": "AWS::EC2::SecurityGroup",
+   "Properties": {
+    "GroupDescription": "Aurora security group",
+    "SecurityGroupEgress": [
+     {
+      "CidrIp": "255.255.255.255/32",
+      "Description": "Disallow all traffic",
+      "FromPort": 252,
+      "IpProtocol": "icmp",
+      "ToPort": 86
+     }
+    ],
+    "VpcId": {
+     "Ref": "CrmVpcC63CEBEA"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "CrmDevStack/DbSg/Resource"
+   }
+  },
+  "DbSgfromCrmDevStackFargateSgA6399AB054327B07C38B": {
+   "Type": "AWS::EC2::SecurityGroupIngress",
+   "Properties": {
+    "Description": "PostgreSQL from Fargate",
+    "FromPort": 5432,
+    "GroupId": {
+     "Fn::GetAtt": [
+      "DbSg495F8305",
+      "GroupId"
+     ]
+    },
+    "IpProtocol": "tcp",
+    "SourceSecurityGroupId": {
+     "Fn::GetAtt": [
+      "FargateSg4CA74029",
+      "GroupId"
+     ]
+    },
+    "ToPort": 5432
+   },
+   "Metadata": {
+    "aws:cdk:path": "CrmDevStack/DbSg/from CrmDevStackFargateSgA6399AB0:5432"
+   }
+  },
+  "RedisSgFB48DCCD": {
+   "Type": "AWS::EC2::SecurityGroup",
+   "Properties": {
+    "GroupDescription": "Redis security group",
+    "SecurityGroupEgress": [
+     {
+      "CidrIp": "255.255.255.255/32",
+      "Description": "Disallow all traffic",
+      "FromPort": 252,
+      "IpProtocol": "icmp",
+      "ToPort": 86
+     }
+    ],
+    "VpcId": {
+     "Ref": "CrmVpcC63CEBEA"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "CrmDevStack/RedisSg/Resource"
+   }
+  },
+  "RedisSgfromCrmDevStackFargateSgA6399AB0637922F2BB0A": {
+   "Type": "AWS::EC2::SecurityGroupIngress",
+   "Properties": {
+    "Description": "Redis from Fargate",
+    "FromPort": 6379,
+    "GroupId": {
+     "Fn::GetAtt": [
+      "RedisSgFB48DCCD",
+      "GroupId"
+     ]
+    },
+    "IpProtocol": "tcp",
+    "SourceSecurityGroupId": {
+     "Fn::GetAtt": [
+      "FargateSg4CA74029",
+      "GroupId"
+     ]
+    },
+    "ToPort": 6379
+   },
+   "Metadata": {
+    "aws:cdk:path": "CrmDevStack/RedisSg/from CrmDevStackFargateSgA6399AB0:6379"
+   }
+  },
+  "DbSecret685A0FA5": {
+   "Type": "AWS::SecretsManager::Secret",
+   "Properties": {
+    "GenerateSecretString": {
+     "ExcludePunctuation": true,
+     "GenerateStringKey": "password",
+     "PasswordLength": 32,
+     "SecretStringTemplate": "{\"username\":\"crmadmin\"}"
+    },
+    "Name": "crm/dev/db-credentials"
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "CrmDevStack/DbSecret/Resource"
+   }
+  },
+  "DbSecretAttachment0609CE05": {
+   "Type": "AWS::SecretsManager::SecretTargetAttachment",
+   "Properties": {
+    "SecretId": {
+     "Ref": "DbSecret685A0FA5"
+    },
+    "TargetId": {
+     "Ref": "CrmDb67725308"
+    },
+    "TargetType": "AWS::RDS::DBCluster"
+   },
+   "Metadata": {
+    "aws:cdk:path": "CrmDevStack/DbSecret/Attachment/Resource"
+   }
+  },
+  "JwtSecretB8834B39": {
+   "Type": "AWS::SecretsManager::Secret",
+   "Properties": {
+    "GenerateSecretString": {
+     "ExcludePunctuation": true,
+     "PasswordLength": 64
+    },
+    "Name": "crm/dev/jwt-secret"
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "CrmDevStack/JwtSecret/Resource"
+   }
+  },
+  "JwtRefreshSecret4736E8C7": {
+   "Type": "AWS::SecretsManager::Secret",
+   "Properties": {
+    "GenerateSecretString": {
+     "ExcludePunctuation": true,
+     "PasswordLength": 64
+    },
+    "Name": "crm/dev/jwt-refresh-secret"
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "CrmDevStack/JwtRefreshSecret/Resource"
+   }
+  },
+  "CrmDbSubnetsD60E3110": {
+   "Type": "AWS::RDS::DBSubnetGroup",
+   "Properties": {
+    "DBSubnetGroupDescription": "Subnets for CrmDb database",
+    "SubnetIds": [
+     {
+      "Ref": "CrmVpcIsolatedSubnet1Subnet94FCE84E"
+     },
+     {
+      "Ref": "CrmVpcIsolatedSubnet2SubnetE8205160"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "CrmDevStack/CrmDb/Subnets/Default"
+   }
+  },
+  "CrmDb67725308": {
+   "Type": "AWS::RDS::DBCluster",
+   "Properties": {
+    "BackupRetentionPeriod": 7,
+    "CopyTagsToSnapshot": true,
+    "DBClusterParameterGroupName": "default.aurora-postgresql16",
+    "DBSubnetGroupName": {
+     "Ref": "CrmDbSubnetsD60E3110"
+    },
+    "DatabaseName": "crm_dev",
+    "DeletionProtection": false,
+    "Engine": "aurora-postgresql",
+    "EngineVersion": "16.4",
+    "MasterUserPassword": {
+     "Fn::Join": [
+      "",
+      [
+       "{{resolve:secretsmanager:",
+       {
+        "Ref": "DbSecret685A0FA5"
+       },
+       ":SecretString:password::}}"
+      ]
+     ]
+    },
+    "MasterUsername": {
+     "Fn::Join": [
+      "",
+      [
+       "{{resolve:secretsmanager:",
+       {
+        "Ref": "DbSecret685A0FA5"
+       },
+       ":SecretString:username::}}"
+      ]
+     ]
+    },
+    "Port": 5432,
+    "ServerlessV2ScalingConfiguration": {
+     "MaxCapacity": 2,
+     "MinCapacity": 0.5
+    },
+    "StorageEncrypted": true,
+    "VpcSecurityGroupIds": [
+     {
+      "Fn::GetAtt": [
+       "DbSg495F8305",
+       "GroupId"
+      ]
+     }
+    ]
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "CrmDevStack/CrmDb/Resource"
+   }
+  },
+  "CrmDbwriter0C65F5FE": {
+   "Type": "AWS::RDS::DBInstance",
+   "Properties": {
+    "DBClusterIdentifier": {
+     "Ref": "CrmDb67725308"
+    },
+    "DBInstanceClass": "db.serverless",
+    "Engine": "aurora-postgresql",
+    "PromotionTier": 0,
+    "PubliclyAccessible": false
+   },
+   "DependsOn": [
+    "CrmVpcIsolatedSubnet1RouteTableAssociationC140C10C",
+    "CrmVpcIsolatedSubnet2RouteTableAssociationECDEB4E2"
+   ],
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "CrmDevStack/CrmDb/writer/Resource"
+   }
+  },
+  "CrmRedis": {
+   "Type": "AWS::ElastiCache::ServerlessCache",
+   "Properties": {
+    "Engine": "redis",
+    "SecurityGroupIds": [
+     {
+      "Fn::GetAtt": [
+       "RedisSgFB48DCCD",
+       "GroupId"
+      ]
+     }
+    ],
+    "ServerlessCacheName": "crm-dev-redis",
+    "SubnetIds": [
+     {
+      "Ref": "CrmVpcIsolatedSubnet1Subnet94FCE84E"
+     },
+     {
+      "Ref": "CrmVpcIsolatedSubnet2SubnetE8205160"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "CrmDevStack/CrmRedis"
+   }
+  },
+  "AssetsBucket5CB76180": {
+   "Type": "AWS::S3::Bucket",
+   "Properties": {
+    "BucketEncryption": {
+     "ServerSideEncryptionConfiguration": [
+      {
+       "ServerSideEncryptionByDefault": {
+        "SSEAlgorithm": "AES256"
+       }
+      }
+     ]
+    },
+    "BucketName": "crm-assets-187038415272-dev",
+    "PublicAccessBlockConfiguration": {
+     "BlockPublicAcls": true,
+     "BlockPublicPolicy": true,
+     "IgnorePublicAcls": true,
+     "RestrictPublicBuckets": true
+    },
+    "Tags": [
+     {
+      "Key": "aws-cdk:auto-delete-objects",
+      "Value": "true"
+     }
+    ]
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "CrmDevStack/AssetsBucket/Resource"
+   }
+  },
+  "AssetsBucketPolicyFFACF6C4": {
+   "Type": "AWS::S3::BucketPolicy",
+   "Properties": {
+    "Bucket": {
+     "Ref": "AssetsBucket5CB76180"
+    },
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "s3:DeleteObject*",
+        "s3:GetBucket*",
+        "s3:List*",
+        "s3:PutBucketPolicy"
+       ],
+       "Effect": "Allow",
+       "Principal": {
+        "AWS": {
+         "Fn::GetAtt": [
+          "CustomS3AutoDeleteObjectsCustomResourceProviderRole3B1BD092",
+          "Arn"
+         ]
+        }
+       },
+       "Resource": [
+        {
+         "Fn::GetAtt": [
+          "AssetsBucket5CB76180",
+          "Arn"
+         ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           {
+            "Fn::GetAtt": [
+             "AssetsBucket5CB76180",
+             "Arn"
+            ]
+           },
+           "/*"
+          ]
+         ]
+        }
+       ]
+      }
+     ],
+     "Version": "2012-10-17"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "CrmDevStack/AssetsBucket/Policy/Resource"
+   }
+  },
+  "AssetsBucketAutoDeleteObjectsCustomResource51BA1286": {
+   "Type": "Custom::S3AutoDeleteObjects",
+   "Properties": {
+    "ServiceToken": {
+     "Fn::GetAtt": [
+      "CustomS3AutoDeleteObjectsCustomResourceProviderHandler9D90184F",
+      "Arn"
+     ]
+    },
+    "BucketName": {
+     "Ref": "AssetsBucket5CB76180"
+    }
+   },
+   "DependsOn": [
+    "AssetsBucketPolicyFFACF6C4"
+   ],
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "CrmDevStack/AssetsBucket/AutoDeleteObjectsCustomResource/Default"
+   }
+  },
+  "CustomS3AutoDeleteObjectsCustomResourceProviderRole3B1BD092": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Version": "2012-10-17",
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "lambda.amazonaws.com"
+       }
+      }
+     ]
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Sub": "arn:${AWS::Partition}:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "CrmDevStack/Custom::S3AutoDeleteObjectsCustomResourceProvider/Role"
+   }
+  },
+  "CustomS3AutoDeleteObjectsCustomResourceProviderHandler9D90184F": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Code": {
+     "S3Bucket": "cdk-hnb659fds-assets-187038415272-us-east-1",
+     "S3Key": "faa95a81ae7d7373f3e1f242268f904eb748d8d0fdd306e8a6fe515a1905a7d6.zip"
+    },
+    "Timeout": 900,
+    "MemorySize": 128,
+    "Handler": "index.handler",
+    "Role": {
+     "Fn::GetAtt": [
+      "CustomS3AutoDeleteObjectsCustomResourceProviderRole3B1BD092",
+      "Arn"
+     ]
+    },
+    "Runtime": "nodejs22.x",
+    "Description": {
+     "Fn::Join": [
+      "",
+      [
+       "Lambda function for auto-deleting objects in ",
+       {
+        "Ref": "AssetsBucket5CB76180"
+       },
+       " S3 bucket."
+      ]
+     ]
+    }
+   },
+   "DependsOn": [
+    "CustomS3AutoDeleteObjectsCustomResourceProviderRole3B1BD092"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "CrmDevStack/Custom::S3AutoDeleteObjectsCustomResourceProvider/Handler",
+    "aws:asset:path": "asset.faa95a81ae7d7373f3e1f242268f904eb748d8d0fdd306e8a6fe515a1905a7d6",
+    "aws:asset:property": "Code"
+   }
+  },
+  "CrmClusterCCD1126B": {
+   "Type": "AWS::ECS::Cluster",
+   "Properties": {
+    "ClusterName": "crm-dev",
+    "ClusterSettings": [
+     {
+      "Name": "containerInsights",
+      "Value": "disabled"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "CrmDevStack/CrmCluster/Resource"
+   }
+  },
+  "CrmAlb32B97D8E": {
+   "Type": "AWS::ElasticLoadBalancingV2::LoadBalancer",
+   "Properties": {
+    "LoadBalancerAttributes": [
+     {
+      "Key": "deletion_protection.enabled",
+      "Value": "false"
+     }
+    ],
+    "Scheme": "internet-facing",
+    "SecurityGroups": [
+     {
+      "Fn::GetAtt": [
+       "AlbSg1155C1BE",
+       "GroupId"
+      ]
+     }
+    ],
+    "Subnets": [
+     {
+      "Ref": "CrmVpcPublicSubnet1Subnet098180E4"
+     },
+     {
+      "Ref": "CrmVpcPublicSubnet2Subnet69FA8367"
+     }
+    ],
+    "Type": "application"
+   },
+   "DependsOn": [
+    "CrmVpcPublicSubnet1DefaultRoute01E75892",
+    "CrmVpcPublicSubnet1RouteTableAssociation7004AC8B",
+    "CrmVpcPublicSubnet2DefaultRoute6A7441E5",
+    "CrmVpcPublicSubnet2RouteTableAssociation36EAFE14"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "CrmDevStack/CrmAlb/Resource"
+   }
+  },
+  "CrmAlbHttpListener1BA459CD": {
+   "Type": "AWS::ElasticLoadBalancingV2::Listener",
+   "Properties": {
+    "DefaultActions": [
+     {
+      "FixedResponseConfig": {
+       "ContentType": "text/plain",
+       "MessageBody": "Not Found",
+       "StatusCode": "404"
+      },
+      "Type": "fixed-response"
+     }
+    ],
+    "LoadBalancerArn": {
+     "Ref": "CrmAlb32B97D8E"
+    },
+    "Port": 80,
+    "Protocol": "HTTP"
+   },
+   "Metadata": {
+    "aws:cdk:path": "CrmDevStack/CrmAlb/HttpListener/Resource"
+   }
+  },
+  "CrmAlbHttpListenerApiTargetGroup149FE0B4": {
+   "Type": "AWS::ElasticLoadBalancingV2::TargetGroup",
+   "Properties": {
+    "HealthCheckIntervalSeconds": 30,
+    "HealthCheckPath": "/health",
+    "HealthyThresholdCount": 2,
+    "Port": 3001,
+    "Protocol": "HTTP",
+    "TargetGroupAttributes": [
+     {
+      "Key": "stickiness.enabled",
+      "Value": "false"
+     }
+    ],
+    "TargetType": "ip",
+    "UnhealthyThresholdCount": 3,
+    "VpcId": {
+     "Ref": "CrmVpcC63CEBEA"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "CrmDevStack/CrmAlb/HttpListener/ApiTargetGroup/Resource"
+   }
+  },
+  "CrmAlbHttpListenerApiTargetRule269C5FD0": {
+   "Type": "AWS::ElasticLoadBalancingV2::ListenerRule",
+   "Properties": {
+    "Actions": [
+     {
+      "TargetGroupArn": {
+       "Ref": "CrmAlbHttpListenerApiTargetGroup149FE0B4"
+      },
+      "Type": "forward"
+     }
+    ],
+    "Conditions": [
+     {
+      "Field": "path-pattern",
+      "PathPatternConfig": {
+       "Values": [
+        "/api/*",
+        "/health"
+       ]
+      }
+     }
+    ],
+    "ListenerArn": {
+     "Ref": "CrmAlbHttpListener1BA459CD"
+    },
+    "Priority": 10
+   },
+   "Metadata": {
+    "aws:cdk:path": "CrmDevStack/CrmAlb/HttpListener/ApiTargetRule/Resource"
+   }
+  },
+  "CrmAlbHttpListenerWebTargetGroup80B20251": {
+   "Type": "AWS::ElasticLoadBalancingV2::TargetGroup",
+   "Properties": {
+    "HealthCheckIntervalSeconds": 30,
+    "HealthCheckPath": "/",
+    "HealthyThresholdCount": 2,
+    "Port": 3000,
+    "Protocol": "HTTP",
+    "TargetGroupAttributes": [
+     {
+      "Key": "stickiness.enabled",
+      "Value": "false"
+     }
+    ],
+    "TargetType": "ip",
+    "UnhealthyThresholdCount": 3,
+    "VpcId": {
+     "Ref": "CrmVpcC63CEBEA"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "CrmDevStack/CrmAlb/HttpListener/WebTargetGroup/Resource"
+   }
+  },
+  "CrmAlbHttpListenerWebTargetRule2528F907": {
+   "Type": "AWS::ElasticLoadBalancingV2::ListenerRule",
+   "Properties": {
+    "Actions": [
+     {
+      "TargetGroupArn": {
+       "Ref": "CrmAlbHttpListenerWebTargetGroup80B20251"
+      },
+      "Type": "forward"
+     }
+    ],
+    "Conditions": [
+     {
+      "Field": "path-pattern",
+      "PathPatternConfig": {
+       "Values": [
+        "/*"
+       ]
+      }
+     }
+    ],
+    "ListenerArn": {
+     "Ref": "CrmAlbHttpListener1BA459CD"
+    },
+    "Priority": 20
+   },
+   "Metadata": {
+    "aws:cdk:path": "CrmDevStack/CrmAlb/HttpListener/WebTargetRule/Resource"
+   }
+  },
+  "ApiTaskDefTaskRole76FB19FA": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "ecs-tasks.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "CrmDevStack/ApiTaskDef/TaskRole/Resource"
+   }
+  },
+  "ApiTaskDefTaskRoleDefaultPolicy66F6BAC0": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "secretsmanager:DescribeSecret",
+        "secretsmanager:GetSecretValue"
+       ],
+       "Effect": "Allow",
+       "Resource": [
+        {
+         "Ref": "DbSecret685A0FA5"
+        },
+        {
+         "Ref": "JwtRefreshSecret4736E8C7"
+        },
+        {
+         "Ref": "JwtSecretB8834B39"
+        }
+       ]
+      },
+      {
+       "Action": [
+        "s3:Abort*",
+        "s3:DeleteObject*",
+        "s3:GetBucket*",
+        "s3:GetObject*",
+        "s3:List*",
+        "s3:PutObject",
+        "s3:PutObjectLegalHold",
+        "s3:PutObjectRetention",
+        "s3:PutObjectTagging",
+        "s3:PutObjectVersionTagging"
+       ],
+       "Effect": "Allow",
+       "Resource": [
+        {
+         "Fn::GetAtt": [
+          "AssetsBucket5CB76180",
+          "Arn"
+         ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           {
+            "Fn::GetAtt": [
+             "AssetsBucket5CB76180",
+             "Arn"
+            ]
+           },
+           "/*"
+          ]
+         ]
+        }
+       ]
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "ApiTaskDefTaskRoleDefaultPolicy66F6BAC0",
+    "Roles": [
+     {
+      "Ref": "ApiTaskDefTaskRole76FB19FA"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "CrmDevStack/ApiTaskDef/TaskRole/DefaultPolicy/Resource"
+   }
+  },
+  "ApiTaskDef37DBDBD0": {
+   "Type": "AWS::ECS::TaskDefinition",
+   "Properties": {
+    "ContainerDefinitions": [
+     {
+      "Environment": [
+       {
+        "Name": "NODE_ENV",
+        "Value": "production"
+       },
+       {
+        "Name": "PORT",
+        "Value": "3001"
+       },
+       {
+        "Name": "DATABASE_HOST",
+        "Value": {
+         "Fn::GetAtt": [
+          "CrmDb67725308",
+          "Endpoint.Address"
+         ]
+        }
+       },
+       {
+        "Name": "DATABASE_PORT",
+        "Value": "5432"
+       },
+       {
+        "Name": "DATABASE_NAME",
+        "Value": "crm_dev"
+       },
+       {
+        "Name": "REDIS_URL",
+        "Value": "redis://crm-dev-redis.serverless.us-east-1.cache.amazonaws.com:6379"
+       },
+       {
+        "Name": "AWS_S3_BUCKET",
+        "Value": {
+         "Ref": "AssetsBucket5CB76180"
+        }
+       },
+       {
+        "Name": "APP_URL",
+        "Value": {
+         "Fn::Join": [
+          "",
+          [
+           "http://",
+           {
+            "Fn::GetAtt": [
+             "CrmAlb32B97D8E",
+             "DNSName"
+            ]
+           }
+          ]
+         ]
+        }
+       }
+      ],
+      "Essential": true,
+      "HealthCheck": {
+       "Command": [
+        "CMD-SHELL",
+        "curl -f http://localhost:3001/health || exit 1"
+       ],
+       "Interval": 30,
+       "Retries": 3,
+       "StartPeriod": 60,
+       "Timeout": 5
+      },
+      "Image": {
+       "Fn::Join": [
+        "",
+        [
+         "187038415272.dkr.ecr.us-east-1.",
+         {
+          "Ref": "AWS::URLSuffix"
+         },
+         "/crm/api:latest"
+        ]
+       ]
+      },
+      "LogConfiguration": {
+       "LogDriver": "awslogs",
+       "Options": {
+        "awslogs-group": {
+         "Ref": "ApiTaskDefapiLogGroup9FDF1262"
+        },
+        "awslogs-stream-prefix": "crm-api",
+        "awslogs-region": "us-east-1"
+       }
+      },
+      "Name": "api",
+      "PortMappings": [
+       {
+        "ContainerPort": 3001,
+        "Protocol": "tcp"
+       }
+      ],
+      "Secrets": [
+       {
+        "Name": "DATABASE_USER",
+        "ValueFrom": {
+         "Fn::Join": [
+          "",
+          [
+           {
+            "Ref": "DbSecret685A0FA5"
+           },
+           ":username::"
+          ]
+         ]
+        }
+       },
+       {
+        "Name": "DATABASE_PASSWORD",
+        "ValueFrom": {
+         "Fn::Join": [
+          "",
+          [
+           {
+            "Ref": "DbSecret685A0FA5"
+           },
+           ":password::"
+          ]
+         ]
+        }
+       },
+       {
+        "Name": "JWT_SECRET",
+        "ValueFrom": {
+         "Ref": "JwtSecretB8834B39"
+        }
+       },
+       {
+        "Name": "JWT_REFRESH_SECRET",
+        "ValueFrom": {
+         "Ref": "JwtRefreshSecret4736E8C7"
+        }
+       }
+      ]
+     }
+    ],
+    "Cpu": "512",
+    "ExecutionRoleArn": {
+     "Fn::GetAtt": [
+      "ApiTaskDefExecutionRoleE6ABB053",
+      "Arn"
+     ]
+    },
+    "Family": "CrmDevStackApiTaskDef51CD5FBE",
+    "Memory": "1024",
+    "NetworkMode": "awsvpc",
+    "RequiresCompatibilities": [
+     "FARGATE"
+    ],
+    "TaskRoleArn": {
+     "Fn::GetAtt": [
+      "ApiTaskDefTaskRole76FB19FA",
+      "Arn"
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "CrmDevStack/ApiTaskDef/Resource"
+   }
+  },
+  "ApiTaskDefapiLogGroup9FDF1262": {
+   "Type": "AWS::Logs::LogGroup",
+   "Properties": {
+    "RetentionInDays": 30
+   },
+   "UpdateReplacePolicy": "Retain",
+   "DeletionPolicy": "Retain",
+   "Metadata": {
+    "aws:cdk:path": "CrmDevStack/ApiTaskDef/api/LogGroup/Resource"
+   }
+  },
+  "ApiTaskDefExecutionRoleE6ABB053": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "ecs-tasks.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "CrmDevStack/ApiTaskDef/ExecutionRole/Resource"
+   }
+  },
+  "ApiTaskDefExecutionRoleDefaultPolicy358EAD94": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "ecr:BatchCheckLayerAvailability",
+        "ecr:BatchGetImage",
+        "ecr:GetDownloadUrlForLayer"
+       ],
+       "Effect": "Allow",
+       "Resource": "arn:aws:ecr:us-east-1:187038415272:repository/crm/api"
+      },
+      {
+       "Action": "ecr:GetAuthorizationToken",
+       "Effect": "Allow",
+       "Resource": "*"
+      },
+      {
+       "Action": [
+        "logs:CreateLogStream",
+        "logs:PutLogEvents"
+       ],
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::GetAtt": [
+         "ApiTaskDefapiLogGroup9FDF1262",
+         "Arn"
+        ]
+       }
+      },
+      {
+       "Action": [
+        "secretsmanager:DescribeSecret",
+        "secretsmanager:GetSecretValue"
+       ],
+       "Effect": "Allow",
+       "Resource": [
+        {
+         "Ref": "DbSecret685A0FA5"
+        },
+        {
+         "Ref": "JwtRefreshSecret4736E8C7"
+        },
+        {
+         "Ref": "JwtSecretB8834B39"
+        }
+       ]
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "ApiTaskDefExecutionRoleDefaultPolicy358EAD94",
+    "Roles": [
+     {
+      "Ref": "ApiTaskDefExecutionRoleE6ABB053"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "CrmDevStack/ApiTaskDef/ExecutionRole/DefaultPolicy/Resource"
+   }
+  },
+  "ApiServiceC9037CF0": {
+   "Type": "AWS::ECS::Service",
+   "Properties": {
+    "Cluster": {
+     "Ref": "CrmClusterCCD1126B"
+    },
+    "DeploymentConfiguration": {
+     "MaximumPercent": 200,
+     "MinimumHealthyPercent": 100
+    },
+    "DesiredCount": 1,
+    "EnableECSManagedTags": false,
+    "HealthCheckGracePeriodSeconds": 60,
+    "LaunchType": "FARGATE",
+    "LoadBalancers": [
+     {
+      "ContainerName": "api",
+      "ContainerPort": 3001,
+      "TargetGroupArn": {
+       "Ref": "CrmAlbHttpListenerApiTargetGroup149FE0B4"
+      }
+     }
+    ],
+    "NetworkConfiguration": {
+     "AwsvpcConfiguration": {
+      "AssignPublicIp": "DISABLED",
+      "SecurityGroups": [
+       {
+        "Fn::GetAtt": [
+         "FargateSg4CA74029",
+         "GroupId"
+        ]
+       }
+      ],
+      "Subnets": [
+       {
+        "Ref": "CrmVpcPrivateSubnet1SubnetEB7A324A"
+       },
+       {
+        "Ref": "CrmVpcPrivateSubnet2SubnetD95E14B1"
+       }
+      ]
+     }
+    },
+    "ServiceName": "crm-dev-api",
+    "TaskDefinition": {
+     "Ref": "ApiTaskDef37DBDBD0"
+    }
+   },
+   "DependsOn": [
+    "ApiTaskDefTaskRoleDefaultPolicy66F6BAC0",
+    "ApiTaskDefTaskRole76FB19FA",
+    "CrmAlbHttpListenerApiTargetRule269C5FD0"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "CrmDevStack/ApiService/Service"
+   }
+  },
+  "ApiServiceTaskCountTargetBFC64025": {
+   "Type": "AWS::ApplicationAutoScaling::ScalableTarget",
+   "Properties": {
+    "MaxCapacity": 2,
+    "MinCapacity": 1,
+    "ResourceId": {
+     "Fn::Join": [
+      "",
+      [
+       "service/",
+       {
+        "Ref": "CrmClusterCCD1126B"
+       },
+       "/",
+       {
+        "Fn::GetAtt": [
+         "ApiServiceC9037CF0",
+         "Name"
+        ]
+       }
+      ]
+     ]
+    },
+    "RoleARN": "arn:aws:iam::187038415272:role/aws-service-role/ecs.application-autoscaling.amazonaws.com/AWSServiceRoleForApplicationAutoScaling_ECSService",
+    "ScalableDimension": "ecs:service:DesiredCount",
+    "ServiceNamespace": "ecs"
+   },
+   "DependsOn": [
+    "ApiTaskDefTaskRoleDefaultPolicy66F6BAC0",
+    "ApiTaskDefTaskRole76FB19FA"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "CrmDevStack/ApiService/TaskCount/Target/Resource"
+   }
+  },
+  "ApiServiceTaskCountTargetApiCpuScaling8D795804": {
+   "Type": "AWS::ApplicationAutoScaling::ScalingPolicy",
+   "Properties": {
+    "PolicyName": "CrmDevStackApiServiceTaskCountTargetApiCpuScaling9A81748E",
+    "PolicyType": "TargetTrackingScaling",
+    "ScalingTargetId": {
+     "Ref": "ApiServiceTaskCountTargetBFC64025"
+    },
+    "TargetTrackingScalingPolicyConfiguration": {
+     "PredefinedMetricSpecification": {
+      "PredefinedMetricType": "ECSServiceAverageCPUUtilization"
+     },
+     "ScaleInCooldown": 300,
+     "ScaleOutCooldown": 60,
+     "TargetValue": 70
+    }
+   },
+   "DependsOn": [
+    "ApiTaskDefTaskRoleDefaultPolicy66F6BAC0",
+    "ApiTaskDefTaskRole76FB19FA"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "CrmDevStack/ApiService/TaskCount/Target/ApiCpuScaling/Resource"
+   }
+  },
+  "WebTaskDefTaskRole73B79392": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "ecs-tasks.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "CrmDevStack/WebTaskDef/TaskRole/Resource"
+   }
+  },
+  "WebTaskDefDC37DBDB": {
+   "Type": "AWS::ECS::TaskDefinition",
+   "Properties": {
+    "ContainerDefinitions": [
+     {
+      "Environment": [
+       {
+        "Name": "NODE_ENV",
+        "Value": "production"
+       },
+       {
+        "Name": "PORT",
+        "Value": "3000"
+       },
+       {
+        "Name": "NEXT_PUBLIC_API_URL",
+        "Value": {
+         "Fn::Join": [
+          "",
+          [
+           "http://",
+           {
+            "Fn::GetAtt": [
+             "CrmAlb32B97D8E",
+             "DNSName"
+            ]
+           }
+          ]
+         ]
+        }
+       }
+      ],
+      "Essential": true,
+      "HealthCheck": {
+       "Command": [
+        "CMD-SHELL",
+        "curl -f http://localhost:3000/ || exit 1"
+       ],
+       "Interval": 30,
+       "Retries": 3,
+       "StartPeriod": 60,
+       "Timeout": 5
+      },
+      "Image": {
+       "Fn::Join": [
+        "",
+        [
+         "187038415272.dkr.ecr.us-east-1.",
+         {
+          "Ref": "AWS::URLSuffix"
+         },
+         "/crm/web:latest"
+        ]
+       ]
+      },
+      "LogConfiguration": {
+       "LogDriver": "awslogs",
+       "Options": {
+        "awslogs-group": {
+         "Ref": "WebTaskDefwebLogGroup2BF12288"
+        },
+        "awslogs-stream-prefix": "crm-web",
+        "awslogs-region": "us-east-1"
+       }
+      },
+      "Name": "web",
+      "PortMappings": [
+       {
+        "ContainerPort": 3000,
+        "Protocol": "tcp"
+       }
+      ]
+     }
+    ],
+    "Cpu": "512",
+    "ExecutionRoleArn": {
+     "Fn::GetAtt": [
+      "WebTaskDefExecutionRoleA6D04B61",
+      "Arn"
+     ]
+    },
+    "Family": "CrmDevStackWebTaskDef8D86DE99",
+    "Memory": "1024",
+    "NetworkMode": "awsvpc",
+    "RequiresCompatibilities": [
+     "FARGATE"
+    ],
+    "TaskRoleArn": {
+     "Fn::GetAtt": [
+      "WebTaskDefTaskRole73B79392",
+      "Arn"
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "CrmDevStack/WebTaskDef/Resource"
+   }
+  },
+  "WebTaskDefwebLogGroup2BF12288": {
+   "Type": "AWS::Logs::LogGroup",
+   "Properties": {
+    "RetentionInDays": 30
+   },
+   "UpdateReplacePolicy": "Retain",
+   "DeletionPolicy": "Retain",
+   "Metadata": {
+    "aws:cdk:path": "CrmDevStack/WebTaskDef/web/LogGroup/Resource"
+   }
+  },
+  "WebTaskDefExecutionRoleA6D04B61": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "ecs-tasks.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "CrmDevStack/WebTaskDef/ExecutionRole/Resource"
+   }
+  },
+  "WebTaskDefExecutionRoleDefaultPolicyABD5D4E0": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "ecr:BatchCheckLayerAvailability",
+        "ecr:BatchGetImage",
+        "ecr:GetDownloadUrlForLayer"
+       ],
+       "Effect": "Allow",
+       "Resource": "arn:aws:ecr:us-east-1:187038415272:repository/crm/web"
+      },
+      {
+       "Action": "ecr:GetAuthorizationToken",
+       "Effect": "Allow",
+       "Resource": "*"
+      },
+      {
+       "Action": [
+        "logs:CreateLogStream",
+        "logs:PutLogEvents"
+       ],
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::GetAtt": [
+         "WebTaskDefwebLogGroup2BF12288",
+         "Arn"
+        ]
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "WebTaskDefExecutionRoleDefaultPolicyABD5D4E0",
+    "Roles": [
+     {
+      "Ref": "WebTaskDefExecutionRoleA6D04B61"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "CrmDevStack/WebTaskDef/ExecutionRole/DefaultPolicy/Resource"
+   }
+  },
+  "WebService7F8A1763": {
+   "Type": "AWS::ECS::Service",
+   "Properties": {
+    "Cluster": {
+     "Ref": "CrmClusterCCD1126B"
+    },
+    "DeploymentConfiguration": {
+     "MaximumPercent": 200,
+     "MinimumHealthyPercent": 100
+    },
+    "DesiredCount": 1,
+    "EnableECSManagedTags": false,
+    "HealthCheckGracePeriodSeconds": 60,
+    "LaunchType": "FARGATE",
+    "LoadBalancers": [
+     {
+      "ContainerName": "web",
+      "ContainerPort": 3000,
+      "TargetGroupArn": {
+       "Ref": "CrmAlbHttpListenerWebTargetGroup80B20251"
+      }
+     }
+    ],
+    "NetworkConfiguration": {
+     "AwsvpcConfiguration": {
+      "AssignPublicIp": "DISABLED",
+      "SecurityGroups": [
+       {
+        "Fn::GetAtt": [
+         "FargateSg4CA74029",
+         "GroupId"
+        ]
+       }
+      ],
+      "Subnets": [
+       {
+        "Ref": "CrmVpcPrivateSubnet1SubnetEB7A324A"
+       },
+       {
+        "Ref": "CrmVpcPrivateSubnet2SubnetD95E14B1"
+       }
+      ]
+     }
+    },
+    "ServiceName": "crm-dev-web",
+    "TaskDefinition": {
+     "Ref": "WebTaskDefDC37DBDB"
+    }
+   },
+   "DependsOn": [
+    "CrmAlbHttpListenerWebTargetRule2528F907",
+    "WebTaskDefTaskRole73B79392"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "CrmDevStack/WebService/Service"
+   }
+  },
+  "MigrateTaskDefTaskRole6B6B04B0": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "ecs-tasks.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "CrmDevStack/MigrateTaskDef/TaskRole/Resource"
+   }
+  },
+  "MigrateTaskDefTaskRoleDefaultPolicy4F587FCF": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "secretsmanager:DescribeSecret",
+        "secretsmanager:GetSecretValue"
+       ],
+       "Effect": "Allow",
+       "Resource": {
+        "Ref": "DbSecret685A0FA5"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "MigrateTaskDefTaskRoleDefaultPolicy4F587FCF",
+    "Roles": [
+     {
+      "Ref": "MigrateTaskDefTaskRole6B6B04B0"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "CrmDevStack/MigrateTaskDef/TaskRole/DefaultPolicy/Resource"
+   }
+  },
+  "MigrateTaskDef5251B2F0": {
+   "Type": "AWS::ECS::TaskDefinition",
+   "Properties": {
+    "ContainerDefinitions": [
+     {
+      "Command": [
+       "node",
+       "dist/database/run-migrations.js"
+      ],
+      "Environment": [
+       {
+        "Name": "DATABASE_HOST",
+        "Value": {
+         "Fn::GetAtt": [
+          "CrmDb67725308",
+          "Endpoint.Address"
+         ]
+        }
+       },
+       {
+        "Name": "DATABASE_PORT",
+        "Value": "5432"
+       },
+       {
+        "Name": "DATABASE_NAME",
+        "Value": "crm_dev"
+       }
+      ],
+      "Essential": true,
+      "Image": {
+       "Fn::Join": [
+        "",
+        [
+         "187038415272.dkr.ecr.us-east-1.",
+         {
+          "Ref": "AWS::URLSuffix"
+         },
+         "/crm/api:latest"
+        ]
+       ]
+      },
+      "LogConfiguration": {
+       "LogDriver": "awslogs",
+       "Options": {
+        "awslogs-group": {
+         "Ref": "MigrateTaskDefmigrateLogGroup13CD1321"
+        },
+        "awslogs-stream-prefix": "crm-migrate",
+        "awslogs-region": "us-east-1"
+       }
+      },
+      "Name": "migrate",
+      "Secrets": [
+       {
+        "Name": "DATABASE_USER",
+        "ValueFrom": {
+         "Fn::Join": [
+          "",
+          [
+           {
+            "Ref": "DbSecret685A0FA5"
+           },
+           ":username::"
+          ]
+         ]
+        }
+       },
+       {
+        "Name": "DATABASE_PASSWORD",
+        "ValueFrom": {
+         "Fn::Join": [
+          "",
+          [
+           {
+            "Ref": "DbSecret685A0FA5"
+           },
+           ":password::"
+          ]
+         ]
+        }
+       }
+      ]
+     }
+    ],
+    "Cpu": "256",
+    "ExecutionRoleArn": {
+     "Fn::GetAtt": [
+      "MigrateTaskDefExecutionRoleAF88259F",
+      "Arn"
+     ]
+    },
+    "Family": "crm-dev-migrate",
+    "Memory": "512",
+    "NetworkMode": "awsvpc",
+    "RequiresCompatibilities": [
+     "FARGATE"
+    ],
+    "TaskRoleArn": {
+     "Fn::GetAtt": [
+      "MigrateTaskDefTaskRole6B6B04B0",
+      "Arn"
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "CrmDevStack/MigrateTaskDef/Resource"
+   }
+  },
+  "MigrateTaskDefmigrateLogGroup13CD1321": {
+   "Type": "AWS::Logs::LogGroup",
+   "Properties": {
+    "RetentionInDays": 7
+   },
+   "UpdateReplacePolicy": "Retain",
+   "DeletionPolicy": "Retain",
+   "Metadata": {
+    "aws:cdk:path": "CrmDevStack/MigrateTaskDef/migrate/LogGroup/Resource"
+   }
+  },
+  "MigrateTaskDefExecutionRoleAF88259F": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "ecs-tasks.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "CrmDevStack/MigrateTaskDef/ExecutionRole/Resource"
+   }
+  },
+  "MigrateTaskDefExecutionRoleDefaultPolicyA34C58EF": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "ecr:BatchCheckLayerAvailability",
+        "ecr:BatchGetImage",
+        "ecr:GetDownloadUrlForLayer"
+       ],
+       "Effect": "Allow",
+       "Resource": "arn:aws:ecr:us-east-1:187038415272:repository/crm/api"
+      },
+      {
+       "Action": "ecr:GetAuthorizationToken",
+       "Effect": "Allow",
+       "Resource": "*"
+      },
+      {
+       "Action": [
+        "logs:CreateLogStream",
+        "logs:PutLogEvents"
+       ],
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::GetAtt": [
+         "MigrateTaskDefmigrateLogGroup13CD1321",
+         "Arn"
+        ]
+       }
+      },
+      {
+       "Action": [
+        "secretsmanager:DescribeSecret",
+        "secretsmanager:GetSecretValue"
+       ],
+       "Effect": "Allow",
+       "Resource": {
+        "Ref": "DbSecret685A0FA5"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "MigrateTaskDefExecutionRoleDefaultPolicyA34C58EF",
+    "Roles": [
+     {
+      "Ref": "MigrateTaskDefExecutionRoleAF88259F"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "CrmDevStack/MigrateTaskDef/ExecutionRole/DefaultPolicy/Resource"
+   }
+  },
+  "AlarmTopicD01E77F9": {
+   "Type": "AWS::SNS::Topic",
+   "Properties": {
+    "TopicName": "crm-dev-alarms"
+   },
+   "Metadata": {
+    "aws:cdk:path": "CrmDevStack/AlarmTopic/Resource"
+   }
+  },
+  "Api5xxAlarm31F257DC": {
+   "Type": "AWS::CloudWatch::Alarm",
+   "Properties": {
+    "AlarmActions": [
+     {
+      "Ref": "AlarmTopicD01E77F9"
+     }
+    ],
+    "AlarmDescription": "API 5xx error count exceeds threshold",
+    "AlarmName": "crm-dev-api-5xx",
+    "ComparisonOperator": "GreaterThanOrEqualToThreshold",
+    "Dimensions": [
+     {
+      "Name": "LoadBalancer",
+      "Value": {
+       "Fn::GetAtt": [
+        "CrmAlb32B97D8E",
+        "LoadBalancerFullName"
+       ]
+      }
+     }
+    ],
+    "EvaluationPeriods": 2,
+    "MetricName": "HTTPCode_Target_5XX_Count",
+    "Namespace": "AWS/ApplicationELB",
+    "Period": 300,
+    "Statistic": "Sum",
+    "Threshold": 10,
+    "TreatMissingData": "notBreaching"
+   },
+   "Metadata": {
+    "aws:cdk:path": "CrmDevStack/Api5xxAlarm/Resource"
+   }
+  },
+  "ApiLatencyAlarm453002C0": {
+   "Type": "AWS::CloudWatch::Alarm",
+   "Properties": {
+    "AlarmActions": [
+     {
+      "Ref": "AlarmTopicD01E77F9"
+     }
+    ],
+    "AlarmDescription": "API p99 latency exceeds 2 seconds",
+    "AlarmName": "crm-dev-api-latency-p99",
+    "ComparisonOperator": "GreaterThanOrEqualToThreshold",
+    "Dimensions": [
+     {
+      "Name": "LoadBalancer",
+      "Value": {
+       "Fn::GetAtt": [
+        "CrmAlb32B97D8E",
+        "LoadBalancerFullName"
+       ]
+      }
+     }
+    ],
+    "EvaluationPeriods": 3,
+    "ExtendedStatistic": "p99",
+    "MetricName": "TargetResponseTime",
+    "Namespace": "AWS/ApplicationELB",
+    "Period": 300,
+    "Threshold": 2,
+    "TreatMissingData": "notBreaching"
+   },
+   "Metadata": {
+    "aws:cdk:path": "CrmDevStack/ApiLatencyAlarm/Resource"
+   }
+  },
+  "AuroraCpuAlarm999C031F": {
+   "Type": "AWS::CloudWatch::Alarm",
+   "Properties": {
+    "AlarmActions": [
+     {
+      "Ref": "AlarmTopicD01E77F9"
+     }
+    ],
+    "AlarmDescription": "Aurora CPU utilization exceeds 80%",
+    "AlarmName": "crm-dev-aurora-cpu",
+    "ComparisonOperator": "GreaterThanOrEqualToThreshold",
+    "Dimensions": [
+     {
+      "Name": "DBClusterIdentifier",
+      "Value": {
+       "Ref": "CrmDb67725308"
+      }
+     }
+    ],
+    "EvaluationPeriods": 3,
+    "MetricName": "CPUUtilization",
+    "Namespace": "AWS/RDS",
+    "Period": 300,
+    "Statistic": "Average",
+    "Threshold": 80
+   },
+   "Metadata": {
+    "aws:cdk:path": "CrmDevStack/AuroraCpuAlarm/Resource"
+   }
+  },
+  "AuroraConnectionsAlarm320D1F2B": {
+   "Type": "AWS::CloudWatch::Alarm",
+   "Properties": {
+    "AlarmActions": [
+     {
+      "Ref": "AlarmTopicD01E77F9"
+     }
+    ],
+    "AlarmDescription": "Aurora connection count is high",
+    "AlarmName": "crm-dev-aurora-connections",
+    "ComparisonOperator": "GreaterThanOrEqualToThreshold",
+    "Dimensions": [
+     {
+      "Name": "DBClusterIdentifier",
+      "Value": {
+       "Ref": "CrmDb67725308"
+      }
+     }
+    ],
+    "EvaluationPeriods": 2,
+    "MetricName": "DatabaseConnections",
+    "Namespace": "AWS/RDS",
+    "Period": 300,
+    "Statistic": "Average",
+    "Threshold": 80
+   },
+   "Metadata": {
+    "aws:cdk:path": "CrmDevStack/AuroraConnectionsAlarm/Resource"
+   }
+  },
+  "ApiTaskCountAlarmD75D3244": {
+   "Type": "AWS::CloudWatch::Alarm",
+   "Properties": {
+    "AlarmActions": [
+     {
+      "Ref": "AlarmTopicD01E77F9"
+     }
+    ],
+    "AlarmDescription": "CRITICAL: No API tasks running",
+    "AlarmName": "crm-dev-api-no-tasks",
+    "ComparisonOperator": "LessThanOrEqualToThreshold",
+    "Dimensions": [
+     {
+      "Name": "ClusterName",
+      "Value": {
+       "Ref": "CrmClusterCCD1126B"
+      }
+     },
+     {
+      "Name": "ServiceName",
+      "Value": {
+       "Fn::GetAtt": [
+        "ApiServiceC9037CF0",
+        "Name"
+       ]
+      }
+     }
+    ],
+    "EvaluationPeriods": 1,
+    "MetricName": "CPUUtilization",
+    "Namespace": "AWS/ECS",
+    "Period": 60,
+    "Statistic": "Average",
+    "Threshold": 0,
+    "TreatMissingData": "breaching"
+   },
+   "Metadata": {
+    "aws:cdk:path": "CrmDevStack/ApiTaskCountAlarm/Resource"
+   }
+  },
+  "CDKMetadata": {
+   "Type": "AWS::CDK::Metadata",
+   "Properties": {
+    "Analytics": "v2:deflate64:H4sIAAAAAAAA/+1ZX28bNwz/LLvHQb11adEBeXOctPCWNEbs5WFGUNA6+qxGJ90knV3vcN99oKT74yRt0zUFvK0PwVmkRP1IUSTFHKVHL1+lz3+ArX3Gs9tnUizTeuaA3zLY2nc18qO0vi75ok4K+DD6yybHyY8JSxS4N+BwC7uWIspRlhm0FluKrZYK3VirlcgrA05olRwv6oSLzFyAve1EFbi3Yr4riTCtllLwpGGPX2HEBhx+yZKJ1RIcZklzw5KV1NtznQf8zQ0br9T1dMwCkJlftqgT2ICQsBRSuN0fWrViNyWfZPE3bX4iNW93L6AMQiblpTqHSvF1cuxMhWS2zavxnelgrcjVpNy8iia9VGOD0YAEjR0ICg8ky952zpAcL5Ifk5uDAXgYKIIrBQeiX1e6cjiHpcSe3tNG1mouvIBuMv04m0zp0xubRX9/cs9cgbQHYPOvg3E4SA4ExuEg+Q7j4GD4CDVRDo3CLr6E/BdHI+eArwtUjr0OeXJRJwatrgzHmE1pqwytE6oXzRJnYLUSPM65Ovv1bDyPO0ZJbIa8MsLt3hhdlYuadO/FcSPKgTiQUm9HUl5WbqkrlUXFYy6aqJz0u6okhmID1ERJoTBQQhznWinkJLOtVSol/qww2ttfli6PfRuZZ0ORNP2L2E+JiHnzfWZjRiIfPefjx/cg/s/p93j+vi6PmPVUjnYH4rcQG4qI4UW5RwgHc48cZTZMQJHWV1oiXV0t8W1fFYO1VYHZyS45rpPSCMVFCXLEua6U25tD60e8P9EIfK6n7aqploJTLVg34Sh86AgO2vG60/wk8zBRfVru13D/sb5s/0D/peofoGH/H8dymPfsP2/2f8q9CS9DiSyQQ6KIQOeaOPfw3ydn2cyBQ6rpbLvtkwl6EvJhofk3q/QfdZCHyf56hJvRMKlzm9bnOg+Pi4DfoEMV4sWL581nCL8Ega2IhlnkBp0tQEGOJq1nfryok8AYlFU5KjTUo/GMmTNC5RTN7GA8x6KkJuTdJZ75G+4iHT9wWWU4rRR3VXxfhUK/BGu32mTnqHK37uPyo9Ecjui2yDXoWPjMweTo+tdnZ+X2den5g1fsw8saZjKb1qfgYAkWx7KyDs2iTlDlgt7c7a/BUzYQrtFYD7tOVpWU3TA+xN9rMyQ1pJiBAh0a7y2voRCyPUMrVC7xd4vmSjtvjVFZSsGHz+Ww696yDFdQSUfr9hrZZamNw+xc54TatgC4wYx8F6TdF9BqPzg3i2aDRqK110cXQo2hBC7c7iEufLjD3Rrh0MSBQcjQtBv2D6BNGVvn1vv9w8132mnwYLExdrDEOm0gxzPFza6kqdF5lsBvq5IkDu5pzPxY6E2fL31Dwuidt4JEmjk12mGsFsLb64YFjG3/4f6r7YsVugujdc/Tk8FWgRCdMQwmyjpQHBuGEqwTHPgaU+/X7VmMicTsi7Q+qfitDzxL/2NwrhgsFhSYvXh3MXo7enN2mrBkSX2h0D0acY7Wdgf4MbtB5fQp2Q4vl++Rk+LhFDbB8THr7TheqQ5UIT4I2n74zyX6r5J9kXqWTcPU0T35zQ0LrFjetAoO7HiH/9i9woJBxqAsgtykV1hqK5w2uxOwyJDbtO6jRH/8PNAGpuZaORAKzURZka+dvT4i8wlL3fwswm3P+DWYHKjTb29PcSWUoCPySekb/fnd97dj4xbxgBaBkZcJjovh6khjMw6SdCJpY6rBOx+VGrIlSFBcqHxzlNaDsHauITvxPDR7YocMNlwgrKNs8imrBAFx4nBxiPvd5RoOH9iC2ixDSTRuGPQTyfUtBylUnta9/iTUJyJvGPIFWwInh0BuKW7GmaeiQDVIF22/tGvsGl8ohVRyL/oWdyKuT7wcJM713AC/vUBnBG/bRElJYX8lFGYtw0spvccP/DV6JmmDk65J63W6Bll1mSHwx1rLTG/bPnHMsXuWYOHjMQmVz4K9wk1rZ3eEhlll03quS0H/VXb07R9qwVuJ1jAudZVtwfF1Wo8kmIKuedSsTrZglFB5G73aob97Pg+4tUG71rI1NW5AhgpkikborF0JJHrYCaPx6b0E4KhffiEspXDKo8lxorQ7MQh8TbVOrEU90PYp2tao31F/CervmBKuixKMsFpdllRWa/PVx778/Jn7y+fJTcOuYqhi48o6XbTDvQj+kTlTozciQ+MT6chaeg9ALlROay4rV1auYUpnmL63P22OXqY/v0yf//DeCvHMVMqJAtOr8P0bvjJAWJ8iAAA="
+   },
+   "Metadata": {
+    "aws:cdk:path": "CrmDevStack/CDKMetadata/Default"
+   }
+  }
+ },
+ "Outputs": {
+  "AlbDnsName": {
+   "Description": "ALB DNS name — access the CRM at this URL",
+   "Value": {
+    "Fn::GetAtt": [
+     "CrmAlb32B97D8E",
+     "DNSName"
+    ]
+   }
+  },
+  "ApiUrl": {
+   "Description": "API base URL",
+   "Value": {
+    "Fn::Join": [
+     "",
+     [
+      "http://",
+      {
+       "Fn::GetAtt": [
+        "CrmAlb32B97D8E",
+        "DNSName"
+       ]
+      },
+      "/api/v1"
+     ]
+    ]
+   }
+  },
+  "EcrApiRepo": {
+   "Description": "ECR repository URI for API image",
+   "Value": {
+    "Fn::Join": [
+     "",
+     [
+      "187038415272.dkr.ecr.us-east-1.",
+      {
+       "Ref": "AWS::URLSuffix"
+      },
+      "/crm/api"
+     ]
+    ]
+   }
+  },
+  "EcrWebRepo": {
+   "Description": "ECR repository URI for Web image",
+   "Value": {
+    "Fn::Join": [
+     "",
+     [
+      "187038415272.dkr.ecr.us-east-1.",
+      {
+       "Ref": "AWS::URLSuffix"
+      },
+      "/crm/web"
+     ]
+    ]
+   }
+  },
+  "ClusterName": {
+   "Description": "ECS cluster name",
+   "Value": {
+    "Ref": "CrmClusterCCD1126B"
+   }
+  },
+  "DbEndpoint": {
+   "Description": "Aurora PostgreSQL endpoint",
+   "Value": {
+    "Fn::GetAtt": [
+     "CrmDb67725308",
+     "Endpoint.Address"
+    ]
+   }
+  },
+  "PrivateSubnets": {
+   "Description": "Private subnet IDs for migration tasks",
+   "Value": {
+    "Fn::Join": [
+     "",
+     [
+      {
+       "Ref": "CrmVpcPrivateSubnet1SubnetEB7A324A"
+      },
+      ",",
+      {
+       "Ref": "CrmVpcPrivateSubnet2SubnetD95E14B1"
+      }
+     ]
+    ]
+   }
+  },
+  "MigrateTaskSG": {
+   "Description": "Security group for migration tasks",
+   "Value": {
+    "Fn::GetAtt": [
+     "FargateSg4CA74029",
+     "GroupId"
+    ]
+   }
+  },
+  "AlarmTopicArn": {
+   "Description": "SNS topic for CloudWatch alarms — subscribe your email/Slack here",
+   "Value": {
+    "Ref": "AlarmTopicD01E77F9"
+   }
+  }
+ },
+ "Parameters": {
+  "BootstrapVersion": {
+   "Type": "AWS::SSM::Parameter::Value<String>",
+   "Default": "/cdk-bootstrap/hnb659fds/version",
+   "Description": "Version of the CDK Bootstrap resources in this environment, automatically retrieved from SSM Parameter Store. [cdk:skip]"
+  }
+ },
+ "Rules": {
+  "CheckBootstrapVersion": {
+   "Assertions": [
+    {
+     "Assert": {
+      "Fn::Not": [
+       {
+        "Fn::Contains": [
+         [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5"
+         ],
+         {
+          "Ref": "BootstrapVersion"
+         }
+        ]
+       }
+      ]
+     },
+     "AssertDescription": "CDK bootstrap stack version 6 required. Please run 'cdk bootstrap' with a recent version of the CDK CLI."
+    }
+   ]
+  }
+ }
+}

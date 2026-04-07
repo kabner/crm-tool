@@ -94,7 +94,8 @@ export class ContactsService {
     const qb = this.contactRepository
       .createQueryBuilder('contact')
       .leftJoinAndSelect('contact.company', 'comp')
-      .leftJoinAndSelect('contact.createdBy', 'createdBy')
+      .leftJoin('contact.createdBy', 'createdBy')
+      .addSelect(['createdBy.id', 'createdBy.firstName', 'createdBy.lastName'])
       .where('contact.tenantId = :tenantId', { tenantId });
 
     // Full-text search across name, email, phone, company name, deal name (Task 3 + Task 8)
@@ -187,7 +188,8 @@ export class ContactsService {
     const contact = await this.contactRepository
       .createQueryBuilder('contact')
       .leftJoinAndSelect('contact.company', 'comp')
-      .leftJoinAndSelect('contact.createdBy', 'createdBy')
+      .leftJoin('contact.createdBy', 'createdBy')
+      .addSelect(['createdBy.id', 'createdBy.firstName', 'createdBy.lastName'])
       .leftJoinAndMapMany(
         'contact.companies',
         ContactCompany,

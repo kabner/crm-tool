@@ -61,7 +61,7 @@ export class WebhooksController {
   @ApiResponse({ status: 201, description: 'Webhook endpoint created' })
   async create(
     @CurrentUser('tenantId') tenantId: string,
-    @CurrentUser('id') userId: string,
+    @CurrentUser('userId') userId: string,
     @Body() dto: CreateWebhookDto,
   ) {
     return this.webhooksService.create(tenantId, userId, dto);

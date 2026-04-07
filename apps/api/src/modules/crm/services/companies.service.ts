@@ -42,7 +42,8 @@ export class CompaniesService {
 
     const qb = this.companyRepo
       .createQueryBuilder('company')
-      .leftJoinAndSelect('company.createdBy', 'createdBy')
+      .leftJoin('company.createdBy', 'createdBy')
+      .addSelect(['createdBy.id', 'createdBy.firstName', 'createdBy.lastName'])
       .where('company.tenantId = :tenantId', { tenantId });
 
     if (search) {
@@ -114,7 +115,8 @@ export class CompaniesService {
     const company = await this.companyRepo
       .createQueryBuilder('company')
       .leftJoinAndSelect('company.parent', 'parent')
-      .leftJoinAndSelect('company.createdBy', 'createdBy')
+      .leftJoin('company.createdBy', 'createdBy')
+      .addSelect(['createdBy.id', 'createdBy.firstName', 'createdBy.lastName'])
       .where('company.id = :id', { id })
       .andWhere('company.tenantId = :tenantId', { tenantId })
       .getOne();
