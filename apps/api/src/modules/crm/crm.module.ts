@@ -12,6 +12,8 @@ import {
   List,
   ListMembership,
   SavedView,
+  UserFavorite,
+  UserSetting,
 } from './entities';
 import { ContactsController } from './controllers/contacts.controller';
 import { ContactsService } from './services/contacts.service';
@@ -46,6 +48,8 @@ import { SavedViewsService } from './services/saved-views.service';
       List,
       ListMembership,
       SavedView,
+      UserFavorite,
+      UserSetting,
     ]),
   ],
   controllers: [ContactsController, CompaniesController, ActivitiesController, DealsController, PipelinesController, ListsController, ImportExportController, SearchController, SavedViewsController],

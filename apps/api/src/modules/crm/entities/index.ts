@@ -14,3 +14,5 @@ export { CustomProperty } from './custom-property.entity';
 export { List } from './list.entity';
 export { ListMembership } from './list-membership.entity';
 export { SavedView } from './saved-view.entity';
+export { UserFavorite } from './user-favorite.entity';
+export { UserSetting } from './user-setting.entity';

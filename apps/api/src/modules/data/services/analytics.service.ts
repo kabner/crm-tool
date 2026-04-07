@@ -89,7 +89,7 @@ export class AnalyticsService {
     const newLeads = await this.contactRepository.count({
       where: {
         tenantId,
-        lifecycleStage: 'lead',
+        leadStatus: 'new',
         createdAt: Between(start, end),
       },
     });

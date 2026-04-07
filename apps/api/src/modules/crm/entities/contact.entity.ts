@@ -9,6 +9,7 @@ import {
   Index,
 } from 'typeorm';
 import { User } from './user.entity';
+import { Company } from './company.entity';
 
 @Entity('contacts')
 @Index('IDX_contacts_tenant_email', ['tenantId', 'email'])
@@ -35,9 +36,6 @@ export class Contact {
   @Column({ name: 'job_title', nullable: true })
   jobTitle: string;
 
-  @Column({ name: 'lifecycle_stage', default: 'lead' })
-  lifecycleStage: string;
-
   @Column({ name: 'lead_status', nullable: true })
   leadStatus: string;
 
@@ -62,7 +60,21 @@ export class Contact {
   @UpdateDateColumn({ name: 'updated_at' })
   updatedAt: Date;
 
+  @Column({ name: 'created_by_id', nullable: true })
+  createdById: string;
+
+  @Column({ name: 'company_id', nullable: true })
+  companyId: string;
+
   @ManyToOne(() => User)
   @JoinColumn({ name: 'owner_id' })
   owner: User;
+
+  @ManyToOne(() => User)
+  @JoinColumn({ name: 'created_by_id' })
+  createdBy: User;
+
+  @ManyToOne(() => Company)
+  @JoinColumn({ name: 'company_id' })
+  company: Company;
 }
