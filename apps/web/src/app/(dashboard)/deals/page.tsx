@@ -64,13 +64,14 @@ export default function DealsPage() {
   const { data: pipelines } = usePipelines();
   const createDeal = useCreateDeal();
 
-  // Default to "All Opportunities"
+  // Default to first real pipeline in board view
   useEffect(() => {
-    if (!selectedPipelineId) {
-      setSelectedPipelineId("all");
-      setViewMode("list");
+    if (!selectedPipelineId && pipelines && pipelines.length > 0) {
+      const defaultPipeline = pipelines.find((p: any) => p.isDefault) || pipelines[0];
+      setSelectedPipelineId(defaultPipeline.id);
+      setViewMode("board");
     }
-  }, [selectedPipelineId]);
+  }, [selectedPipelineId, pipelines]);
 
   const isAllOpportunities = selectedPipelineId === "all";
 
