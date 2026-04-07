@@ -14,7 +14,10 @@ import {
   SavedView,
   UserFavorite,
   UserSetting,
+  User,
+  FeedReaction,
 } from './entities';
+import { Notification } from '../../shared/notifications/entities/notification.entity';
 import { ContactsController } from './controllers/contacts.controller';
 import { ContactsService } from './services/contacts.service';
 import { CompaniesController } from './controllers/companies.controller';
@@ -37,6 +40,8 @@ import { FavoritesController } from './controllers/favorites.controller';
 import { FavoritesService } from './services/favorites.service';
 import { UserSettingsController } from './controllers/user-settings.controller';
 import { UserSettingsService } from './services/user-settings.service';
+import { FeedController } from './controllers/feed.controller';
+import { FeedService } from './services/feed.service';
 
 @Module({
   imports: [
@@ -54,10 +59,13 @@ import { UserSettingsService } from './services/user-settings.service';
       SavedView,
       UserFavorite,
       UserSetting,
+      User,
+      FeedReaction,
+      Notification,
     ]),
   ],
-  controllers: [ContactsController, CompaniesController, ActivitiesController, DealsController, PipelinesController, ListsController, ImportExportController, SearchController, SavedViewsController, FavoritesController, UserSettingsController],
-  providers: [ContactsService, CompaniesService, ActivitiesService, DealsService, PipelinesService, ListsService, ImportExportService, SearchService, SavedViewsService, FavoritesService, UserSettingsService],
-  exports: [ContactsService, CompaniesService, ActivitiesService, DealsService, PipelinesService, ListsService, ImportExportService, SearchService, SavedViewsService, FavoritesService, UserSettingsService],
+  controllers: [ContactsController, CompaniesController, ActivitiesController, DealsController, PipelinesController, ListsController, ImportExportController, SearchController, SavedViewsController, FavoritesController, UserSettingsController, FeedController],
+  providers: [ContactsService, CompaniesService, ActivitiesService, DealsService, PipelinesService, ListsService, ImportExportService, SearchService, SavedViewsService, FavoritesService, UserSettingsService, FeedService],
+  exports: [ContactsService, CompaniesService, ActivitiesService, DealsService, PipelinesService, ListsService, ImportExportService, SearchService, SavedViewsService, FavoritesService, UserSettingsService, FeedService],
 })
 export class CrmModule {}

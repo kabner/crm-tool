@@ -16,3 +16,4 @@ export { ListMembership } from './list-membership.entity';
 export { SavedView } from './saved-view.entity';
 export { UserFavorite } from './user-favorite.entity';
 export { UserSetting } from './user-setting.entity';
+export { FeedReaction } from './feed-reaction.entity';
