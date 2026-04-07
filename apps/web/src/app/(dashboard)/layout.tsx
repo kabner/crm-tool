@@ -30,7 +30,6 @@ import {
   Receipt,
   RefreshCw,
   DollarSign,
-  Target,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import * as Avatar from "@radix-ui/react-avatar";
@@ -104,8 +103,7 @@ const navSections: NavSection[] = [
   {
     section: "Settings",
     items: [
-      { label: "Integrations", href: "/settings/integrations", icon: Settings },
-      { label: "Lead Scoring", href: "/settings/lead-scoring", icon: Target },
+      { label: "Settings", href: "/settings", icon: Settings },
     ],
   },
 ];
