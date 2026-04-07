@@ -379,7 +379,7 @@ export default function ListDetailPage() {
                         </td>
                         <td className="px-4 py-3">
                           <Badge variant="secondary">
-                            {contact.lifecycleStage}
+                            {contact.company?.lifecycleStage ?? '-'}
                           </Badge>
                         </td>
                         {list.type === "static" && (

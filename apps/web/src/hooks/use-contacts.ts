@@ -9,7 +9,6 @@ export interface Contact {
   email: string | null;
   phone: string | null;
   jobTitle: string | null;
-  lifecycleStage: string;
   leadStatus: string | null;
   ownerId: string | null;
   tags: string[];
@@ -18,6 +17,10 @@ export interface Contact {
   lastActivityAt: string | null;
   createdAt: string;
   updatedAt: string;
+  companyId: string | null;
+  company: { id: string; name: string; lifecycleStage: string } | null;
+  createdById: string | null;
+  createdBy: { firstName: string; lastName: string } | null;
   companies?: any[];
 }
 
@@ -25,6 +28,7 @@ export interface ContactsResponse {
   data: Contact[];
   meta: {
     total: number;
+    totalCount: number;
     page: number;
     limit: number;
     totalPages: number;
@@ -35,11 +39,13 @@ export interface ContactFilters {
   page?: number;
   limit?: number;
   search?: string;
-  lifecycleStage?: string;
   leadStatus?: string;
   ownerId?: string;
   tags?: string;
   companyId?: string;
+  favorite?: string;
+  createdAfter?: string;
+  createdBefore?: string;
   sort?: string;
   order?: "ASC" | "DESC";
 }
@@ -50,11 +56,10 @@ export interface CreateContactInput {
   email?: string;
   phone?: string;
   jobTitle?: string;
-  lifecycleStage?: string;
+  companyId: string;
   leadStatus?: string;
   tags?: string[];
   source?: string;
-  companyIds?: string[];
 }
 
 export interface UpdateContactInput extends Partial<CreateContactInput> {}

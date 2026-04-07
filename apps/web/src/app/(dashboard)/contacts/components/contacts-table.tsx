@@ -1,80 +1,89 @@
-"use client";
+'use client';
 
-import { Badge } from "@/components/ui/badge";
-import { Skeleton } from "@/components/ui/skeleton";
-import type { Contact } from "@/hooks/use-contacts";
+import { Badge } from '@/components/ui/badge';
+import { Skeleton } from '@/components/ui/skeleton';
+import { SortableTableHeader } from '@/components/sortable-table-header';
+import { FavoriteButton } from '@/components/favorite-button';
+import { PhoneDisplay } from '@/components/ui/phone-display';
+import type { Contact } from '@/hooks/use-contacts';
 
 const LIFECYCLE_STAGE_VARIANT: Record<
   string,
-  "default" | "secondary" | "outline" | "destructive"
+  'default' | 'secondary' | 'outline' | 'destructive'
 > = {
-  subscriber: "outline",
-  lead: "secondary",
-  mql: "secondary",
-  sql: "default",
-  opportunity: "default",
-  customer: "default",
-  evangelist: "default",
+  subscriber: 'outline',
+  lead: 'secondary',
+  mql: 'secondary',
+  sql: 'default',
+  opportunity: 'default',
+  customer: 'default',
+  evangelist: 'default',
 };
 
 interface ContactsTableProps {
   contacts: Contact[];
-  isLoading: boolean;
+  loading: boolean;
+  visibleColumns: string[];
+  sort: string;
+  order: 'ASC' | 'DESC';
+  onSort: (field: string) => void;
+  favoriteIds: Set<string>;
+  onToggleFavorite: (id: string) => void;
   onRowClick: (id: string) => void;
 }
 
+const COLUMN_CONFIG: { key: string; label: string; sortField?: string }[] = [
+  { key: 'favorite', label: '' },
+  { key: 'name', label: 'Name', sortField: 'firstName' },
+  { key: 'email', label: 'Email', sortField: 'email' },
+  { key: 'phone', label: 'Phone' },
+  { key: 'company', label: 'Company' },
+  { key: 'lifecycleStage', label: 'Lifecycle Stage' },
+  { key: 'leadStatus', label: 'Lead Status', sortField: 'leadStatus' },
+  { key: 'createdBy', label: 'Created By' },
+  { key: 'createdAt', label: 'Created At', sortField: 'createdAt' },
+  { key: 'jobTitle', label: 'Job Title' },
+  { key: 'tags', label: 'Tags' },
+  { key: 'source', label: 'Source', sortField: 'source' },
+];
+
 export function ContactsTable({
   contacts,
-  isLoading,
+  loading,
+  visibleColumns,
+  sort,
+  order,
+  onSort,
+  favoriteIds,
+  onToggleFavorite,
   onRowClick,
 }: ContactsTableProps) {
-  if (isLoading) {
+  const activeCols = COLUMN_CONFIG.filter((c) => visibleColumns.includes(c.key));
+
+  if (loading) {
     return (
       <div className="overflow-x-auto rounded-md border border-border">
         <table className="min-w-[800px] w-full">
           <thead>
             <tr className="border-b border-border bg-muted/50">
-              <th className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">
-                Name
-              </th>
-              <th className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">
-                Email
-              </th>
-              <th className="hidden md:table-cell px-4 py-3 text-left text-sm font-medium text-muted-foreground">
-                Phone
-              </th>
-              <th className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">
-                Lifecycle Stage
-              </th>
-              <th className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">
-                Owner
-              </th>
-              <th className="hidden md:table-cell px-4 py-3 text-left text-sm font-medium text-muted-foreground">
-                Created At
-              </th>
+              {activeCols.map((col) => (
+                <th
+                  key={col.key}
+                  className="px-4 py-3 text-left text-sm font-medium text-muted-foreground"
+                >
+                  {col.label}
+                </th>
+              ))}
             </tr>
           </thead>
           <tbody>
             {Array.from({ length: 5 }).map((_, i) => (
               <tr key={i} className="border-b border-border">
-                <td className="px-4 py-3">
-                  <Skeleton className="h-4 w-32" />
-                </td>
-                <td className="px-4 py-3">
-                  <Skeleton className="h-4 w-40" />
-                </td>
-                <td className="hidden md:table-cell px-4 py-3">
-                  <Skeleton className="h-4 w-28" />
-                </td>
-                <td className="px-4 py-3">
-                  <Skeleton className="h-5 w-20" />
-                </td>
-                <td className="px-4 py-3">
-                  <Skeleton className="h-4 w-24" />
-                </td>
-                <td className="hidden md:table-cell px-4 py-3">
-                  <Skeleton className="h-4 w-24" />
-                </td>
+                {activeCols.map((col) => (
+                  <td key={col.key} className="px-4 py-3">
+                    <Skeleton className="h-4 w-24" />
+                  </td>
+                ))}
               </tr>
             ))}
           </tbody>
@@ -91,29 +100,115 @@ export function ContactsTable({
     );
   }
 
+  function renderCell(contact: Contact, colKey: string) {
+    switch (colKey) {
+      case 'favorite':
+        return (
+          <FavoriteButton
+            isFavorite={favoriteIds.has(contact.id)}
+            onToggle={() => onToggleFavorite(contact.id)}
+          />
+        );
+      case 'name':
+        return (
+          <span className="font-medium">
+            {contact.firstName} {contact.lastName}
+          </span>
+        );
+      case 'email':
+        return (
+          <span className="text-muted-foreground">{contact.email ?? '-'}</span>
+        );
+      case 'phone':
+        return <PhoneDisplay phone={contact.phone} className="text-muted-foreground" />;
+      case 'company':
+        return (
+          <span className="text-muted-foreground">
+            {contact.company?.name ?? '-'}
+          </span>
+        );
+      case 'lifecycleStage': {
+        const stage = contact.company?.lifecycleStage;
+        if (!stage) return <span className="text-muted-foreground">-</span>;
+        return (
+          <Badge variant={LIFECYCLE_STAGE_VARIANT[stage] ?? 'outline'}>
+            {stage}
+          </Badge>
+        );
+      }
+      case 'leadStatus':
+        return (
+          <span className="text-muted-foreground">
+            {contact.leadStatus ?? '-'}
+          </span>
+        );
+      case 'createdBy':
+        return (
+          <span className="text-muted-foreground">
+            {contact.createdBy
+              ? `${contact.createdBy.firstName} ${contact.createdBy.lastName}`
+              : 'System'}
+          </span>
+        );
+      case 'createdAt':
+        return (
+          <span className="text-muted-foreground">
+            {new Date(contact.createdAt).toLocaleDateString()}
+          </span>
+        );
+      case 'jobTitle':
+        return (
+          <span className="text-muted-foreground">
+            {contact.jobTitle ?? '-'}
+          </span>
+        );
+      case 'tags':
+        return contact.tags && contact.tags.length > 0 ? (
+          <div className="flex flex-wrap gap-1">
+            {contact.tags.map((tag) => (
+              <Badge key={tag} variant="outline" className="text-xs">
+                {tag}
+              </Badge>
+            ))}
+          </div>
+        ) : (
+          <span className="text-muted-foreground">-</span>
+        );
+      case 'source':
+        return (
+          <span className="text-muted-foreground">
+            {contact.source ?? '-'}
+          </span>
+        );
+      default:
+        return null;
+    }
+  }
+
   return (
     <div className="overflow-x-auto rounded-md border border-border">
       <table className="min-w-[800px] w-full">
         <thead>
           <tr className="border-b border-border bg-muted/50">
-            <th className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">
-              Name
-            </th>
-            <th className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">
-              Email
-            </th>
-            <th className="hidden md:table-cell px-4 py-3 text-left text-sm font-medium text-muted-foreground">
-              Phone
-            </th>
-            <th className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">
-              Lifecycle Stage
-            </th>
-            <th className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">
-              Owner
-            </th>
-            <th className="hidden md:table-cell px-4 py-3 text-left text-sm font-medium text-muted-foreground">
-              Created At
-            </th>
+            {activeCols.map((col) =>
+              col.sortField ? (
+                <SortableTableHeader
+                  key={col.key}
+                  label={col.label}
+                  field={col.sortField}
+                  currentSort={sort}
+                  currentOrder={order}
+                  onSort={onSort}
+                />
+              ) : (
+                <th
+                  key={col.key}
+                  className="px-4 py-3 text-left text-sm font-medium text-muted-foreground"
+                >
+                  {col.label}
+                </th>
+              ),
+            )}
           </tr>
         </thead>
         <tbody>
@@ -123,30 +218,11 @@ export function ContactsTable({
               onClick={() => onRowClick(contact.id)}
               className="cursor-pointer border-b border-border transition-colors hover:bg-muted/50"
             >
-              <td className="px-4 py-3 text-sm font-medium">
-                {contact.firstName} {contact.lastName}
-              </td>
-              <td className="px-4 py-3 text-sm text-muted-foreground">
-                {contact.email ?? "-"}
-              </td>
-              <td className="hidden md:table-cell px-4 py-3 text-sm text-muted-foreground">
-                {contact.phone ?? "-"}
-              </td>
-              <td className="px-4 py-3">
-                <Badge
-                  variant={
-                    LIFECYCLE_STAGE_VARIANT[contact.lifecycleStage] ?? "outline"
-                  }
-                >
-                  {contact.lifecycleStage}
-                </Badge>
-              </td>
-              <td className="px-4 py-3 text-sm text-muted-foreground">
-                {contact.ownerId ?? "-"}
-              </td>
-              <td className="hidden md:table-cell px-4 py-3 text-sm text-muted-foreground">
-                {new Date(contact.createdAt).toLocaleDateString()}
-              </td>
+              {activeCols.map((col) => (
+                <td key={col.key} className="px-4 py-3 text-sm">
+                  {renderCell(contact, col.key)}
+                </td>
+              ))}
             </tr>
           ))}
         </tbody>

@@ -1,77 +1,147 @@
-"use client";
+'use client';
 
-import { useState, useCallback } from "react";
-import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useContacts, useCreateContact } from "@/hooks/use-contacts";
-import { ContactsTable } from "./components/contacts-table";
-import { ContactForm } from "./components/contact-form";
+import { useState, useCallback, useMemo } from 'react';
+import { useRouter } from 'next/navigation';
+import { Plus, X, Save, ChevronDown } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { FilterBar, type ActiveFilter, type FilterField } from '@/components/filter-bar/filter-bar';
+import { RecordCount } from '@/components/record-count';
+import { ColumnPicker, type ColumnDef } from '@/components/column-picker';
+import { ContactsTable } from './components/contacts-table';
+import { ContactForm } from './components/contact-form';
+import { useContacts, useCreateContact } from '@/hooks/use-contacts';
+import { useFavorites, useToggleFavorite } from '@/hooks/use-favorites';
+import { useSavedViews, useCreateView } from '@/hooks/use-saved-views';
 
-const LIFECYCLE_STAGES = [
-  "All",
-  "Subscriber",
-  "Lead",
-  "MQL",
-  "SQL",
-  "Opportunity",
-  "Customer",
-  "Evangelist",
-] as const;
+const CONTACT_FILTER_FIELDS: FilterField[] = [
+  {
+    key: 'leadStatus',
+    label: 'Lead Status',
+    type: 'select',
+    options: [
+      { label: 'New', value: 'new' },
+      { label: 'Open', value: 'open' },
+      { label: 'In Progress', value: 'in_progress' },
+      { label: 'Qualified', value: 'qualified' },
+      { label: 'Unqualified', value: 'unqualified' },
+    ],
+  },
+  { key: 'companyId', label: 'Company', type: 'text' },
+  { key: 'tags', label: 'Tags', type: 'text' },
+  { key: 'favorite', label: 'Favorites Only', type: 'boolean' },
+  { key: 'createdAfter', label: 'Created After', type: 'date' },
+  { key: 'createdBefore', label: 'Created Before', type: 'date' },
+];
 
-const LEAD_STATUSES = [
-  "All",
-  "New",
-  "Attempting Contact",
-  "Connected",
-  "Qualified",
-  "Unqualified",
-] as const;
+const ALL_COLUMNS: ColumnDef[] = [
+  { key: 'favorite', label: 'Favorite', defaultVisible: true },
+  { key: 'name', label: 'Name', defaultVisible: true },
+  { key: 'email', label: 'Email', defaultVisible: true },
+  { key: 'phone', label: 'Phone', defaultVisible: true },
+  { key: 'company', label: 'Company', defaultVisible: true },
+  { key: 'lifecycleStage', label: 'Lifecycle Stage', defaultVisible: true },
+  { key: 'leadStatus', label: 'Lead Status', defaultVisible: false },
+  { key: 'createdBy', label: 'Created By', defaultVisible: true },
+  { key: 'createdAt', label: 'Created At', defaultVisible: true },
+  { key: 'jobTitle', label: 'Job Title', defaultVisible: false },
+  { key: 'tags', label: 'Tags', defaultVisible: false },
+  { key: 'source', label: 'Source', defaultVisible: false },
+];
+
+const DEFAULT_VISIBLE = ALL_COLUMNS.filter((c) => c.defaultVisible).map((c) => c.key);
 
 export default function ContactsPage() {
   const router = useRouter();
-  const [page, setPage] = useState(1);
-  const [search, setSearch] = useState("");
-  const [debouncedSearch, setDebouncedSearch] = useState("");
-  const [showCreateForm, setShowCreateForm] = useState(false);
 
-  // Filters
-  const [lifecycleStage, setLifecycleStage] = useState("All");
-  const [leadStatus, setLeadStatus] = useState("All");
-  const [ownerFilter, setOwnerFilter] = useState("");
-  const [tagsFilter, setTagsFilter] = useState("");
+  // UI state
+  const [showCreateForm, setShowCreateForm] = useState(false);
+  const [page, setPage] = useState(1);
+  const [search, setSearch] = useState('');
+  const [filters, setFilters] = useState<ActiveFilter[]>([]);
+  const [sort, setSort] = useState('createdAt');
+  const [order, setOrder] = useState<'ASC' | 'DESC'>('DESC');
+  const [visibleColumns, setVisibleColumns] = useState<string[]>(DEFAULT_VISIBLE);
+
+  // Saved views
+  const { data: savedViews } = useSavedViews('contact');
+  const createView = useCreateView();
+  const [viewDropdownOpen, setViewDropdownOpen] = useState(false);
+
+  // Favorites
+  const { data: favorites } = useFavorites('contact');
+  const toggleFavorite = useToggleFavorite();
+
+  const favoriteIds = useMemo(() => {
+    if (!favorites) return new Set<string>();
+    return new Set(favorites.map((f) => f.entityId));
+  }, [favorites]);
+
+  // Build API filters from active filters
+  const apiFilters = useMemo(() => {
+    const result: Record<string, string> = {};
+    for (const f of filters) {
+      result[f.key] = f.value;
+    }
+    return result;
+  }, [filters]);
 
   const { data, isLoading } = useContacts({
     page,
     limit: 20,
-    search: debouncedSearch || undefined,
-    lifecycleStage: lifecycleStage !== "All" ? lifecycleStage.toLowerCase() : undefined,
-    leadStatus: leadStatus !== "All" ? leadStatus.toLowerCase() : undefined,
-    ownerId: ownerFilter || undefined,
-    tags: tagsFilter || undefined,
+    search: search || undefined,
+    sort,
+    order,
+    ...apiFilters,
   });
 
   const createContact = useCreateContact();
 
-  // Debounced search
-  const debounceTimer = useState<ReturnType<typeof setTimeout> | null>(null);
+  const contacts = data?.data ?? [];
+  const meta = data?.meta ?? { total: 0, totalCount: 0, page: 1, limit: 20, totalPages: 1 };
 
   const handleSearchChange = useCallback(
     (value: string) => {
       setSearch(value);
-      if (debounceTimer[0]) clearTimeout(debounceTimer[0]);
-      debounceTimer[0] = setTimeout(() => {
-        setDebouncedSearch(value);
-        setPage(1);
-      }, 300);
+      setPage(1);
     },
-    [debounceTimer],
+    [],
   );
 
-  const handleRowClick = (id: string) => {
-    router.push(`/contacts/${id}`);
-  };
+  const handleFiltersChange = useCallback(
+    (newFilters: ActiveFilter[]) => {
+      setFilters(newFilters);
+      setPage(1);
+    },
+    [],
+  );
+
+  const handleSort = useCallback(
+    (field: string) => {
+      if (sort === field) {
+        setOrder((prev) => (prev === 'ASC' ? 'DESC' : 'ASC'));
+      } else {
+        setSort(field);
+        setOrder('ASC');
+      }
+      setPage(1);
+    },
+    [sort],
+  );
+
+  const handleToggleFavorite = useCallback(
+    (id: string) => {
+      toggleFavorite.mutate({ entityType: 'contact', entityId: id });
+    },
+    [toggleFavorite],
+  );
+
+  const handleRowClick = useCallback(
+    (id: string) => {
+      router.push(`/contacts/${id}`);
+    },
+    [router],
+  );
 
   const handleCreateSubmit = async (formData: {
     firstName: string;
@@ -79,7 +149,7 @@ export default function ContactsPage() {
     email?: string;
     phone?: string;
     jobTitle?: string;
-    lifecycleStage?: string;
+    companyId: string;
     leadStatus?: string;
     tags?: string[];
     source?: string;
@@ -88,23 +158,133 @@ export default function ContactsPage() {
     setShowCreateForm(false);
   };
 
-  const contacts = data?.data ?? [];
-  const meta = data?.meta ?? { total: 0, page: 1, limit: 20, totalPages: 1 };
+  const handleSaveView = () => {
+    const name = window.prompt('View name:');
+    if (!name) return;
+
+    const filterObj: Record<string, string> = {};
+    for (const f of filters) {
+      filterObj[f.key] = f.value;
+    }
+
+    createView.mutate({
+      objectType: 'contact',
+      name,
+      filters: { search, ...filterObj },
+      columns: visibleColumns,
+      sort: { field: sort, order },
+    });
+  };
+
+  const handleApplyView = (view: { filters: Record<string, any>; columns: string[]; sort: { field: string; order: 'ASC' | 'DESC' } | Record<string, never> }) => {
+    const { search: viewSearch, ...viewFilters } = view.filters;
+    if (viewSearch) setSearch(viewSearch);
+    else setSearch('');
+
+    const newActiveFilters: ActiveFilter[] = Object.entries(viewFilters).map(([key, value]) => {
+      const fieldDef = CONTACT_FILTER_FIELDS.find((f) => f.key === key);
+      return { key, value: String(value), label: fieldDef ? `${fieldDef.label}: ${value}` : `${key}: ${value}` };
+    });
+    setFilters(newActiveFilters);
+
+    if (view.columns && view.columns.length > 0) {
+      setVisibleColumns(view.columns);
+    }
+
+    if (view.sort && 'field' in view.sort && view.sort.field) {
+      setSort(view.sort.field);
+      setOrder(view.sort.order);
+    }
+
+    setPage(1);
+    setViewDropdownOpen(false);
+  };
+
+  const hasActiveFilters = filters.length > 0 || !!search;
 
   return (
     <div className="space-y-6">
+      {/* Header */}
       <div className="flex items-center justify-between">
-        <div>
+        <div className="flex items-center gap-3">
           <h1 className="text-3xl font-bold tracking-tight">Contacts</h1>
-          <p className="text-muted-foreground">
-            Manage your contacts and their information.
-          </p>
+          <RecordCount
+            filtered={meta.total}
+            total={meta.totalCount ?? meta.total}
+            hasFilters={hasActiveFilters}
+          />
         </div>
-        <Button onClick={() => setShowCreateForm(!showCreateForm)}>
-          {showCreateForm ? "Cancel" : "Create Contact"}
-        </Button>
+        <div className="flex items-center gap-2">
+          <ColumnPicker
+            columns={ALL_COLUMNS}
+            visibleColumns={visibleColumns}
+            onChange={setVisibleColumns}
+          />
+
+          {/* Saved Views dropdown */}
+          <div className="relative">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setViewDropdownOpen(!viewDropdownOpen)}
+              className="gap-1.5"
+            >
+              Views
+              <ChevronDown className="h-4 w-4" />
+            </Button>
+            {viewDropdownOpen && (
+              <div className="absolute right-0 top-full z-50 mt-1 w-56 rounded-md border bg-popover p-2 shadow-md">
+                <p className="mb-1 px-2 text-xs font-medium text-muted-foreground">
+                  Saved Views
+                </p>
+                {savedViews && savedViews.length > 0 ? (
+                  savedViews.map((view) => (
+                    <button
+                      key={view.id}
+                      type="button"
+                      onClick={() => handleApplyView(view)}
+                      className="w-full rounded-md px-2 py-1.5 text-left text-sm hover:bg-muted"
+                    >
+                      {view.name}
+                      {view.isDefault && (
+                        <span className="ml-1 text-xs text-muted-foreground">(default)</span>
+                      )}
+                    </button>
+                  ))
+                ) : (
+                  <p className="px-2 py-1.5 text-sm text-muted-foreground">No saved views</p>
+                )}
+                <div className="mt-1 border-t pt-1">
+                  <button
+                    type="button"
+                    onClick={handleSaveView}
+                    className="flex w-full items-center gap-1.5 rounded-md px-2 py-1.5 text-left text-sm hover:bg-muted"
+                  >
+                    <Save className="h-3.5 w-3.5" />
+                    Save Current View
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+
+          <Button onClick={() => setShowCreateForm(!showCreateForm)}>
+            {showCreateForm ? (
+              <>
+                <X className="mr-2 h-4 w-4" />
+                Cancel
+              </>
+            ) : (
+              <>
+                <Plus className="mr-2 h-4 w-4" />
+                Create Contact
+              </>
+            )}
+          </Button>
+        </div>
       </div>
 
+      {/* Create form */}
       {showCreateForm && (
         <Card>
           <CardHeader>
@@ -114,82 +294,32 @@ export default function ContactsPage() {
             <ContactForm
               onSubmit={handleCreateSubmit}
               isLoading={createContact.isPending}
+              onCancel={() => setShowCreateForm(false)}
             />
           </CardContent>
         </Card>
       )}
 
-      <div className="space-y-3">
-        <div className="flex items-center gap-4">
-          <Input
-            placeholder="Search contacts..."
-            value={search}
-            onChange={(e) => handleSearchChange(e.target.value)}
-            className="max-w-sm"
-          />
-        </div>
+      {/* Filter bar */}
+      <FilterBar
+        fields={CONTACT_FILTER_FIELDS}
+        onSearchChange={handleSearchChange}
+        onFiltersChange={handleFiltersChange}
+        searchPlaceholder="Search contacts..."
+        initialSearch={search}
+        initialFilters={filters}
+      />
 
-        {/* Filter bar */}
-        <div className="flex flex-wrap items-center gap-3">
-          <select
-            value={lifecycleStage}
-            onChange={(e) => { setLifecycleStage(e.target.value); setPage(1); }}
-            className="rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring"
-          >
-            {LIFECYCLE_STAGES.map((stage) => (
-              <option key={stage} value={stage}>
-                {stage === "All" ? "All Stages" : stage}
-              </option>
-            ))}
-          </select>
-
-          <select
-            value={leadStatus}
-            onChange={(e) => { setLeadStatus(e.target.value); setPage(1); }}
-            className="rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring"
-          >
-            {LEAD_STATUSES.map((status) => (
-              <option key={status} value={status}>
-                {status === "All" ? "All Statuses" : status}
-              </option>
-            ))}
-          </select>
-
-          <Input
-            placeholder="Owner ID..."
-            value={ownerFilter}
-            onChange={(e) => { setOwnerFilter(e.target.value); setPage(1); }}
-            className="w-40"
-          />
-
-          <Input
-            placeholder="Filter by tag..."
-            value={tagsFilter}
-            onChange={(e) => { setTagsFilter(e.target.value); setPage(1); }}
-            className="w-40"
-          />
-
-          {(lifecycleStage !== "All" || leadStatus !== "All" || ownerFilter || tagsFilter) && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => {
-                setLifecycleStage("All");
-                setLeadStatus("All");
-                setOwnerFilter("");
-                setTagsFilter("");
-                setPage(1);
-              }}
-            >
-              Clear Filters
-            </Button>
-          )}
-        </div>
-      </div>
-
+      {/* Table */}
       <ContactsTable
         contacts={contacts}
-        isLoading={isLoading}
+        loading={isLoading}
+        visibleColumns={visibleColumns}
+        sort={sort}
+        order={order}
+        onSort={handleSort}
+        favoriteIds={favoriteIds}
+        onToggleFavorite={handleToggleFavorite}
         onRowClick={handleRowClick}
       />
 
@@ -197,9 +327,8 @@ export default function ContactsPage() {
       {meta.totalPages > 1 && (
         <div className="flex items-center justify-between">
           <p className="text-sm text-muted-foreground">
-            Showing {(meta.page - 1) * meta.limit + 1} to{" "}
-            {Math.min(meta.page * meta.limit, meta.total)} of {meta.total}{" "}
-            contacts
+            Showing {(meta.page - 1) * meta.limit + 1} to{' '}
+            {Math.min(meta.page * meta.limit, meta.total)} of {meta.total} contacts
           </p>
           <div className="flex items-center gap-2">
             <Button
