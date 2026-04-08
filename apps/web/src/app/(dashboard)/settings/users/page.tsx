@@ -39,7 +39,7 @@ export default function UsersSettingsPage() {
 
   const { data: users, isLoading } = useQuery<User[]>({
     queryKey: ['users'],
-    queryFn: () => apiClient.get<User[]>('/api/v1/users'),
+    queryFn: () => apiClient.get<User[]>('/api/v1/auth/users'),
   });
 
   const createUser = useMutation({
