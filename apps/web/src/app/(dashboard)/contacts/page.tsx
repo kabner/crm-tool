@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
-import { Plus, X, Save, ChevronDown } from 'lucide-react';
+import { Plus, X, Save, ChevronDown, Camera } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { FilterBar, type ActiveFilter, type FilterField } from '@/components/filter-bar/filter-bar';
@@ -14,6 +14,7 @@ import { useContacts, useCreateContact } from '@/hooks/use-contacts';
 import { useFavorites, useToggleFavorite } from '@/hooks/use-favorites';
 import { useSavedViews, useCreateView } from '@/hooks/use-saved-views';
 import { useContactTypes } from '@/hooks/use-contact-types';
+import { ScanCardDialog } from '@/components/scan-card-dialog';
 
 const BASE_CONTACT_FILTER_FIELDS: FilterField[] = [
   {
@@ -68,6 +69,17 @@ export default function ContactsPage() {
       options: (contactTypes ?? []).map((ct) => ({ label: ct.name, value: ct.name })),
     },
   ], [contactTypes]);
+
+  // Scan card state
+  const [scanOpen, setScanOpen] = useState(false);
+  const [scannedData, setScannedData] = useState<{
+    firstName?: string;
+    lastName?: string;
+    email?: string;
+    phone?: string;
+    companyName?: string;
+    jobTitle?: string;
+  } | null>(null);
 
   // UI state
   const [showCreateForm, setShowCreateForm] = useState(false);
@@ -172,6 +184,7 @@ export default function ContactsPage() {
   }) => {
     await createContact.mutateAsync(formData);
     setShowCreateForm(false);
+    setScannedData(null);
   };
 
   const handleSaveView = () => {
@@ -284,6 +297,14 @@ export default function ContactsPage() {
             )}
           </div>
 
+          <Button
+            variant="outline"
+            onClick={() => setScanOpen(true)}
+          >
+            <Camera className="mr-2 h-4 w-4" />
+            Scan Card
+          </Button>
+
           <Button onClick={() => setShowCreateForm(!showCreateForm)}>
             {showCreateForm ? (
               <>
@@ -300,6 +321,15 @@ export default function ContactsPage() {
         </div>
       </div>
 
+      <ScanCardDialog
+        open={scanOpen}
+        onOpenChange={setScanOpen}
+        onResult={(data) => {
+          setScannedData(data);
+          setShowCreateForm(true);
+        }}
+      />
+
       {/* Create form */}
       {showCreateForm && (
         <Card>
@@ -308,9 +338,13 @@ export default function ContactsPage() {
           </CardHeader>
           <CardContent>
             <ContactForm
+              initialData={scannedData ?? undefined}
               onSubmit={handleCreateSubmit}
               isLoading={createContact.isPending}
-              onCancel={() => setShowCreateForm(false)}
+              onCancel={() => {
+                setShowCreateForm(false);
+                setScannedData(null);
+              }}
             />
           </CardContent>
         </Card>

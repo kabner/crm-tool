@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
-import { Plus, X } from 'lucide-react';
+import { Plus, X, Camera } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { FilterBar, type ActiveFilter, type FilterField } from '@/components/filter-bar/filter-bar';
@@ -11,6 +11,7 @@ import { ColumnPicker, type ColumnDef } from '@/components/column-picker';
 import { LeadsTable } from './components/leads-table';
 import { LeadForm } from './components/lead-form';
 import { useLeads, useCreateLead } from '@/hooks/use-leads';
+import { ScanCardDialog } from '@/components/scan-card-dialog';
 
 const LEAD_FILTER_FIELDS: FilterField[] = [
   {
@@ -44,6 +45,17 @@ const DEFAULT_VISIBLE = ALL_COLUMNS.filter((c) => c.defaultVisible).map((c) => c
 
 export default function LeadsPage() {
   const router = useRouter();
+
+  // Scan card state
+  const [scanOpen, setScanOpen] = useState(false);
+  const [scannedData, setScannedData] = useState<{
+    firstName?: string;
+    lastName?: string;
+    email?: string;
+    phone?: string;
+    companyName?: string;
+    jobTitle?: string;
+  } | null>(null);
 
   // UI state
   const [showCreateForm, setShowCreateForm] = useState(false);
@@ -120,6 +132,7 @@ export default function LeadsPage() {
   }) => {
     await createLead.mutateAsync(formData);
     setShowCreateForm(false);
+    setScannedData(null);
   };
 
   const hasActiveFilters = filters.length > 0 || !!search;
@@ -143,6 +156,14 @@ export default function LeadsPage() {
             onChange={setVisibleColumns}
           />
 
+          <Button
+            variant="outline"
+            onClick={() => setScanOpen(true)}
+          >
+            <Camera className="mr-2 h-4 w-4" />
+            Scan Card
+          </Button>
+
           <Button onClick={() => setShowCreateForm(!showCreateForm)}>
             {showCreateForm ? (
               <>
@@ -159,6 +180,15 @@ export default function LeadsPage() {
         </div>
       </div>
 
+      <ScanCardDialog
+        open={scanOpen}
+        onOpenChange={setScanOpen}
+        onResult={(data) => {
+          setScannedData(data);
+          setShowCreateForm(true);
+        }}
+      />
+
       {/* Create form */}
       {showCreateForm && (
         <Card>
@@ -167,9 +197,13 @@ export default function LeadsPage() {
           </CardHeader>
           <CardContent>
             <LeadForm
+              initialData={scannedData ?? undefined}
               onSubmit={handleCreateSubmit}
               isLoading={createLead.isPending}
-              onCancel={() => setShowCreateForm(false)}
+              onCancel={() => {
+                setShowCreateForm(false);
+                setScannedData(null);
+              }}
             />
           </CardContent>
         </Card>
