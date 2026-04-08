@@ -31,6 +31,7 @@ import {
   Receipt,
   RefreshCw,
   DollarSign,
+  UserPlus,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import * as Avatar from "@radix-ui/react-avatar";
@@ -53,6 +54,7 @@ const navSections: NavSection[] = [
       { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
       { label: "Contacts", href: "/contacts", icon: Users },
       { label: "Companies", href: "/companies", icon: Building2 },
+      { label: "Leads", href: "/leads", icon: UserPlus },
     ],
   },
   {
