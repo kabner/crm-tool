@@ -115,6 +115,7 @@ export interface PipelineSummary {
 export interface Pipeline {
   id: string;
   name: string;
+  type?: string; // 'sales' | 'project'
   isDefault: boolean;
   stages?: {
     id: string;
@@ -207,10 +208,11 @@ export function usePipelineSummary(pipelineId: string) {
   });
 }
 
-export function usePipelines() {
+export function usePipelines(type?: string) {
+  const url = type ? `/api/v1/pipelines?type=${type}` : "/api/v1/pipelines";
   return useQuery<Pipeline[]>({
-    queryKey: ["pipelines"],
-    queryFn: () => apiClient.get<Pipeline[]>("/api/v1/pipelines"),
+    queryKey: ["pipelines", type],
+    queryFn: () => apiClient.get<Pipeline[]>(url),
   });
 }
 
