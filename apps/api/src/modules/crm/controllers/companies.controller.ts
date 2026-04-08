@@ -45,6 +45,25 @@ export class CompaniesController {
     return this.companiesService.findAll(tenantId, filters, userId);
   }
 
+  @Get('duplicates')
+  @RequirePermissions(Permissions.COMPANIES_READ)
+  @ApiOperation({ summary: 'Find duplicate companies' })
+  @ApiResponse({ status: 200, description: 'List of duplicate company pairs' })
+  findDuplicates(@CurrentUser('tenantId') tenantId: string) {
+    return this.companiesService.findDuplicates(tenantId);
+  }
+
+  @Post('merge')
+  @RequirePermissions(Permissions.COMPANIES_WRITE)
+  @ApiOperation({ summary: 'Merge two companies' })
+  @ApiResponse({ status: 200, description: 'Merged company' })
+  merge(
+    @CurrentUser('tenantId') tenantId: string,
+    @Body() body: { keepId: string; mergeId: string },
+  ) {
+    return this.companiesService.merge(tenantId, body.keepId, body.mergeId);
+  }
+
   @Get(':id')
   @RequirePermissions(Permissions.COMPANIES_READ)
   @ApiOperation({ summary: 'Get company by ID' })
