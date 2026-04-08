@@ -72,4 +72,10 @@ export class CreateDealDto {
   @IsString()
   @IsIn(['none', 'low', 'medium', 'high'])
   priority?: string;
+
+  @ApiPropertyOptional({ description: 'Record visibility', enum: ['everyone', 'owner', 'private'] })
+  @IsOptional()
+  @IsString()
+  @IsIn(['everyone', 'owner', 'private'])
+  visibility?: string;
 }

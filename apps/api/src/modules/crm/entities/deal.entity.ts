@@ -59,6 +59,9 @@ export class Deal {
   @Column({ default: 'none', length: 10 })
   priority: string;
 
+  @Column({ default: 'everyone' })
+  visibility: string; // 'everyone' | 'owner' | 'private'
+
   @Column({ name: 'custom_props', type: 'jsonb', default: '{}' })
   customProps: Record<string, any>;
 

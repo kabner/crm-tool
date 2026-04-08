@@ -37,6 +37,7 @@ export class DealsService {
   async findAll(
     tenantId: string,
     filters: DealFilterDto,
+    userId?: string,
   ): Promise<{
     data: Deal[];
     meta: { total: number; page: number; limit: number; totalPages: number };
@@ -63,6 +64,14 @@ export class DealsService {
       .leftJoinAndSelect('deal.stage', 'stage')
       .leftJoinAndSelect('deal.pipeline', 'pipeline')
       .where('deal.tenantId = :tenantId', { tenantId });
+
+    // Visibility filter: show records visible to everyone, or where user is owner
+    if (userId) {
+      qb.andWhere(
+        '(deal.visibility = :visEveryone OR deal.ownerId = :visUserId)',
+        { visEveryone: 'everyone', visUserId: userId },
+      );
+    }
 
     if (search) {
       qb.andWhere('deal.name ILIKE :search', { search: `%${search}%` });

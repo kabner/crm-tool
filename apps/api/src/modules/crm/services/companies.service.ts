@@ -86,6 +86,14 @@ export class CompaniesService {
       qb.andWhere('company.createdAt <= :createdBefore', { createdBefore });
     }
 
+    // Visibility filter: show records visible to everyone, or where user is creator/owner
+    if (userId) {
+      qb.andWhere(
+        '(company.visibility = :visEveryone OR company.createdById = :visUserId OR company.ownerId = :visUserId)',
+        { visEveryone: 'everyone', visUserId: userId },
+      );
+    }
+
     // Favorite filter
     if (favorite === 'true' && userId) {
       qb.innerJoin(

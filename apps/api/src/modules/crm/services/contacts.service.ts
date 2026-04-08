@@ -159,6 +159,14 @@ export class ContactsService {
       qb.andWhere('contact.createdAt <= :createdBefore', { createdBefore });
     }
 
+    // Visibility filter: show records visible to everyone, or where user is creator/owner
+    if (userId) {
+      qb.andWhere(
+        '(contact.visibility = :visEveryone OR contact.createdById = :visUserId OR contact.ownerId = :visUserId)',
+        { visEveryone: 'everyone', visUserId: userId },
+      );
+    }
+
     // Favorite filter
     if (favorite === 'true' && userId) {
       qb.innerJoin(

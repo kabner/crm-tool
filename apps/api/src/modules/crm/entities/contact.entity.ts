@@ -66,6 +66,9 @@ export class Contact {
   @Column({ name: 'created_by_id', nullable: true })
   createdById: string;
 
+  @Column({ default: 'everyone' })
+  visibility: string; // 'everyone' | 'owner' | 'private'
+
   @Column({ name: 'company_id', nullable: true })
   companyId: string;
 
