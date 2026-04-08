@@ -18,6 +18,7 @@ import {
   FeedReaction,
   ContactTypeOption,
   ActivityTypeOption,
+  RecordAttachment,
 } from './entities';
 import { Notification } from '../../shared/notifications/entities/notification.entity';
 import { ContactsController } from './controllers/contacts.controller';
@@ -48,6 +49,8 @@ import { ContactTypesController } from './controllers/contact-types.controller';
 import { ContactTypesService } from './services/contact-types.service';
 import { ActivityTypesController } from './controllers/activity-types.controller';
 import { ActivityTypesService } from './services/activity-types.service';
+import { AttachmentsController } from './controllers/attachments.controller';
+import { AttachmentsService } from './services/attachments.service';
 
 @Module({
   imports: [
@@ -70,10 +73,11 @@ import { ActivityTypesService } from './services/activity-types.service';
       Notification,
       ContactTypeOption,
       ActivityTypeOption,
+      RecordAttachment,
     ]),
   ],
-  controllers: [ContactsController, CompaniesController, ActivitiesController, DealsController, PipelinesController, ListsController, ImportExportController, SearchController, SavedViewsController, FavoritesController, UserSettingsController, FeedController, ContactTypesController, ActivityTypesController],
-  providers: [ContactsService, CompaniesService, ActivitiesService, DealsService, PipelinesService, ListsService, ImportExportService, SearchService, SavedViewsService, FavoritesService, UserSettingsService, FeedService, ContactTypesService, ActivityTypesService],
-  exports: [ContactsService, CompaniesService, ActivitiesService, DealsService, PipelinesService, ListsService, ImportExportService, SearchService, SavedViewsService, FavoritesService, UserSettingsService, FeedService, ContactTypesService, ActivityTypesService],
+  controllers: [ContactsController, CompaniesController, ActivitiesController, DealsController, PipelinesController, ListsController, ImportExportController, SearchController, SavedViewsController, FavoritesController, UserSettingsController, FeedController, ContactTypesController, ActivityTypesController, AttachmentsController],
+  providers: [ContactsService, CompaniesService, ActivitiesService, DealsService, PipelinesService, ListsService, ImportExportService, SearchService, SavedViewsService, FavoritesService, UserSettingsService, FeedService, ContactTypesService, ActivityTypesService, AttachmentsService],
+  exports: [ContactsService, CompaniesService, ActivitiesService, DealsService, PipelinesService, ListsService, ImportExportService, SearchService, SavedViewsService, FavoritesService, UserSettingsService, FeedService, ContactTypesService, ActivityTypesService, AttachmentsService],
 })
 export class CrmModule {}
