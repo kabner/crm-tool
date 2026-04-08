@@ -104,6 +104,18 @@ export class ActivitiesController {
     );
   }
 
+  @Get(':id/subtasks')
+  @RequirePermissions(Permissions.CONTACTS_READ)
+  @ApiOperation({ summary: 'Get subtasks for a parent task' })
+  @ApiParam({ name: 'id', description: 'Parent activity ID' })
+  @ApiResponse({ status: 200, description: 'List of subtasks' })
+  async findSubtasks(
+    @CurrentUser() user: RequestUser,
+    @Param('id', ParseUUIDPipe) id: string,
+  ) {
+    return this.activitiesService.findSubtasks(user.tenantId, id);
+  }
+
   @Get(':id')
   @RequirePermissions(Permissions.CONTACTS_READ)
   @ApiOperation({ summary: 'Get a single activity' })

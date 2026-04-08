@@ -5,6 +5,7 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   ManyToOne,
+  OneToMany,
   JoinColumn,
   Index,
 } from 'typeorm';
@@ -63,6 +64,9 @@ export class Activity {
   @Column({ name: 'completed_at', nullable: true })
   completedAt: Date;
 
+  @Column({ name: 'parent_id', nullable: true })
+  parentId: string;
+
   @Column({ type: 'jsonb', default: '{}' })
   metadata: Record<string, any>;
 
@@ -87,4 +91,11 @@ export class Activity {
   @ManyToOne(() => Deal)
   @JoinColumn({ name: 'deal_id' })
   deal: Deal;
+
+  @ManyToOne(() => Activity, (activity) => activity.children, { nullable: true })
+  @JoinColumn({ name: 'parent_id' })
+  parent: Activity;
+
+  @OneToMany(() => Activity, (activity) => activity.parent)
+  children: Activity[];
 }

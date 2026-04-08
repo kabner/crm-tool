@@ -50,7 +50,9 @@ export class ActivitiesService {
     const qb = this.activityRepo
       .createQueryBuilder('activity')
       .leftJoinAndSelect('activity.user', 'user')
-      .where('activity.tenantId = :tenantId', { tenantId });
+      .leftJoinAndSelect('activity.children', 'children')
+      .where('activity.tenantId = :tenantId', { tenantId })
+      .andWhere('activity.parentId IS NULL');
 
     this.applyFilters(qb, filters);
 
@@ -130,6 +132,19 @@ export class ActivitiesService {
   async remove(tenantId: string, id: string): Promise<void> {
     const activity = await this.findOne(tenantId, id);
     await this.activityRepo.remove(activity);
+  }
+
+  async findSubtasks(
+    tenantId: string,
+    parentId: string,
+  ): Promise<Activity[]> {
+    return this.activityRepo
+      .createQueryBuilder('activity')
+      .leftJoinAndSelect('activity.user', 'user')
+      .where('activity.tenantId = :tenantId', { tenantId })
+      .andWhere('activity.parentId = :parentId', { parentId })
+      .orderBy('activity.createdAt', 'ASC')
+      .getMany();
   }
 
   async getUpcomingTasks(
