@@ -22,7 +22,6 @@ export function MentionInput({
   const [mentionQuery, setMentionQuery] = useState('');
   const [mentionStart, setMentionStart] = useState(-1);
   const [selectedIndex, setSelectedIndex] = useState(0);
-  const [dropdownPos, setDropdownPos] = useState({ top: 0, left: 0 });
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -36,19 +35,6 @@ export function MentionInput({
       `${user.firstName} ${user.lastName}`.toLowerCase().startsWith(q)
     );
   });
-
-  const computeDropdownPosition = useCallback(() => {
-    const textarea = textareaRef.current;
-    if (!textarea) return;
-
-    // Position dropdown below the textarea
-    const rect = textarea.getBoundingClientRect();
-    const containerRect = textarea.offsetParent?.getBoundingClientRect() ?? rect;
-    setDropdownPos({
-      top: textarea.offsetTop + textarea.offsetHeight + 4,
-      left: textarea.offsetLeft,
-    });
-  }, []);
 
   const handleSelect = useCallback(
     (user: TenantUser) => {
@@ -104,7 +90,6 @@ export function MentionInput({
         setMentionQuery(query);
         setShowDropdown(true);
         setSelectedIndex(0);
-        computeDropdownPosition();
         return;
       }
     }
@@ -166,8 +151,8 @@ export function MentionInput({
       {showDropdown && filteredUsers.length > 0 && (
         <div
           ref={dropdownRef}
-          className="absolute z-50 w-64 max-h-48 overflow-y-auto rounded-md border border-border bg-popover shadow-md"
-          style={{ top: dropdownPos.top, left: dropdownPos.left }}
+          className="absolute left-0 z-50 w-72 max-h-52 overflow-y-auto rounded-md border border-border bg-popover shadow-lg"
+          style={{ top: '100%', marginTop: '4px' }}
         >
           {filteredUsers.slice(0, 8).map((user, index) => (
             <button
