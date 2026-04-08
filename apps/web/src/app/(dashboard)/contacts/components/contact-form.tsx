@@ -22,6 +22,7 @@ const contactSchema = z.object({
   leadStatus: z.string().optional(),
   tags: z.string().optional(),
   source: z.string().optional(),
+  visibility: z.enum(['everyone', 'owner', 'private']).optional(),
 });
 
 type ContactFormValues = z.infer<typeof contactSchema>;
@@ -51,6 +52,7 @@ interface ContactFormProps {
     leadStatus?: string | null;
     tags?: string[];
     source?: string | null;
+    visibility?: string;
   };
   onSubmit: (data: {
     firstName: string;
@@ -63,6 +65,7 @@ interface ContactFormProps {
     leadStatus?: string;
     tags?: string[];
     source?: string;
+    visibility?: string;
   }) => void;
   isLoading?: boolean;
   onCancel?: () => void;
@@ -103,6 +106,7 @@ export function ContactForm({
       leadStatus: initialData?.leadStatus ?? '',
       tags: initialData?.tags?.join(', ') ?? '',
       source: initialData?.source ?? '',
+      visibility: (initialData?.visibility as 'everyone' | 'owner' | 'private') ?? 'everyone',
     },
   });
 
@@ -125,6 +129,7 @@ export function ContactForm({
       leadStatus: values.leadStatus || undefined,
       tags,
       source: values.source || undefined,
+      visibility: values.visibility || undefined,
     });
   }
 
@@ -258,9 +263,23 @@ export function ContactForm({
         <Input id="tags" placeholder="e.g. vip, enterprise" {...register('tags')} />
       </div>
 
-      <div className="space-y-2">
-        <Label htmlFor="source">Source</Label>
-        <Input id="source" placeholder="e.g. website, referral" {...register('source')} />
+      <div className="grid grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <Label htmlFor="source">Source</Label>
+          <Input id="source" placeholder="e.g. website, referral" {...register('source')} />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="visibility">Visibility</Label>
+          <select
+            id="visibility"
+            {...register('visibility')}
+            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+          >
+            <option value="everyone">Everyone</option>
+            <option value="owner">Only Me &amp; Owner</option>
+            <option value="private">Private</option>
+          </select>
+        </div>
       </div>
 
       <div className="flex justify-end gap-2 pt-4">

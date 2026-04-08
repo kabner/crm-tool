@@ -15,6 +15,7 @@ export interface Contact {
   customProps: Record<string, any>;
   contactType: string | null;
   source: string | null;
+  visibility: string;
   lastActivityAt: string | null;
   createdAt: string;
   updatedAt: string;
@@ -63,6 +64,7 @@ export interface CreateContactInput {
   leadStatus?: string;
   tags?: string[];
   source?: string;
+  visibility?: string;
 }
 
 export interface UpdateContactInput extends Partial<CreateContactInput> {}

@@ -40,6 +40,7 @@ import { useContacts } from '@/hooks/use-contacts';
 import { useFavorites, useToggleFavorite } from '@/hooks/use-favorites';
 import { CompanyForm, type CompanyFormValues } from '../components/company-form';
 import { AttachmentsPanel } from '@/components/attachments-panel';
+import { VisibilityBadge } from '@/components/visibility-badge';
 
 const LIFECYCLE_STAGE_VARIANT: Record<
   string,
@@ -191,6 +192,9 @@ export default function CompanyDetailPage() {
             <ArrowLeft className="h-4 w-4" />
           </Button>
           <h1 className="text-3xl font-bold tracking-tight">{company.name}</h1>
+          {company.visibility && company.visibility !== 'everyone' && (
+            <VisibilityBadge visibility={company.visibility} />
+          )}
           <FavoriteButton
             isFavorite={favoriteIds.has(id)}
             onToggle={handleToggleFavorite}

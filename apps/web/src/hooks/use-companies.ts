@@ -21,6 +21,7 @@ export interface Company {
     country?: string;
   } | null;
   lifecycleStage: string;
+  visibility: string;
   ownerId: string | null;
   parentId: string | null;
   customProps: Record<string, unknown>;
@@ -76,6 +77,7 @@ export interface CreateCompanyInput {
   size?: string;
   phone?: string;
   lifecycleStage?: string;
+  visibility?: string;
   address?: {
     street?: string;
     city?: string;

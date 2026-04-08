@@ -22,6 +22,7 @@ import {
 import { useFavorites, useToggleFavorite } from '@/hooks/use-favorites';
 import { ContactForm } from '../components/contact-form';
 import { AttachmentsPanel } from '@/components/attachments-panel';
+import { VisibilityBadge } from '@/components/visibility-badge';
 
 const LIFECYCLE_STAGE_VARIANT: Record<
   string,
@@ -144,6 +145,9 @@ export default function ContactDetailPage() {
           <h1 className="text-3xl font-bold tracking-tight">
             {contact.firstName} {contact.lastName}
           </h1>
+          {contact.visibility && contact.visibility !== 'everyone' && (
+            <VisibilityBadge visibility={contact.visibility} />
+          )}
           <FavoriteButton
             isFavorite={favoriteIds.has(id)}
             onToggle={handleToggleFavorite}

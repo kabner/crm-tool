@@ -34,6 +34,7 @@ export interface Deal {
   lastStageChangeAt: string | null;
   lastActivityAt: string | null;
   priority: string;
+  visibility: string;
 }
 
 export interface DealsResponse {
@@ -134,6 +135,7 @@ export interface CreateDealInput {
   closeDate?: string;
   companyName?: string;
   ownerId?: string;
+  visibility?: string;
 }
 
 export interface UpdateDealInput extends Partial<CreateDealInput> {

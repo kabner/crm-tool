@@ -23,6 +23,7 @@ import {
 import { DealForm } from "../components/deal-form";
 import { DealActivityTimeline } from "../components/deal-activity-timeline";
 import { AttachmentsPanel } from "@/components/attachments-panel";
+import { VisibilityBadge } from "@/components/visibility-badge";
 
 function formatCurrency(amount: number): string {
   return new Intl.NumberFormat("en-US", {
@@ -157,7 +158,12 @@ export default function DealDetailPage() {
             <ArrowLeft className="h-4 w-4" />
           </Button>
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">{deal.name}</h1>
+            <div className="flex items-center gap-2">
+              <h1 className="text-3xl font-bold tracking-tight">{deal.name}</h1>
+              {deal.visibility && deal.visibility !== 'everyone' && (
+                <VisibilityBadge visibility={deal.visibility} />
+              )}
+            </div>
             {deal.amount != null && (
               <p className="text-xl font-semibold text-muted-foreground">
                 {formatCurrency(deal.amount)}

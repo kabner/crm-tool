@@ -19,6 +19,7 @@ const dealSchema = z.object({
   closeDate: z.string().optional(),
   companyName: z.string().optional(),
   ownerId: z.string().optional(),
+  visibility: z.enum(['everyone', 'owner', 'private']).optional(),
 });
 
 type DealFormValues = z.infer<typeof dealSchema>;
@@ -33,6 +34,7 @@ interface DealFormProps {
     companyName?: string;
     companyId?: string;
     ownerId?: string | null;
+    visibility?: string;
   };
   onSubmit: (data: {
     name: string;
@@ -42,6 +44,7 @@ interface DealFormProps {
     closeDate?: string;
     companyName?: string;
     ownerId?: string;
+    visibility?: string;
   }) => void;
   isLoading?: boolean;
 }
@@ -73,6 +76,7 @@ export function DealForm({ initialData, onSubmit, isLoading }: DealFormProps) {
         : "",
       companyName: initialData?.companyName ?? "",
       ownerId: initialData?.ownerId ?? "",
+      visibility: (initialData?.visibility as 'everyone' | 'owner' | 'private') ?? "everyone",
     },
   });
 
@@ -133,6 +137,7 @@ export function DealForm({ initialData, onSubmit, isLoading }: DealFormProps) {
       closeDate: values.closeDate || undefined,
       companyName: values.companyName || undefined,
       ownerId: values.ownerId || undefined,
+      visibility: values.visibility || undefined,
     });
   }
 
@@ -245,6 +250,19 @@ export function DealForm({ initialData, onSubmit, isLoading }: DealFormProps) {
               {...register("ownerId")}
             />
           </div>
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="visibility">Visibility</Label>
+          <select
+            id="visibility"
+            {...register("visibility")}
+            className={selectClassName}
+          >
+            <option value="everyone">Everyone</option>
+            <option value="owner">Only Me &amp; Owner</option>
+            <option value="private">Private</option>
+          </select>
         </div>
 
         <div className="flex justify-end pt-4">
