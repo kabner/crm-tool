@@ -8,6 +8,7 @@ import {
   Mail,
   Calendar,
   Loader2,
+  Repeat,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -54,6 +55,8 @@ export function AddActivityForm({
   const [dueDate, setDueDate] = useState("");
   const [callDuration, setCallDuration] = useState("");
   const [callOutcome, setCallOutcome] = useState("connected");
+  const [recurrenceRule, setRecurrenceRule] = useState("");
+  const [recurrenceEndDate, setRecurrenceEndDate] = useState("");
 
   const createActivity = useCreateActivity();
 
@@ -63,6 +66,8 @@ export function AddActivityForm({
     setDueDate("");
     setCallDuration("");
     setCallOutcome("connected");
+    setRecurrenceRule("");
+    setRecurrenceEndDate("");
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -82,6 +87,8 @@ export function AddActivityForm({
       companyId: companyId || undefined,
       dealId: dealId || undefined,
       dueDate: dueDate || undefined,
+      recurrenceRule: recurrenceRule || undefined,
+      recurrenceEndDate: recurrenceEndDate || undefined,
       metadata: Object.keys(metadata).length > 0 ? metadata : undefined,
     });
 
@@ -156,6 +163,43 @@ export function AddActivityForm({
                 value={dueDate}
                 onChange={(e) => setDueDate(e.target.value)}
               />
+            </div>
+          )}
+
+          {/* Recurrence fields for tasks */}
+          {type === "task" && (
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <Label htmlFor="activity-recurrence">
+                  <span className="flex items-center gap-1.5">
+                    <Repeat className="h-3.5 w-3.5" />
+                    Repeat
+                  </span>
+                </Label>
+                <select
+                  id="activity-recurrence"
+                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                  value={recurrenceRule}
+                  onChange={(e) => setRecurrenceRule(e.target.value)}
+                >
+                  <option value="">None</option>
+                  <option value="daily">Daily</option>
+                  <option value="weekly">Weekly</option>
+                  <option value="monthly">Monthly</option>
+                  <option value="yearly">Yearly</option>
+                </select>
+              </div>
+              {recurrenceRule && (
+                <div className="space-y-1.5">
+                  <Label htmlFor="activity-recurrence-end">Until</Label>
+                  <Input
+                    id="activity-recurrence-end"
+                    type="date"
+                    value={recurrenceEndDate}
+                    onChange={(e) => setRecurrenceEndDate(e.target.value)}
+                  />
+                </div>
+              )}
             </div>
           )}
 

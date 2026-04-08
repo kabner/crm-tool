@@ -19,6 +19,7 @@ import {
   Clock,
   Plus,
   Check,
+  Repeat,
 } from "lucide-react";
 import { SubtaskToggle } from "@/components/subtask-list";
 
@@ -137,9 +138,19 @@ export function DealActivityTimeline({ dealId, compact = false }: DealActivityTi
                     <Icon className="h-3.5 w-3.5" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className={cn("text-sm", isTask && isCompleted && "line-through text-muted-foreground")}>
-                      {activity.subject}
-                    </p>
+                    <div className="flex items-center gap-1.5">
+                      <p className={cn("text-sm", isTask && isCompleted && "line-through text-muted-foreground")}>
+                        {activity.subject}
+                      </p>
+                      {activity.recurrenceRule && (
+                        <span
+                          className="inline-flex items-center text-muted-foreground"
+                          title={`Repeats ${activity.recurrenceRule}`}
+                        >
+                          <Repeat className="h-3 w-3" />
+                        </span>
+                      )}
+                    </div>
                     <p className="text-xs text-muted-foreground">
                       {activity.user ? `${activity.user.firstName} ${activity.user.lastName}` : "System"}{" "}
                       · {new Date(activity.createdAt).toLocaleDateString("en-US", {

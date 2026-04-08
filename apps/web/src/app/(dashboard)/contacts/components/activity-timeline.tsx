@@ -10,6 +10,7 @@ import {
   Plus,
   Check,
   Trash2,
+  Repeat,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -170,6 +171,15 @@ export function ActivityTimeline({
                       <Badge variant="secondary" className="text-xs">
                         {typeLabels[activity.type] ?? activity.type}
                       </Badge>
+                      {activity.recurrenceRule && (
+                        <span
+                          className="inline-flex items-center gap-0.5 text-xs text-muted-foreground"
+                          title={`Repeats ${activity.recurrenceRule}`}
+                        >
+                          <Repeat className="h-3 w-3" />
+                          {activity.recurrenceRule}
+                        </span>
+                      )}
                       {isTask && isCompleted && (
                         <Badge
                           variant="default"

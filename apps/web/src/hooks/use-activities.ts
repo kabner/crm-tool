@@ -18,6 +18,9 @@ export interface Activity {
   parentId: string | null;
   dueDate: string | null;
   completedAt: string | null;
+  recurrenceRule: string | null;
+  recurrenceEndDate: string | null;
+  recurringSourceId: string | null;
   metadata: Record<string, unknown>;
   createdAt: string;
   updatedAt: string;
@@ -64,6 +67,8 @@ export interface CreateActivityInput {
   dealId?: string;
   parentId?: string;
   dueDate?: string;
+  recurrenceRule?: string;
+  recurrenceEndDate?: string;
   metadata?: Record<string, unknown>;
 }
 
