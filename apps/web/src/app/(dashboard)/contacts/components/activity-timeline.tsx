@@ -17,6 +17,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useCompleteTask, useDeleteActivity } from "@/hooks/use-activities";
 import type { Activity } from "@/hooks/use-activities";
 import { AddActivityForm } from "./add-activity-form";
+import { SubtaskToggle } from "@/components/subtask-list";
 
 const typeIcons: Record<string, React.ElementType> = {
   note: PenLine,
@@ -221,6 +222,13 @@ export function ActivityTimeline({
                   <p className="mt-1 text-sm text-muted-foreground line-clamp-2">
                     {activity.body}
                   </p>
+                )}
+
+                {isTask && (
+                  <SubtaskToggle
+                    activity={activity}
+                    contactId={contactId}
+                  />
                 )}
               </div>
             </div>

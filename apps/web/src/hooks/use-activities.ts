@@ -15,11 +15,13 @@ export interface Activity {
   companyId: string | null;
   dealId: string | null;
   userId: string;
+  parentId: string | null;
   dueDate: string | null;
   completedAt: string | null;
   metadata: Record<string, unknown>;
   createdAt: string;
   updatedAt: string;
+  children?: Activity[];
   user?: {
     id: string;
     firstName: string;
@@ -60,6 +62,7 @@ export interface CreateActivityInput {
   contactId?: string;
   companyId?: string;
   dealId?: string;
+  parentId?: string;
   dueDate?: string;
   metadata?: Record<string, unknown>;
 }
@@ -105,6 +108,15 @@ export function useUpcomingTasks() {
     queryKey: ["activities", "upcoming-tasks"],
     queryFn: () =>
       apiClient.get<Activity[]>("/api/v1/activities/tasks/upcoming"),
+  });
+}
+
+export function useSubtasks(parentId: string) {
+  return useQuery<Activity[]>({
+    queryKey: ["activities", "subtasks", parentId],
+    queryFn: () =>
+      apiClient.get<Activity[]>(`/api/v1/activities/${parentId}/subtasks`),
+    enabled: !!parentId,
   });
 }
 

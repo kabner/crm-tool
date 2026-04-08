@@ -20,6 +20,7 @@ import {
   Plus,
   Check,
 } from "lucide-react";
+import { SubtaskToggle } from "@/components/subtask-list";
 
 const ACTIVITY_ICONS: Record<string, React.ElementType> = {
   call: Phone,
@@ -130,26 +131,33 @@ export function DealActivityTimeline({ dealId, compact = false }: DealActivityTi
             const isCompleted = !!activity.completedAt;
 
             return (
-              <div key={activity.id} className="flex gap-3 rounded-md px-2 py-2 hover:bg-muted/50 transition-colors">
-                <div className={cn("flex h-8 w-8 shrink-0 items-center justify-center rounded-full", colorClass)}>
-                  <Icon className="h-3.5 w-3.5" />
+              <div key={activity.id}>
+                <div className="flex gap-3 rounded-md px-2 py-2 hover:bg-muted/50 transition-colors">
+                  <div className={cn("flex h-8 w-8 shrink-0 items-center justify-center rounded-full", colorClass)}>
+                    <Icon className="h-3.5 w-3.5" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className={cn("text-sm", isTask && isCompleted && "line-through text-muted-foreground")}>
+                      {activity.subject}
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      {activity.user ? `${activity.user.firstName} ${activity.user.lastName}` : "System"}{" "}
+                      · {new Date(activity.createdAt).toLocaleDateString("en-US", {
+                        month: "short", day: "numeric", hour: "numeric", minute: "2-digit",
+                      })}
+                    </p>
+                    {isTask && (
+                      <SubtaskToggle activity={activity} dealId={dealId} />
+                    )}
+                  </div>
+                  <div className="flex items-center gap-1 shrink-0">
+                    {isTask && !isCompleted && (
+                      <Button variant="ghost" size="icon" className="h-7 w-7 shrink-0" onClick={() => completeActivity.mutate(activity.id)}>
+                        <Check className="h-3.5 w-3.5" />
+                      </Button>
+                    )}
+                  </div>
                 </div>
-                <div className="flex-1 min-w-0">
-                  <p className={cn("text-sm", isTask && isCompleted && "line-through text-muted-foreground")}>
-                    {activity.subject}
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    {activity.user ? `${activity.user.firstName} ${activity.user.lastName}` : "System"}{" "}
-                    · {new Date(activity.createdAt).toLocaleDateString("en-US", {
-                      month: "short", day: "numeric", hour: "numeric", minute: "2-digit",
-                    })}
-                  </p>
-                </div>
-                {isTask && !isCompleted && (
-                  <Button variant="ghost" size="icon" className="h-7 w-7 shrink-0" onClick={() => completeActivity.mutate(activity.id)}>
-                    <Check className="h-3.5 w-3.5" />
-                  </Button>
-                )}
               </div>
             );
           })}
