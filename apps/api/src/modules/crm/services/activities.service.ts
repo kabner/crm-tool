@@ -29,6 +29,9 @@ export class ActivitiesService {
       tenantId,
       userId,
       dueDate: dto.dueDate ? new Date(dto.dueDate) : undefined,
+      recurrenceEndDate: dto.recurrenceEndDate
+        ? new Date(dto.recurrenceEndDate)
+        : undefined,
       metadata: dto.metadata ?? {},
     });
     const savedActivity = await this.activityRepo.save(activity);
@@ -126,7 +129,66 @@ export class ActivitiesService {
   async complete(tenantId: string, id: string): Promise<Activity> {
     const activity = await this.findOne(tenantId, id);
     activity.completedAt = new Date();
-    return this.activityRepo.save(activity);
+    const saved = await this.activityRepo.save(activity);
+
+    if (saved.recurrenceRule && saved.type === 'task') {
+      await this.createNextRecurrence(saved);
+    }
+
+    return saved;
+  }
+
+  private async createNextRecurrence(activity: Activity): Promise<void> {
+    const nextDueDate = this.calculateNextDueDate(
+      activity.dueDate,
+      activity.recurrenceRule,
+    );
+
+    if (
+      activity.recurrenceEndDate &&
+      nextDueDate > new Date(activity.recurrenceEndDate)
+    ) {
+      return;
+    }
+
+    const next = this.activityRepo.create({
+      tenantId: activity.tenantId,
+      type: 'task',
+      subject: activity.subject,
+      body: activity.body,
+      contactId: activity.contactId,
+      companyId: activity.companyId,
+      dealId: activity.dealId,
+      userId: activity.userId,
+      dueDate: nextDueDate,
+      recurrenceRule: activity.recurrenceRule,
+      recurrenceEndDate: activity.recurrenceEndDate,
+      recurringSourceId: activity.recurringSourceId || activity.id,
+      metadata: activity.metadata,
+    });
+    await this.activityRepo.save(next);
+  }
+
+  private calculateNextDueDate(
+    currentDueDate: Date | null,
+    rule: string,
+  ): Date {
+    const base = currentDueDate ? new Date(currentDueDate) : new Date();
+    switch (rule) {
+      case 'daily':
+        base.setDate(base.getDate() + 1);
+        break;
+      case 'weekly':
+        base.setDate(base.getDate() + 7);
+        break;
+      case 'monthly':
+        base.setMonth(base.getMonth() + 1);
+        break;
+      case 'yearly':
+        base.setFullYear(base.getFullYear() + 1);
+        break;
+    }
+    return base;
   }
 
   async remove(tenantId: string, id: string): Promise<void> {

@@ -67,6 +67,15 @@ export class Activity {
   @Column({ name: 'parent_id', nullable: true })
   parentId: string;
 
+  @Column({ name: 'recurrence_rule', nullable: true })
+  recurrenceRule: string;
+
+  @Column({ name: 'recurrence_end_date', nullable: true })
+  recurrenceEndDate: Date;
+
+  @Column({ name: 'recurring_source_id', nullable: true })
+  recurringSourceId: string;
+
   @Column({ type: 'jsonb', default: '{}' })
   metadata: Record<string, any>;
 
