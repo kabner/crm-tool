@@ -4,8 +4,9 @@ import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { SortableTableHeader } from '@/components/sortable-table-header';
 import { FavoriteButton } from '@/components/favorite-button';
-import { PhoneDisplay } from '@/components/ui/phone-display';
+import { InlineEditCell } from '@/components/inline-edit-cell';
 import type { Contact } from '@/hooks/use-contacts';
+import { useUpdateContact } from '@/hooks/use-contacts';
 import { useContactTypes } from '@/hooks/use-contact-types';
 
 const LIFECYCLE_STAGE_VARIANT: Record<
@@ -49,6 +50,17 @@ const COLUMN_CONFIG: { key: string; label: string; sortField?: string }[] = [
   { key: 'contactType', label: 'Contact Type' },
 ];
 
+const LEAD_STATUSES = [
+  { value: 'new', label: 'New' },
+  { value: 'open', label: 'Open' },
+  { value: 'in_progress', label: 'In Progress' },
+  { value: 'open_deal', label: 'Open Deal' },
+  { value: 'unqualified', label: 'Unqualified' },
+  { value: 'attempted_to_contact', label: 'Attempted to Contact' },
+  { value: 'connected', label: 'Connected' },
+  { value: 'bad_timing', label: 'Bad Timing' },
+];
+
 export function ContactsTable({
   contacts,
   loading,
@@ -61,6 +73,7 @@ export function ContactsTable({
   onRowClick,
 }: ContactsTableProps) {
   const { data: contactTypes } = useContactTypes();
+  const updateContact = useUpdateContact();
   const activeCols = COLUMN_CONFIG.filter((c) => visibleColumns.includes(c.key));
 
   if (loading) {
@@ -120,10 +133,18 @@ export function ContactsTable({
         );
       case 'email':
         return (
-          <span className="text-muted-foreground">{contact.email ?? '-'}</span>
+          <InlineEditCell
+            value={contact.email ?? null}
+            onSave={(v) => updateContact.mutate({ id: contact.id, data: { email: v } })}
+          />
         );
       case 'phone':
-        return <PhoneDisplay phone={contact.phone} className="text-muted-foreground" />;
+        return (
+          <InlineEditCell
+            value={contact.phone ?? null}
+            onSave={(v) => updateContact.mutate({ id: contact.id, data: { phone: v } })}
+          />
+        );
       case 'company':
         return (
           <span className="text-muted-foreground">
@@ -141,9 +162,12 @@ export function ContactsTable({
       }
       case 'leadStatus':
         return (
-          <span className="text-muted-foreground">
-            {contact.leadStatus ?? '-'}
-          </span>
+          <InlineEditCell
+            value={contact.leadStatus ?? null}
+            onSave={(v) => updateContact.mutate({ id: contact.id, data: { leadStatus: v } })}
+            type="select"
+            options={LEAD_STATUSES}
+          />
         );
       case 'createdBy':
         return (
@@ -161,9 +185,10 @@ export function ContactsTable({
         );
       case 'jobTitle':
         return (
-          <span className="text-muted-foreground">
-            {contact.jobTitle ?? '-'}
-          </span>
+          <InlineEditCell
+            value={contact.jobTitle ?? null}
+            onSave={(v) => updateContact.mutate({ id: contact.id, data: { jobTitle: v } })}
+          />
         );
       case 'tags':
         return contact.tags && contact.tags.length > 0 ? (
@@ -184,12 +209,14 @@ export function ContactsTable({
           </span>
         );
       case 'contactType': {
-        if (!contact.contactType) return <span className="text-muted-foreground">-</span>;
-        const ct = contactTypes?.find((t) => t.name === contact.contactType);
+        const ctOptions = (contactTypes ?? []).map((t) => ({ value: t.name, label: t.name }));
         return (
-          <Badge variant="outline" style={ct?.color ? { borderColor: ct.color, color: ct.color } : undefined}>
-            {contact.contactType}
-          </Badge>
+          <InlineEditCell
+            value={contact.contactType ?? null}
+            onSave={(v) => updateContact.mutate({ id: contact.id, data: { contactType: v } })}
+            type="select"
+            options={ctOptions}
+          />
         );
       }
       default:
