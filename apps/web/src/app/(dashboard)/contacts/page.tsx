@@ -13,8 +13,9 @@ import { ContactForm } from './components/contact-form';
 import { useContacts, useCreateContact } from '@/hooks/use-contacts';
 import { useFavorites, useToggleFavorite } from '@/hooks/use-favorites';
 import { useSavedViews, useCreateView } from '@/hooks/use-saved-views';
+import { useContactTypes } from '@/hooks/use-contact-types';
 
-const CONTACT_FILTER_FIELDS: FilterField[] = [
+const BASE_CONTACT_FILTER_FIELDS: FilterField[] = [
   {
     key: 'leadStatus',
     label: 'Lead Status',
@@ -47,12 +48,26 @@ const ALL_COLUMNS: ColumnDef[] = [
   { key: 'jobTitle', label: 'Job Title', defaultVisible: false },
   { key: 'tags', label: 'Tags', defaultVisible: false },
   { key: 'source', label: 'Source', defaultVisible: false },
+  { key: 'contactType', label: 'Contact Type', defaultVisible: true },
 ];
 
 const DEFAULT_VISIBLE = ALL_COLUMNS.filter((c) => c.defaultVisible).map((c) => c.key);
 
 export default function ContactsPage() {
   const router = useRouter();
+
+  // Contact types
+  const { data: contactTypes } = useContactTypes();
+
+  const CONTACT_FILTER_FIELDS = useMemo<FilterField[]>(() => [
+    ...BASE_CONTACT_FILTER_FIELDS,
+    {
+      key: 'contactType',
+      label: 'Contact Type',
+      type: 'select',
+      options: (contactTypes ?? []).map((ct) => ({ label: ct.name, value: ct.name })),
+    },
+  ], [contactTypes]);
 
   // UI state
   const [showCreateForm, setShowCreateForm] = useState(false);
@@ -150,6 +165,7 @@ export default function ContactsPage() {
     phone?: string;
     jobTitle?: string;
     companyId: string;
+    contactType?: string;
     leadStatus?: string;
     tags?: string[];
     source?: string;

@@ -6,6 +6,7 @@ import { SortableTableHeader } from '@/components/sortable-table-header';
 import { FavoriteButton } from '@/components/favorite-button';
 import { PhoneDisplay } from '@/components/ui/phone-display';
 import type { Contact } from '@/hooks/use-contacts';
+import { useContactTypes } from '@/hooks/use-contact-types';
 
 const LIFECYCLE_STAGE_VARIANT: Record<
   string,
@@ -45,6 +46,7 @@ const COLUMN_CONFIG: { key: string; label: string; sortField?: string }[] = [
   { key: 'jobTitle', label: 'Job Title' },
   { key: 'tags', label: 'Tags' },
   { key: 'source', label: 'Source', sortField: 'source' },
+  { key: 'contactType', label: 'Contact Type' },
 ];
 
 export function ContactsTable({
@@ -58,6 +60,7 @@ export function ContactsTable({
   onToggleFavorite,
   onRowClick,
 }: ContactsTableProps) {
+  const { data: contactTypes } = useContactTypes();
   const activeCols = COLUMN_CONFIG.filter((c) => visibleColumns.includes(c.key));
 
   if (loading) {
@@ -180,6 +183,15 @@ export function ContactsTable({
             {contact.source ?? '-'}
           </span>
         );
+      case 'contactType': {
+        if (!contact.contactType) return <span className="text-muted-foreground">-</span>;
+        const ct = contactTypes?.find((t) => t.name === contact.contactType);
+        return (
+          <Badge variant="outline" style={ct?.color ? { borderColor: ct.color, color: ct.color } : undefined}>
+            {contact.contactType}
+          </Badge>
+        );
+      }
       default:
         return null;
     }

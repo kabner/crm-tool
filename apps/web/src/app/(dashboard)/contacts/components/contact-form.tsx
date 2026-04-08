@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { PhoneInput } from '@/components/ui/phone-input';
 import { useCompanies } from '@/hooks/use-companies';
+import { useContactTypes } from '@/hooks/use-contact-types';
 
 const contactSchema = z.object({
   firstName: z.string().min(1, 'First name is required'),
@@ -17,6 +18,7 @@ const contactSchema = z.object({
   phone: z.string().optional(),
   jobTitle: z.string().optional(),
   companyId: z.string().min(1, 'Company is required'),
+  contactType: z.string().optional(),
   leadStatus: z.string().optional(),
   tags: z.string().optional(),
   source: z.string().optional(),
@@ -45,6 +47,7 @@ interface ContactFormProps {
     jobTitle?: string | null;
     companyId?: string | null;
     company?: { id: string; name: string } | null;
+    contactType?: string | null;
     leadStatus?: string | null;
     tags?: string[];
     source?: string | null;
@@ -56,6 +59,7 @@ interface ContactFormProps {
     phone?: string;
     jobTitle?: string;
     companyId: string;
+    contactType?: string;
     leadStatus?: string;
     tags?: string[];
     source?: string;
@@ -70,6 +74,7 @@ export function ContactForm({
   isLoading,
   onCancel,
 }: ContactFormProps) {
+  const { data: contactTypes } = useContactTypes();
   const [companySearch, setCompanySearch] = useState(initialData?.company?.name ?? '');
 
   const { data: companiesData } = useCompanies({
@@ -94,6 +99,7 @@ export function ContactForm({
       phone: initialData?.phone ?? '',
       jobTitle: initialData?.jobTitle ?? '',
       companyId: initialData?.companyId ?? initialData?.company?.id ?? '',
+      contactType: initialData?.contactType ?? '',
       leadStatus: initialData?.leadStatus ?? '',
       tags: initialData?.tags?.join(', ') ?? '',
       source: initialData?.source ?? '',
@@ -115,6 +121,7 @@ export function ContactForm({
       phone: values.phone || undefined,
       jobTitle: values.jobTitle || undefined,
       companyId: values.companyId,
+      contactType: values.contactType || undefined,
       leadStatus: values.leadStatus || undefined,
       tags,
       source: values.source || undefined,
@@ -213,6 +220,22 @@ export function ContactForm({
             <p className="text-sm text-destructive">{errors.companyId.message}</p>
           )}
         </div>
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="contactType">Contact Type</Label>
+        <select
+          id="contactType"
+          {...register('contactType')}
+          className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+        >
+          <option value="">Select type...</option>
+          {(contactTypes ?? []).map((ct) => (
+            <option key={ct.id} value={ct.name}>
+              {ct.name}
+            </option>
+          ))}
+        </select>
       </div>
 
       <div className="space-y-2">

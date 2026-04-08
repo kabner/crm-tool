@@ -249,6 +249,16 @@ export default function ContactDetailPage() {
                       )}
                     </dd>
                   </div>
+                  {contact.contactType && (
+                    <div>
+                      <dt className="text-sm font-medium text-muted-foreground">
+                        Contact Type
+                      </dt>
+                      <dd className="mt-1">
+                        <Badge variant="outline">{contact.contactType}</Badge>
+                      </dd>
+                    </div>
+                  )}
                   <div>
                     <dt className="text-sm font-medium text-muted-foreground">
                       Lead Status
