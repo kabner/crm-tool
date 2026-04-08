@@ -89,6 +89,14 @@ export class AuthController {
   }
 
   @UseGuards(JwtAuthGuard)
+  @Get('users')
+  @ApiOperation({ summary: 'List users in the current tenant' })
+  @ApiResponse({ status: 200, description: 'Users returned' })
+  async listUsers(@CurrentUser() user: RequestUser) {
+    return this.authService.listTenantUsers(user.tenantId);
+  }
+
+  @UseGuards(JwtAuthGuard)
   @Post('logout')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Logout and revoke sessions' })
