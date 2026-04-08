@@ -20,3 +20,4 @@ export { FeedReaction } from './feed-reaction.entity';
 export { ContactTypeOption } from './contact-type-option.entity';
 export { ActivityTypeOption } from './activity-type-option.entity';
 export { RecordAttachment } from './record-attachment.entity';
+export { Lead } from './lead.entity';
