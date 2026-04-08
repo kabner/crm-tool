@@ -10,6 +10,7 @@ const SETTINGS_NAV = [
     items: [
       { label: 'Account', href: '/settings/account' },
       { label: 'Users', href: '/settings/users' },
+      { label: 'Merge & Dedup', href: '/settings/merge' },
     ],
   },
   {
