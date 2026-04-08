@@ -13,6 +13,7 @@ export interface Contact {
   ownerId: string | null;
   tags: string[];
   customProps: Record<string, any>;
+  contactType: string | null;
   source: string | null;
   lastActivityAt: string | null;
   createdAt: string;
@@ -43,6 +44,7 @@ export interface ContactFilters {
   ownerId?: string;
   tags?: string;
   companyId?: string;
+  contactType?: string;
   favorite?: string;
   createdAfter?: string;
   createdBefore?: string;
@@ -57,6 +59,7 @@ export interface CreateContactInput {
   phone?: string;
   jobTitle?: string;
   companyId: string;
+  contactType?: string;
   leadStatus?: string;
   tags?: string[];
   source?: string;
