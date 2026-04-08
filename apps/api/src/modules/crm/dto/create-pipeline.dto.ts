@@ -39,6 +39,14 @@ export class CreatePipelineDto {
   name: string;
 
   @ApiPropertyOptional({
+    description: 'Pipeline type: sales or project',
+    default: 'sales',
+  })
+  @IsOptional()
+  @IsString()
+  type?: string;
+
+  @ApiPropertyOptional({
     description: 'Whether this is the default pipeline',
     default: false,
   })

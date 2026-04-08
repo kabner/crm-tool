@@ -19,6 +19,9 @@ export class Pipeline {
   @Column()
   name: string;
 
+  @Column({ default: 'sales' })
+  type: string; // 'sales' | 'project'
+
   @Column({ name: 'is_default', default: false })
   isDefault: boolean;
 

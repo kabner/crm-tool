@@ -6,6 +6,7 @@ import {
   Delete,
   Body,
   Param,
+  Query,
   UseGuards,
   ParseUUIDPipe,
   HttpCode,
@@ -37,8 +38,11 @@ export class PipelinesController {
   @RequirePermissions(Permissions.DEALS_READ)
   @ApiOperation({ summary: 'List all pipelines' })
   @ApiResponse({ status: 200, description: 'List of pipelines with stage counts' })
-  async findAll(@CurrentUser('tenantId') tenantId: string) {
-    return this.pipelinesService.findAll(tenantId);
+  async findAll(
+    @CurrentUser('tenantId') tenantId: string,
+    @Query('type') type?: string,
+  ) {
+    return this.pipelinesService.findAll(tenantId, type);
   }
 
   @Get('default')
