@@ -22,6 +22,7 @@ import {
 } from "@/hooks/use-deals";
 import { DealForm } from "../components/deal-form";
 import { DealActivityTimeline } from "../components/deal-activity-timeline";
+import { AttachmentsPanel } from "@/components/attachments-panel";
 
 function formatCurrency(amount: number): string {
   return new Intl.NumberFormat("en-US", {
@@ -391,7 +392,7 @@ export default function DealDetailPage() {
           </div>
 
           {/* Activity timeline */}
-          <div>
+          <div className="space-y-6">
             <Card>
               <CardHeader>
                 <CardTitle>Activity</CardTitle>
@@ -400,6 +401,7 @@ export default function DealDetailPage() {
                 <DealActivityTimeline dealId={id} />
               </CardContent>
             </Card>
+            <AttachmentsPanel entityType="deal" entityId={id} />
           </div>
         </div>
       )}

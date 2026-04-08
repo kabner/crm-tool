@@ -39,6 +39,7 @@ import {
 import { useContacts } from '@/hooks/use-contacts';
 import { useFavorites, useToggleFavorite } from '@/hooks/use-favorites';
 import { CompanyForm, type CompanyFormValues } from '../components/company-form';
+import { AttachmentsPanel } from '@/components/attachments-panel';
 
 const LIFECYCLE_STAGE_VARIANT: Record<
   string,
@@ -380,6 +381,7 @@ export default function CompanyDetailPage() {
           </Card>
 
           {/* Associated Contacts */}
+          <div className="space-y-6">
           <Card>
             <CardHeader>
               <div className="flex items-center justify-between">
@@ -500,6 +502,8 @@ export default function CompanyDetailPage() {
               )}
             </CardContent>
           </Card>
+          <AttachmentsPanel entityType="company" entityId={company.id} />
+          </div>
         </div>
       )}
     </div>

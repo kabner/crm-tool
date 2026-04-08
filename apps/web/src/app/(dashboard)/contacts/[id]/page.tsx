@@ -21,6 +21,7 @@ import {
 } from '@/hooks/use-contacts';
 import { useFavorites, useToggleFavorite } from '@/hooks/use-favorites';
 import { ContactForm } from '../components/contact-form';
+import { AttachmentsPanel } from '@/components/attachments-panel';
 
 const LIFECYCLE_STAGE_VARIANT: Record<
   string,
@@ -311,7 +312,7 @@ export default function ContactDetailPage() {
           </div>
 
           {/* Activity Timeline */}
-          <div>
+          <div className="space-y-6">
             <Card>
               <CardHeader>
                 <CardTitle>Activity</CardTitle>
@@ -322,6 +323,7 @@ export default function ContactDetailPage() {
                 </p>
               </CardContent>
             </Card>
+            <AttachmentsPanel entityType="contact" entityId={contact.id} />
           </div>
         </div>
       )}
