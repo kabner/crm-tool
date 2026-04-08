@@ -49,7 +49,7 @@ export default function UsersSettingsPage() {
       email: string;
       role: string;
       password: string;
-    }) => apiClient.post('/api/v1/auth/register', data),
+    }) => apiClient.post('/api/v1/auth/create-user', data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['users'] });
       setShowAddForm(false);

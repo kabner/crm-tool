@@ -125,6 +125,30 @@ export class AuthController {
   }
 
   @UseGuards(JwtAuthGuard)
+  @Post('create-user')
+  @ApiOperation({ summary: 'Create a new user in the current tenant' })
+  @ApiResponse({ status: 201, description: 'User created' })
+  async createUser(
+    @CurrentUser() user: RequestUser,
+    @Body() dto: { firstName: string; lastName: string; email: string; password: string },
+  ) {
+    const newUser = await this.authService.register({
+      tenantId: user.tenantId,
+      firstName: dto.firstName,
+      lastName: dto.lastName,
+      email: dto.email,
+      password: dto.password,
+    } as RegisterDto);
+    return {
+      id: newUser.id,
+      tenantId: newUser.tenantId,
+      email: newUser.email,
+      firstName: newUser.firstName,
+      lastName: newUser.lastName,
+    };
+  }
+
+  @UseGuards(JwtAuthGuard)
   @Patch('profile')
   @ApiOperation({ summary: 'Update current user profile' })
   @ApiResponse({ status: 200, description: 'Profile updated successfully' })
