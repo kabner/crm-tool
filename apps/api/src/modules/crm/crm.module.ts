@@ -16,6 +16,8 @@ import {
   UserSetting,
   User,
   FeedReaction,
+  ContactTypeOption,
+  ActivityTypeOption,
 } from './entities';
 import { Notification } from '../../shared/notifications/entities/notification.entity';
 import { ContactsController } from './controllers/contacts.controller';
@@ -62,6 +64,8 @@ import { FeedService } from './services/feed.service';
       User,
       FeedReaction,
       Notification,
+      ContactTypeOption,
+      ActivityTypeOption,
     ]),
   ],
   controllers: [ContactsController, CompaniesController, ActivitiesController, DealsController, PipelinesController, ListsController, ImportExportController, SearchController, SavedViewsController, FavoritesController, UserSettingsController, FeedController],

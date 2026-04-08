@@ -51,6 +51,9 @@ export class Contact {
   @Column({ nullable: true })
   source: string;
 
+  @Column({ name: 'contact_type', nullable: true })
+  contactType: string;
+
   @Column({ name: 'last_activity_at', nullable: true })
   lastActivityAt: Date;
 

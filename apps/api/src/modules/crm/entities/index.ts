@@ -17,3 +17,5 @@ export { SavedView } from './saved-view.entity';
 export { UserFavorite } from './user-favorite.entity';
 export { UserSetting } from './user-setting.entity';
 export { FeedReaction } from './feed-reaction.entity';
+export { ContactTypeOption } from './contact-type-option.entity';
+export { ActivityTypeOption } from './activity-type-option.entity';
