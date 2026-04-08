@@ -22,6 +22,7 @@ import {
   Repeat,
 } from "lucide-react";
 import { SubtaskToggle } from "@/components/subtask-list";
+import { renderMentions } from "@/lib/render-mentions";
 
 const ACTIVITY_ICONS: Record<string, React.ElementType> = {
   call: Phone,
@@ -157,6 +158,11 @@ export function DealActivityTimeline({ dealId, compact = false }: DealActivityTi
                         month: "short", day: "numeric", hour: "numeric", minute: "2-digit",
                       })}
                     </p>
+                    {activity.body && (
+                      <p className="mt-0.5 text-xs text-muted-foreground line-clamp-2">
+                        {renderMentions(activity.body)}
+                      </p>
+                    )}
                     {isTask && (
                       <SubtaskToggle activity={activity} dealId={dealId} />
                     )}

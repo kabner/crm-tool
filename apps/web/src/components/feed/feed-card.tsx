@@ -14,6 +14,7 @@ import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { EmojiReactions } from '@/components/feed/emoji-reactions';
+import { renderMentions } from '@/lib/render-mentions';
 import type { FeedItem } from '@/hooks/use-feed';
 
 function timeAgo(date: string): string {
@@ -126,7 +127,7 @@ export function FeedCard({ item, onReaction }: FeedCardProps) {
 
             {item.body && (
               <p className="text-sm text-muted-foreground line-clamp-2">
-                {item.body}
+                {renderMentions(item.body)}
               </p>
             )}
 

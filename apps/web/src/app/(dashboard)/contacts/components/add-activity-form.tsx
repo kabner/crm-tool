@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
+import { MentionInput } from "@/components/mention-input";
 import { useCreateActivity } from "@/hooks/use-activities";
 
 type ActivityType = "note" | "task" | "call" | "email" | "meeting";
@@ -138,16 +139,14 @@ export function AddActivityForm({
             <Label htmlFor="activity-body">
               {type === "call" ? "Call Notes" : "Details"}
             </Label>
-            <textarea
-              id="activity-body"
-              className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+            <MentionInput
               placeholder={
                 type === "call"
-                  ? "Notes from the call..."
-                  : "Add more details..."
+                  ? "Notes from the call... Use @ to mention teammates"
+                  : "Add more details... Use @ to mention teammates"
               }
               value={body}
-              onChange={(e) => setBody(e.target.value)}
+              onChange={setBody}
             />
           </div>
 

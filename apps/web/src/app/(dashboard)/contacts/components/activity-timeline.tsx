@@ -19,6 +19,7 @@ import { useCompleteTask, useDeleteActivity } from "@/hooks/use-activities";
 import type { Activity } from "@/hooks/use-activities";
 import { AddActivityForm } from "./add-activity-form";
 import { SubtaskToggle } from "@/components/subtask-list";
+import { renderMentions } from "@/lib/render-mentions";
 
 const typeIcons: Record<string, React.ElementType> = {
   note: PenLine,
@@ -230,7 +231,7 @@ export function ActivityTimeline({
 
                 {activity.body && (
                   <p className="mt-1 text-sm text-muted-foreground line-clamp-2">
-                    {activity.body}
+                    {renderMentions(activity.body)}
                   </p>
                 )}
 
