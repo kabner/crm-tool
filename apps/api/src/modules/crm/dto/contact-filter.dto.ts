@@ -20,6 +20,11 @@ export class ContactFilterDto extends PaginationQueryDto {
   @IsString()
   leadStatus?: string;
 
+  @ApiPropertyOptional({ description: 'Filter by contact type' })
+  @IsOptional()
+  @IsString()
+  contactType?: string;
+
   @ApiPropertyOptional({ description: 'Filter by owner ID' })
   @IsOptional()
   @IsUUID()

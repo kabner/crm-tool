@@ -126,6 +126,10 @@ export class ContactsService {
       qb.andWhere('contact.leadStatus = :leadStatus', { leadStatus });
     }
 
+    if (filters.contactType) {
+      qb.andWhere('contact.contactType = :contactType', { contactType: filters.contactType });
+    }
+
     if (ownerId) {
       qb.andWhere('contact.ownerId = :ownerId', { ownerId });
     }

@@ -64,6 +64,11 @@ export class CreateContactDto {
   @IsOptional()
   source?: string;
 
+  @ApiPropertyOptional({ description: 'Contact type' })
+  @IsString()
+  @IsOptional()
+  contactType?: string;
+
   @ApiPropertyOptional({
     description: 'Company IDs to associate',
     type: [String],
