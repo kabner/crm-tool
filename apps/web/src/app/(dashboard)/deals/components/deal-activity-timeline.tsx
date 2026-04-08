@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { MentionInput } from "@/components/mention-input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import {
@@ -52,15 +53,18 @@ export function DealActivityTimeline({ dealId, compact = false }: DealActivityTi
   const [showForm, setShowForm] = useState(false);
   const [newType, setNewType] = useState("note");
   const [newSubject, setNewSubject] = useState("");
+  const [newBody, setNewBody] = useState("");
 
   const handleCreate = async () => {
     if (!newSubject.trim()) return;
     await createActivity.mutateAsync({
       type: newType,
       subject: newSubject,
+      body: newBody || undefined,
       dealId,
     });
     setNewSubject("");
+    setNewBody("");
     setShowForm(false);
   };
 
@@ -104,15 +108,21 @@ export function DealActivityTimeline({ dealId, compact = false }: DealActivityTi
               <option value="task">Task</option>
             </select>
             <Input
-              placeholder="What happened?"
+              placeholder="Subject"
               value={newSubject}
               onChange={(e) => setNewSubject(e.target.value)}
               className="h-8 text-sm"
-              onKeyDown={(e) => e.key === "Enter" && handleCreate()}
+              onKeyDown={(e) => e.key === "Enter" && !newBody && handleCreate()}
             />
           </div>
+          <MentionInput
+            placeholder="Add details or notes... Use @ to mention teammates"
+            value={newBody}
+            onChange={setNewBody}
+            className="min-h-[60px] text-sm"
+          />
           <div className="flex justify-end gap-2">
-            <Button variant="ghost" size="sm" onClick={() => { setShowForm(false); setNewSubject(""); }}>
+            <Button variant="ghost" size="sm" onClick={() => { setShowForm(false); setNewSubject(""); setNewBody(""); }}>
               Cancel
             </Button>
             <Button size="sm" onClick={handleCreate} disabled={!newSubject.trim() || createActivity.isPending}>

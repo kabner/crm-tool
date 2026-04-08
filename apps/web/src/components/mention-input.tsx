@@ -151,15 +151,18 @@ export function MentionInput({
       {showDropdown && filteredUsers.length > 0 && (
         <div
           ref={dropdownRef}
-          className="absolute left-0 z-50 w-72 max-h-52 overflow-y-auto rounded-md border border-border bg-popover shadow-lg"
+          className="absolute left-0 z-50 w-72 max-h-56 overflow-y-auto rounded-lg border border-border bg-popover shadow-lg"
           style={{ top: '100%', marginTop: '4px' }}
         >
+          <div className="px-3 py-1.5 text-xs font-medium text-muted-foreground border-b border-border">
+            {mentionQuery ? `Matching "${mentionQuery}"` : 'Tag a teammate'}
+          </div>
           {filteredUsers.slice(0, 8).map((user, index) => (
             <button
               key={user.id}
               type="button"
               className={cn(
-                'flex w-full items-center gap-2 px-3 py-2 text-sm text-left hover:bg-accent',
+                'flex w-full items-center gap-2 px-3 py-2 text-sm text-left hover:bg-accent transition-colors',
                 index === selectedIndex && 'bg-accent',
               )}
               onMouseDown={(e) => {
@@ -168,20 +171,23 @@ export function MentionInput({
               }}
               onMouseEnter={() => setSelectedIndex(index)}
             >
-              <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-medium text-primary">
+              <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-semibold text-primary">
                 {user.firstName[0]}
                 {user.lastName[0]}
               </div>
-              <div>
-                <span className="font-medium">
+              <div className="min-w-0">
+                <div className="font-medium truncate">
                   {user.firstName} {user.lastName}
-                </span>
-                <span className="ml-1 text-muted-foreground text-xs">
+                </div>
+                <div className="text-xs text-muted-foreground truncate">
                   {user.email}
-                </span>
+                </div>
               </div>
             </button>
           ))}
+          {filteredUsers.length === 0 && mentionQuery && (
+            <div className="px-3 py-2 text-sm text-muted-foreground">No matching users</div>
+          )}
         </div>
       )}
     </div>
