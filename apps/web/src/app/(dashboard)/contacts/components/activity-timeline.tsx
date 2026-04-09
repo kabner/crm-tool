@@ -229,6 +229,53 @@ export function ActivityTimeline({
                   </div>
                 </div>
 
+                {/* Google metadata for synced emails/meetings */}
+                {activity.type === "email" && !!activity.metadata?.direction && (() => {
+                  const meta = activity.metadata as Record<string, string>;
+                  return (
+                    <div className="mt-1 flex items-center gap-2">
+                      <Badge
+                        variant="outline"
+                        className={
+                          meta.direction === "inbound"
+                            ? "border-blue-300 text-blue-600 text-[10px]"
+                            : "border-green-300 text-green-600 text-[10px]"
+                        }
+                      >
+                        {meta.direction === "inbound" ? "Received" : "Sent"}
+                      </Badge>
+                      {meta.from && (
+                        <span className="text-[10px] text-muted-foreground truncate">
+                          {meta.direction === "inbound"
+                            ? `from ${meta.from}`
+                            : `to ${meta.to}`}
+                        </span>
+                      )}
+                    </div>
+                  );
+                })()}
+
+                {activity.type === "meeting" && !!activity.metadata?.googleEventId && (() => {
+                  const meta = activity.metadata as Record<string, string>;
+                  return (
+                    <div className="mt-1 flex items-center gap-2">
+                      <Badge variant="outline" className="border-orange-300 text-orange-600 text-[10px]">
+                        Google Calendar
+                      </Badge>
+                      {meta.meetLink && (
+                        <a
+                          href={meta.meetLink}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-[10px] text-primary hover:underline"
+                        >
+                          Join meeting
+                        </a>
+                      )}
+                    </div>
+                  );
+                })()}
+
                 {activity.body && (
                   <p className="mt-1 text-sm text-muted-foreground line-clamp-2">
                     {renderMentions(activity.body)}

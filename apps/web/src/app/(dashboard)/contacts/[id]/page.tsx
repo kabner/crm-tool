@@ -2,9 +2,10 @@
 
 import { useState, useMemo, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { ArrowLeft, Pencil, Trash2 } from 'lucide-react';
+import { ArrowLeft, Pencil, Trash2, Mail, Send } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
 import {
   Card,
   CardContent,
@@ -20,7 +21,10 @@ import {
   useDeleteContact,
 } from '@/hooks/use-contacts';
 import { useFavorites, useToggleFavorite } from '@/hooks/use-favorites';
+import { useActivities } from '@/hooks/use-activities';
+import { useGoogleStatus, useGmailSend } from '@/hooks/use-google-integration';
 import { ContactForm } from '../components/contact-form';
+import { ActivityTimeline } from '../components/activity-timeline';
 import { AttachmentsPanel } from '@/components/attachments-panel';
 import { VisibilityBadge } from '@/components/visibility-badge';
 
@@ -49,6 +53,15 @@ export default function ContactDetailPage() {
   const toggleFavorite = useToggleFavorite();
 
   const [isEditing, setIsEditing] = useState(false);
+  const [showEmailForm, setShowEmailForm] = useState(false);
+  const [emailSubject, setEmailSubject] = useState('');
+  const [emailBody, setEmailBody] = useState('');
+
+  const { data: activitiesData, isLoading: activitiesLoading } = useActivities({
+    contactId: id,
+  });
+  const { data: googleStatus } = useGoogleStatus();
+  const gmailSend = useGmailSend();
 
   const favoriteIds = useMemo(() => {
     if (!favorites) return new Set<string>();
@@ -315,16 +328,84 @@ export default function ContactDetailPage() {
             </Card>
           </div>
 
-          {/* Activity Timeline */}
+          {/* Activity Timeline + Gmail + Attachments */}
           <div className="space-y-6">
+            {/* Gmail Send (only if Google connected and contact has email) */}
+            {googleStatus?.connected && contact.email && (
+              <Card>
+                <CardHeader className="pb-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Mail className="h-4 w-4 text-purple-600" />
+                      <CardTitle className="text-sm">Send via Gmail</CardTitle>
+                    </div>
+                    {!showEmailForm && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setShowEmailForm(true)}
+                      >
+                        Compose
+                      </Button>
+                    )}
+                  </div>
+                </CardHeader>
+                {showEmailForm && (
+                  <CardContent className="space-y-3">
+                    <Input
+                      placeholder="Subject"
+                      value={emailSubject}
+                      onChange={(e) => setEmailSubject(e.target.value)}
+                    />
+                    <textarea
+                      className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm min-h-[80px] resize-y"
+                      placeholder="Write your email..."
+                      value={emailBody}
+                      onChange={(e) => setEmailBody(e.target.value)}
+                    />
+                    <div className="flex gap-2">
+                      <Button
+                        size="sm"
+                        disabled={!emailSubject || !emailBody || gmailSend.isPending}
+                        onClick={async () => {
+                          await gmailSend.mutateAsync({
+                            to: contact.email!,
+                            subject: emailSubject,
+                            body: emailBody,
+                            contactId: contact.id,
+                          });
+                          setEmailSubject('');
+                          setEmailBody('');
+                          setShowEmailForm(false);
+                        }}
+                      >
+                        <Send className="mr-1 h-3 w-3" />
+                        {gmailSend.isPending ? 'Sending...' : 'Send'}
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => {
+                          setShowEmailForm(false);
+                          setEmailSubject('');
+                          setEmailBody('');
+                        }}
+                      >
+                        Cancel
+                      </Button>
+                    </div>
+                  </CardContent>
+                )}
+              </Card>
+            )}
+
             <Card>
-              <CardHeader>
-                <CardTitle>Activity</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-muted-foreground">
-                  No activities yet
-                </p>
+              <CardContent className="pt-6">
+                <ActivityTimeline
+                  contactId={id}
+                  activities={activitiesData?.data ?? []}
+                  isLoading={activitiesLoading}
+                />
               </CardContent>
             </Card>
             <AttachmentsPanel entityType="contact" entityId={contact.id} />

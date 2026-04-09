@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import * as Tabs from "@radix-ui/react-tabs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -25,12 +25,20 @@ import {
   Plus,
   Send,
 } from "lucide-react";
+import {
+  useGoogleStatus,
+  useGoogleConnect,
+  useGoogleDisconnect,
+  useGmailSync,
+  useCalendarSync,
+} from "@/hooks/use-google-integration";
 import { apiClient } from "@/lib/api-client";
 import { cn } from "@/lib/utils";
-import { format } from "date-fns";
+import { format, formatDistanceToNow } from "date-fns";
 
 export default function IntegrationsPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [activeTab, setActiveTab] = useState("webhooks");
   const [showWebhookForm, setShowWebhookForm] = useState(false);
   const [showApiKeyDialog, setShowApiKeyDialog] = useState(false);
@@ -40,9 +48,39 @@ export default function IntegrationsPage() {
     ok: boolean;
     error?: string;
   } | null>(null);
+  const [googleMessage, setGoogleMessage] = useState<{
+    type: "success" | "error";
+    text: string;
+  } | null>(null);
 
   const { data: webhooks, isLoading: webhooksLoading } = useWebhooks();
   const { data: apiKeys, isLoading: apiKeysLoading } = useApiKeys();
+
+  // Google integration hooks
+  const { data: googleStatus, isLoading: googleLoading } = useGoogleStatus();
+  const googleConnect = useGoogleConnect();
+  const googleDisconnect = useGoogleDisconnect();
+  const gmailSync = useGmailSync();
+  const calendarSync = useCalendarSync();
+
+  // Handle OAuth callback params
+  useEffect(() => {
+    const googleParam = searchParams.get("google");
+    if (googleParam === "connected") {
+      setGoogleMessage({ type: "success", text: "Google account connected successfully!" });
+      setActiveTab("integrations");
+    } else if (googleParam === "error") {
+      setGoogleMessage({ type: "error", text: "Failed to connect Google account. Please try again." });
+      setActiveTab("integrations");
+    }
+    if (googleParam) {
+      const timer = setTimeout(() => {
+        setGoogleMessage(null);
+        router.replace("/settings/integrations");
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [searchParams, router]);
   const createWebhook = useCreateWebhook();
   const deleteWebhook = useDeleteWebhook();
   const revokeApiKey = useRevokeApiKey();
@@ -327,8 +365,114 @@ export default function IntegrationsPage() {
         </Tabs.Content>
 
         {/* Integrations Tab */}
-        <Tabs.Content value="integrations" className="mt-6">
+        <Tabs.Content value="integrations" className="mt-6 space-y-4">
+          {googleMessage && (
+            <div
+              className={cn(
+                "rounded-md px-4 py-3 text-sm",
+                googleMessage.type === "success"
+                  ? "bg-green-50 text-green-700 border border-green-200"
+                  : "bg-red-50 text-destructive border border-red-200",
+              )}
+            >
+              {googleMessage.text}
+            </div>
+          )}
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {/* Google Workspace Card */}
+            <Card>
+              <CardHeader>
+                <div className="flex items-center gap-3">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-white border border-border">
+                    <span className="text-lg font-bold">
+                      <span className="text-[#4285F4]">G</span>
+                    </span>
+                  </div>
+                  <div>
+                    <CardTitle className="text-base">Google Workspace</CardTitle>
+                    <p className="text-xs text-muted-foreground">
+                      Gmail &amp; Calendar sync
+                    </p>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {googleLoading ? (
+                  <p className="text-sm text-muted-foreground">Loading...</p>
+                ) : googleStatus?.connected ? (
+                  <>
+                    <p className="text-sm text-green-600">
+                      Connected as {googleStatus.email}
+                    </p>
+                    <div className="space-y-2 text-sm">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <span className="font-medium">Gmail</span>
+                          <p className="text-xs text-muted-foreground">
+                            {googleStatus.gmailLastSyncAt
+                              ? `Last synced ${formatDistanceToNow(new Date(googleStatus.gmailLastSyncAt), { addSuffix: true })}`
+                              : "Never synced"}
+                          </p>
+                        </div>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => gmailSync.mutate()}
+                          disabled={gmailSync.isPending}
+                        >
+                          {gmailSync.isPending ? "Syncing..." : "Sync Now"}
+                        </Button>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <span className="font-medium">Calendar</span>
+                          <p className="text-xs text-muted-foreground">
+                            {googleStatus.calendarLastSyncAt
+                              ? `Last synced ${formatDistanceToNow(new Date(googleStatus.calendarLastSyncAt), { addSuffix: true })}`
+                              : "Never synced"}
+                          </p>
+                        </div>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => calendarSync.mutate()}
+                          disabled={calendarSync.isPending}
+                        >
+                          {calendarSync.isPending ? "Syncing..." : "Sync Now"}
+                        </Button>
+                      </div>
+                    </div>
+                    <Button
+                      size="sm"
+                      variant="destructive"
+                      className="w-full"
+                      onClick={() => {
+                        if (confirm("Disconnect your Google account? Email and calendar sync will stop.")) {
+                          googleDisconnect.mutate();
+                        }
+                      }}
+                      disabled={googleDisconnect.isPending}
+                    >
+                      {googleDisconnect.isPending ? "Disconnecting..." : "Disconnect"}
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <p className="text-sm text-muted-foreground">
+                      Connect your Google account to sync emails and calendar events with your CRM.
+                    </p>
+                    <Button
+                      size="sm"
+                      onClick={() => googleConnect.mutate()}
+                      disabled={googleConnect.isPending}
+                    >
+                      {googleConnect.isPending ? "Connecting..." : "Connect"}
+                    </Button>
+                  </>
+                )}
+              </CardContent>
+            </Card>
+
             {/* Slack Card */}
             <Card>
               <CardHeader>
