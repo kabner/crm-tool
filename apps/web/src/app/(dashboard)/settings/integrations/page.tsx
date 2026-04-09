@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import * as Tabs from "@radix-ui/react-tabs";
 import { Button } from "@/components/ui/button";
@@ -37,6 +37,14 @@ import { cn } from "@/lib/utils";
 import { format, formatDistanceToNow } from "date-fns";
 
 export default function IntegrationsPage() {
+  return (
+    <Suspense>
+      <IntegrationsPageContent />
+    </Suspense>
+  );
+}
+
+function IntegrationsPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [activeTab, setActiveTab] = useState("webhooks");
