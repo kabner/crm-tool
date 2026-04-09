@@ -6,6 +6,7 @@ import {
   IsArray,
   IsObject,
   IsUUID,
+  IsIn,
 } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
@@ -64,6 +65,11 @@ export class CreateContactDto {
   @IsOptional()
   source?: string;
 
+  @ApiPropertyOptional({ description: 'Contact type' })
+  @IsString()
+  @IsOptional()
+  contactType?: string;
+
   @ApiPropertyOptional({
     description: 'Company IDs to associate',
     type: [String],
@@ -72,4 +78,10 @@ export class CreateContactDto {
   @IsUUID('4', { each: true })
   @IsOptional()
   companyIds?: string[];
+
+  @ApiPropertyOptional({ description: 'Record visibility', enum: ['everyone', 'owner', 'private'] })
+  @IsOptional()
+  @IsString()
+  @IsIn(['everyone', 'owner', 'private'])
+  visibility?: string;
 }

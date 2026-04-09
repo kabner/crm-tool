@@ -4,9 +4,11 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, In } from 'typeorm';
 import { Company } from '../entities/company.entity';
 import { ContactCompany } from '../entities/contact-company.entity';
+import { Activity } from '../entities/activity.entity';
+import { Contact } from '../entities/contact.entity';
 import { UserFavorite } from '../entities/user-favorite.entity';
 import { CreateCompanyDto } from '../dto/create-company.dto';
 import { UpdateCompanyDto } from '../dto/update-company.dto';
@@ -19,6 +21,10 @@ export class CompaniesService {
     private readonly companyRepo: Repository<Company>,
     @InjectRepository(ContactCompany)
     private readonly contactCompanyRepo: Repository<ContactCompany>,
+    @InjectRepository(Activity)
+    private readonly activityRepo: Repository<Activity>,
+    @InjectRepository(Contact)
+    private readonly contactRepo: Repository<Contact>,
     @InjectRepository(UserFavorite)
     private readonly userFavoriteRepo: Repository<UserFavorite>,
   ) {}
@@ -78,6 +84,14 @@ export class CompaniesService {
 
     if (createdBefore) {
       qb.andWhere('company.createdAt <= :createdBefore', { createdBefore });
+    }
+
+    // Visibility filter: show records visible to everyone, or where user is creator/owner
+    if (userId) {
+      qb.andWhere(
+        '(company.visibility = :visEveryone OR company.createdById = :visUserId OR company.ownerId = :visUserId)',
+        { visEveryone: 'everyone', visUserId: userId },
+      );
     }
 
     // Favorite filter
@@ -213,5 +227,118 @@ export class CompaniesService {
       role: assoc.role,
       isPrimary: assoc.isPrimary,
     }));
+  }
+
+  async findDuplicates(tenantId: string) {
+    const pairs: { id1: string; id2: string; match_type: string }[] =
+      await this.companyRepo.query(
+        `SELECT c1.id as id1, c2.id as id2,
+          CASE WHEN c1.domain IS NOT NULL AND c1.domain = c2.domain THEN 'domain' ELSE 'name' END as match_type
+        FROM companies c1
+        JOIN companies c2 ON c1.tenant_id = c2.tenant_id
+          AND c1.id < c2.id
+          AND (
+            (c1.domain IS NOT NULL AND c1.domain != '' AND c1.domain = c2.domain)
+            OR (c1.name = c2.name)
+          )
+        WHERE c1.tenant_id = $1
+        LIMIT 50`,
+        [tenantId],
+      );
+
+    const allIds = new Set<string>();
+    pairs.forEach((p) => {
+      allIds.add(p.id1);
+      allIds.add(p.id2);
+    });
+
+    if (allIds.size === 0) {
+      return { pairs: [] };
+    }
+
+    const companies = await this.companyRepo.find({
+      where: { id: In([...allIds]), tenantId },
+    });
+    const companyMap = new Map(companies.map((c) => [c.id, c]));
+
+    return {
+      pairs: pairs
+        .filter((p) => companyMap.has(p.id1) && companyMap.has(p.id2))
+        .map((p) => ({
+          company1: companyMap.get(p.id1),
+          company2: companyMap.get(p.id2),
+          matchType: p.match_type,
+        })),
+    };
+  }
+
+  async merge(
+    tenantId: string,
+    keepId: string,
+    mergeId: string,
+  ): Promise<Company & { contactsCount: number }> {
+    const keep = await this.findOne(tenantId, keepId);
+    const merge = await this.findOne(tenantId, mergeId);
+
+    // Fill empty fields on keep from merge
+    const fillableFields: (keyof Company)[] = [
+      'domain',
+      'industry',
+      'size',
+      'phone',
+      'address',
+      'ownerId',
+      'parentId',
+    ];
+    for (const field of fillableFields) {
+      if (!keep[field] && merge[field]) {
+        (keep as any)[field] = merge[field];
+      }
+    }
+
+    // Merge customProps
+    if (merge.customProps) {
+      keep.customProps = { ...merge.customProps, ...keep.customProps };
+    }
+
+    await this.companyRepo.save(keep);
+
+    // Move activities from merge to keep
+    await this.activityRepo
+      .createQueryBuilder()
+      .update(Activity)
+      .set({ companyId: keepId })
+      .where('companyId = :mergeId', { mergeId })
+      .execute();
+
+    // Move contacts (company_id FK) from merge to keep
+    await this.contactRepo
+      .createQueryBuilder()
+      .update(Contact)
+      .set({ companyId: keepId })
+      .where('companyId = :mergeId', { mergeId })
+      .execute();
+
+    // Move contact_companies from merge to keep (avoid duplicates)
+    const mergeAssociations = await this.contactCompanyRepo.find({
+      where: { companyId: mergeId },
+    });
+    const keepAssociations = await this.contactCompanyRepo.find({
+      where: { companyId: keepId },
+    });
+    const keepContactIds = new Set(keepAssociations.map((a) => a.contactId));
+
+    for (const assoc of mergeAssociations) {
+      if (!keepContactIds.has(assoc.contactId)) {
+        assoc.companyId = keepId;
+        await this.contactCompanyRepo.save(assoc);
+      }
+    }
+
+    // Delete remaining merge associations and the merge company
+    await this.contactCompanyRepo.delete({ companyId: mergeId });
+    await this.companyRepo.remove(merge);
+
+    return this.findOne(tenantId, keepId);
   }
 }

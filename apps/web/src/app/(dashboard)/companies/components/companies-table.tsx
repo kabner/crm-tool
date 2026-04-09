@@ -1,24 +1,11 @@
 'use client';
 
-import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { SortableTableHeader } from '@/components/sortable-table-header';
 import { FavoriteButton } from '@/components/favorite-button';
-import { PhoneDisplay } from '@/components/ui/phone-display';
+import { InlineEditCell } from '@/components/inline-edit-cell';
 import type { Company } from '@/hooks/use-companies';
-
-const LIFECYCLE_STAGE_VARIANT: Record<
-  string,
-  'default' | 'secondary' | 'outline' | 'destructive'
-> = {
-  subscriber: 'outline',
-  lead: 'secondary',
-  mql: 'secondary',
-  sql: 'default',
-  opportunity: 'default',
-  customer: 'default',
-  evangelist: 'default',
-};
+import { useUpdateCompany } from '@/hooks/use-companies';
 
 interface CompaniesTableProps {
   companies: Company[];
@@ -44,6 +31,45 @@ const COLUMN_CONFIG: { key: string; label: string; sortField?: string }[] = [
   { key: 'createdAt', label: 'Created At', sortField: 'createdAt' },
 ];
 
+const INDUSTRIES = [
+  { value: 'Technology', label: 'Technology' },
+  { value: 'Healthcare', label: 'Healthcare' },
+  { value: 'Finance', label: 'Finance' },
+  { value: 'Manufacturing', label: 'Manufacturing' },
+  { value: 'Retail', label: 'Retail' },
+  { value: 'Education', label: 'Education' },
+  { value: 'Real Estate', label: 'Real Estate' },
+  { value: 'Media', label: 'Media' },
+  { value: 'Energy', label: 'Energy' },
+  { value: 'Consulting', label: 'Consulting' },
+  { value: 'Transportation', label: 'Transportation' },
+  { value: 'Agriculture', label: 'Agriculture' },
+  { value: 'Hospitality', label: 'Hospitality' },
+  { value: 'Telecommunications', label: 'Telecommunications' },
+  { value: 'Other', label: 'Other' },
+];
+
+const SIZES = [
+  { value: '1-10', label: '1-10' },
+  { value: '11-50', label: '11-50' },
+  { value: '51-200', label: '51-200' },
+  { value: '201-500', label: '201-500' },
+  { value: '501-1000', label: '501-1000' },
+  { value: '1001-5000', label: '1001-5000' },
+  { value: '5001-10000', label: '5001-10000' },
+  { value: '10001+', label: '10001+' },
+];
+
+const LIFECYCLE_STAGES = [
+  { value: 'subscriber', label: 'Subscriber' },
+  { value: 'lead', label: 'Lead' },
+  { value: 'mql', label: 'MQL' },
+  { value: 'sql', label: 'SQL' },
+  { value: 'opportunity', label: 'Opportunity' },
+  { value: 'customer', label: 'Customer' },
+  { value: 'evangelist', label: 'Evangelist' },
+];
+
 export function CompaniesTable({
   companies,
   loading,
@@ -56,6 +82,7 @@ export function CompaniesTable({
   onRowClick,
 }: CompaniesTableProps) {
   const activeCols = COLUMN_CONFIG.filter((c) => visibleColumns.includes(c.key));
+  const updateCompany = useUpdateCompany();
 
   if (loading) {
     return (
@@ -110,29 +137,45 @@ export function CompaniesTable({
         return <span className="font-medium">{company.name}</span>;
       case 'domain':
         return (
-          <span className="text-muted-foreground">{company.domain ?? '-'}</span>
+          <InlineEditCell
+            value={company.domain ?? null}
+            onSave={(v) => updateCompany.mutate({ id: company.id, data: { domain: v } })}
+          />
         );
       case 'industry':
-        return company.industry ? (
-          <Badge variant="secondary">{company.industry}</Badge>
-        ) : (
-          <span className="text-muted-foreground">-</span>
+        return (
+          <InlineEditCell
+            value={company.industry ?? null}
+            onSave={(v) => updateCompany.mutate({ id: company.id, data: { industry: v } })}
+            type="select"
+            options={INDUSTRIES}
+          />
         );
       case 'size':
         return (
-          <span className="text-muted-foreground">{company.size ?? '-'}</span>
+          <InlineEditCell
+            value={company.size ?? null}
+            onSave={(v) => updateCompany.mutate({ id: company.id, data: { size: v } })}
+            type="select"
+            options={SIZES}
+          />
         );
       case 'phone':
-        return <PhoneDisplay phone={company.phone} className="text-muted-foreground" />;
-      case 'lifecycleStage': {
-        const stage = company.lifecycleStage;
-        if (!stage) return <span className="text-muted-foreground">-</span>;
         return (
-          <Badge variant={LIFECYCLE_STAGE_VARIANT[stage] ?? 'outline'}>
-            {stage}
-          </Badge>
+          <InlineEditCell
+            value={company.phone ?? null}
+            onSave={(v) => updateCompany.mutate({ id: company.id, data: { phone: v } })}
+          />
         );
-      }
+      case 'lifecycleStage':
+        return (
+          <InlineEditCell
+            value={company.lifecycleStage ?? null}
+            onSave={(v) => updateCompany.mutate({ id: company.id, data: { lifecycleStage: v } })}
+            type="select"
+            options={LIFECYCLE_STAGES}
+          />
+        );
       case 'createdBy':
         return (
           <span className="text-muted-foreground">

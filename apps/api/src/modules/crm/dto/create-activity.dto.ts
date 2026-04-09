@@ -46,6 +46,25 @@ export class CreateActivityDto {
   @IsOptional()
   dueDate?: string;
 
+  @ApiPropertyOptional({ description: 'Parent task ID for subtasks' })
+  @IsUUID()
+  @IsOptional()
+  parentId?: string;
+
+  @ApiPropertyOptional({
+    description: 'Recurrence rule for repeating tasks',
+    enum: ['daily', 'weekly', 'monthly', 'yearly'],
+  })
+  @IsOptional()
+  @IsString()
+  @IsIn(['daily', 'weekly', 'monthly', 'yearly'])
+  recurrenceRule?: string;
+
+  @ApiPropertyOptional({ description: 'End date for recurrence (ISO 8601)' })
+  @IsOptional()
+  @IsDateString()
+  recurrenceEndDate?: string;
+
   @ApiPropertyOptional({ description: 'Additional metadata' })
   @IsObject()
   @IsOptional()

@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
+import { formatCurrency } from "@/lib/currency";
 import {
   useDeal,
   useUpdateDeal,
@@ -20,17 +21,11 @@ import {
   useMoveDealStage,
   usePipeline,
 } from "@/hooks/use-deals";
+import { usePipelineFields } from "@/hooks/use-pipeline-fields";
 import { DealForm } from "../components/deal-form";
 import { DealActivityTimeline } from "../components/deal-activity-timeline";
-
-function formatCurrency(amount: number): string {
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(amount);
-}
+import { AttachmentsPanel } from "@/components/attachments-panel";
+import { VisibilityBadge } from "@/components/visibility-badge";
 
 function isPastDue(dateStr: string): boolean {
   const today = new Date();
@@ -52,6 +47,7 @@ export default function DealDetailPage() {
 
   const pipelineId = deal?.stage?.pipeline?.id ?? deal?.pipeline?.id ?? "";
   const { data: pipeline } = usePipeline(pipelineId);
+  const { data: pipelineFields } = usePipelineFields(pipelineId);
 
   const [isEditing, setIsEditing] = useState(false);
 
@@ -156,10 +152,15 @@ export default function DealDetailPage() {
             <ArrowLeft className="h-4 w-4" />
           </Button>
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">{deal.name}</h1>
+            <div className="flex items-center gap-2">
+              <h1 className="text-3xl font-bold tracking-tight">{deal.name}</h1>
+              {deal.visibility && deal.visibility !== 'everyone' && (
+                <VisibilityBadge visibility={deal.visibility} />
+              )}
+            </div>
             {deal.amount != null && (
               <p className="text-xl font-semibold text-muted-foreground">
-                {formatCurrency(deal.amount)}
+                {formatCurrency(deal.amount, deal.currency)}
               </p>
             )}
           </div>
@@ -232,6 +233,7 @@ export default function DealDetailPage() {
               initialData={{
                 name: deal.name,
                 amount: deal.amount,
+                currency: deal.currency,
                 pipelineId: pipelineId,
                 stageId: deal.stage?.id,
                 closeDate: deal.closeDate,
@@ -239,6 +241,7 @@ export default function DealDetailPage() {
                 ownerId: deal.owner
                   ? undefined
                   : undefined,
+                customProps: deal.customProps,
               }}
               onSubmit={handleUpdate}
               isLoading={updateDeal.isPending}
@@ -267,7 +270,7 @@ export default function DealDetailPage() {
                     </dt>
                     <dd className="mt-1 text-sm font-semibold">
                       {deal.amount != null
-                        ? formatCurrency(deal.amount)
+                        ? formatCurrency(deal.amount, deal.currency)
                         : "-"}
                     </dd>
                   </div>
@@ -360,17 +363,60 @@ export default function DealDetailPage() {
                     </dd>
                   </div>
 
-                  {/* Custom properties */}
+                  {/* Pipeline-specific custom fields */}
+                  {pipelineFields && pipelineFields.length > 0 && deal.customProps && (
+                    <div className="sm:col-span-2">
+                      <dt className="text-sm font-medium text-muted-foreground">
+                        Pipeline Fields
+                      </dt>
+                      <dd className="mt-1">
+                        <dl className="grid grid-cols-2 gap-2">
+                          {pipelineFields.map((field) => {
+                            const val = deal.customProps[field.fieldKey];
+                            let display: string;
+                            if (val == null || val === "") {
+                              display = "-";
+                            } else if (field.fieldType === "boolean") {
+                              display = val ? "Yes" : "No";
+                            } else if (field.fieldType === "currency") {
+                              display = `$${Number(val).toLocaleString(undefined, { minimumFractionDigits: 2 })}`;
+                            } else if (field.fieldType === "percentage") {
+                              display = `${val}%`;
+                            } else if (field.fieldType === "date") {
+                              display = new Date(String(val)).toLocaleDateString();
+                            } else {
+                              display = String(val);
+                            }
+                            return (
+                              <div key={field.id}>
+                                <dt className="text-xs text-muted-foreground">
+                                  {field.name}
+                                </dt>
+                                <dd className="text-sm">{display}</dd>
+                              </div>
+                            );
+                          })}
+                        </dl>
+                      </dd>
+                    </div>
+                  )}
+                  {/* Other custom properties */}
                   {deal.customProps &&
-                    Object.keys(deal.customProps).length > 0 && (
+                    Object.keys(deal.customProps).filter(
+                      (k) => !pipelineFields?.some((f) => f.fieldKey === k),
+                    ).length > 0 && (
                       <div className="sm:col-span-2">
                         <dt className="text-sm font-medium text-muted-foreground">
                           Custom Properties
                         </dt>
                         <dd className="mt-1">
                           <dl className="grid grid-cols-2 gap-2">
-                            {Object.entries(deal.customProps).map(
-                              ([key, value]) => (
+                            {Object.entries(deal.customProps)
+                              .filter(
+                                ([key]) =>
+                                  !pipelineFields?.some((f) => f.fieldKey === key),
+                              )
+                              .map(([key, value]) => (
                                 <div key={key}>
                                   <dt className="text-xs text-muted-foreground">
                                     {key}
@@ -379,8 +425,7 @@ export default function DealDetailPage() {
                                     {String(value)}
                                   </dd>
                                 </div>
-                              ),
-                            )}
+                              ))}
                           </dl>
                         </dd>
                       </div>
@@ -391,7 +436,7 @@ export default function DealDetailPage() {
           </div>
 
           {/* Activity timeline */}
-          <div>
+          <div className="space-y-6">
             <Card>
               <CardHeader>
                 <CardTitle>Activity</CardTitle>
@@ -400,6 +445,7 @@ export default function DealDetailPage() {
                 <DealActivityTimeline dealId={id} />
               </CardContent>
             </Card>
+            <AttachmentsPanel entityType="deal" entityId={id} />
           </div>
         </div>
       )}

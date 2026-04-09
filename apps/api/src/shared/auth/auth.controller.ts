@@ -89,6 +89,14 @@ export class AuthController {
   }
 
   @UseGuards(JwtAuthGuard)
+  @Get('users')
+  @ApiOperation({ summary: 'List users in the current tenant' })
+  @ApiResponse({ status: 200, description: 'Users returned' })
+  async listUsers(@CurrentUser() user: RequestUser) {
+    return this.authService.listTenantUsers(user.tenantId);
+  }
+
+  @UseGuards(JwtAuthGuard)
   @Post('logout')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: 'Logout and revoke sessions' })
@@ -114,6 +122,30 @@ export class AuthController {
       dto.newPassword,
     );
     return { message: 'Password changed successfully' };
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('create-user')
+  @ApiOperation({ summary: 'Create a new user in the current tenant' })
+  @ApiResponse({ status: 201, description: 'User created' })
+  async createUser(
+    @CurrentUser() user: RequestUser,
+    @Body() dto: { firstName: string; lastName: string; email: string; password: string },
+  ) {
+    const newUser = await this.authService.register({
+      tenantId: user.tenantId,
+      firstName: dto.firstName,
+      lastName: dto.lastName,
+      email: dto.email,
+      password: dto.password,
+    } as RegisterDto);
+    return {
+      id: newUser.id,
+      tenantId: newUser.tenantId,
+      email: newUser.email,
+      firstName: newUser.firstName,
+      lastName: newUser.lastName,
+    };
   }
 
   @UseGuards(JwtAuthGuard)

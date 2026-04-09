@@ -3,6 +3,7 @@ import {
   IsOptional,
   IsUUID,
   IsObject,
+  IsIn,
   ValidateNested,
 } from 'class-validator';
 import { Type } from 'class-transformer';
@@ -86,4 +87,10 @@ export class CreateCompanyDto {
   @IsOptional()
   @IsString()
   lifecycleStage?: string;
+
+  @ApiPropertyOptional({ description: 'Record visibility', enum: ['everyone', 'owner', 'private'] })
+  @IsOptional()
+  @IsString()
+  @IsIn(['everyone', 'owner', 'private'])
+  visibility?: string;
 }

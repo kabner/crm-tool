@@ -15,6 +15,7 @@ const companySchema = z.object({
   size: z.string().optional(),
   phone: z.string().optional(),
   lifecycleStage: z.string().optional(),
+  visibility: z.enum(['everyone', 'owner', 'private']).optional(),
   address: z
     .object({
       street: z.string().optional(),
@@ -97,6 +98,7 @@ export function CompanyForm({
       size: '',
       phone: '',
       lifecycleStage: '',
+      visibility: 'everyone',
       address: {
         street: '',
         city: '',
@@ -190,6 +192,19 @@ export function CompanyForm({
                 {stage.label}
               </option>
             ))}
+          </select>
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="visibility">Visibility</Label>
+          <select
+            id="visibility"
+            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+            {...register('visibility')}
+          >
+            <option value="everyone">Everyone</option>
+            <option value="owner">Only Me &amp; Owner</option>
+            <option value="private">Private</option>
           </select>
         </div>
       </div>

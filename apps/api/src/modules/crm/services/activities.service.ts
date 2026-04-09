@@ -1,22 +1,31 @@
 import {
   Injectable,
+  Logger,
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, SelectQueryBuilder } from 'typeorm';
 import { Activity } from '../entities/activity.entity';
 import { Deal } from '../entities/deal.entity';
+import { User } from '../entities/user.entity';
+import { Notification } from '../../../shared/notifications/entities/notification.entity';
 import { CreateActivityDto } from '../dto/create-activity.dto';
 import { UpdateActivityDto } from '../dto/update-activity.dto';
 import { ActivityFilterDto } from '../dto/activity-filter.dto';
 
 @Injectable()
 export class ActivitiesService {
+  private readonly logger = new Logger(ActivitiesService.name);
+
   constructor(
     @InjectRepository(Activity)
     private readonly activityRepo: Repository<Activity>,
     @InjectRepository(Deal)
     private readonly dealRepository: Repository<Deal>,
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
+    @InjectRepository(Notification)
+    private readonly notificationRepository: Repository<Notification>,
   ) {}
 
   async create(
@@ -29,6 +38,9 @@ export class ActivitiesService {
       tenantId,
       userId,
       dueDate: dto.dueDate ? new Date(dto.dueDate) : undefined,
+      recurrenceEndDate: dto.recurrenceEndDate
+        ? new Date(dto.recurrenceEndDate)
+        : undefined,
       metadata: dto.metadata ?? {},
     });
     const savedActivity = await this.activityRepo.save(activity);
@@ -40,7 +52,71 @@ export class ActivitiesService {
       );
     }
 
+    // Process @mentions asynchronously (fire-and-forget)
+    this.processMentions(savedActivity).catch((err) =>
+      this.logger.error('Failed to process mentions', err),
+    );
+
     return savedActivity;
+  }
+
+  private async processMentions(activity: Activity): Promise<void> {
+    if (!activity.body) return;
+
+    const mentionRegex = /@(\w+(?:\.\w+)?)/g;
+    const mentions = new Set<string>();
+    let match: RegExpExecArray | null;
+
+    while ((match = mentionRegex.exec(activity.body)) !== null) {
+      mentions.add(match[1]!.toLowerCase());
+    }
+
+    if (mentions.size === 0) return;
+
+    const tenantUsers = await this.userRepository.find({
+      where: { tenantId: activity.tenantId, status: 'active' },
+      select: ['id', 'firstName', 'lastName'],
+    });
+
+    const actionUrl = activity.contactId
+      ? `/contacts/${activity.contactId}`
+      : activity.companyId
+        ? `/companies/${activity.companyId}`
+        : activity.dealId
+          ? `/deals/${activity.dealId}`
+          : null;
+
+    const matchedUserIds = new Set<string>();
+
+    for (const mention of mentions) {
+      for (const user of tenantUsers) {
+        if (user.id === activity.userId) continue; // don't notify yourself
+        const fullName = `${user.firstName}.${user.lastName}`.toLowerCase();
+        const first = user.firstName.toLowerCase();
+
+        if (mention === fullName || mention === first) {
+          matchedUserIds.add(user.id);
+        }
+      }
+    }
+
+    const notifications = Array.from(matchedUserIds).map((userId) =>
+      this.notificationRepository.create({
+        tenantId: activity.tenantId,
+        userId,
+        type: 'mention',
+        title: 'You were mentioned in a note',
+        body: activity.subject,
+        actionUrl,
+        resourceType: 'activity',
+        resourceId: activity.id,
+        actorId: activity.userId,
+      }),
+    );
+
+    if (notifications.length > 0) {
+      await this.notificationRepository.save(notifications);
+    }
   }
 
   async findAll(
@@ -50,7 +126,9 @@ export class ActivitiesService {
     const qb = this.activityRepo
       .createQueryBuilder('activity')
       .leftJoinAndSelect('activity.user', 'user')
-      .where('activity.tenantId = :tenantId', { tenantId });
+      .leftJoinAndSelect('activity.children', 'children')
+      .where('activity.tenantId = :tenantId', { tenantId })
+      .andWhere('activity.parentId IS NULL');
 
     this.applyFilters(qb, filters);
 
@@ -124,12 +202,84 @@ export class ActivitiesService {
   async complete(tenantId: string, id: string): Promise<Activity> {
     const activity = await this.findOne(tenantId, id);
     activity.completedAt = new Date();
-    return this.activityRepo.save(activity);
+    const saved = await this.activityRepo.save(activity);
+
+    if (saved.recurrenceRule && saved.type === 'task') {
+      await this.createNextRecurrence(saved);
+    }
+
+    return saved;
+  }
+
+  private async createNextRecurrence(activity: Activity): Promise<void> {
+    const nextDueDate = this.calculateNextDueDate(
+      activity.dueDate,
+      activity.recurrenceRule,
+    );
+
+    if (
+      activity.recurrenceEndDate &&
+      nextDueDate > new Date(activity.recurrenceEndDate)
+    ) {
+      return;
+    }
+
+    const next = this.activityRepo.create({
+      tenantId: activity.tenantId,
+      type: 'task',
+      subject: activity.subject,
+      body: activity.body,
+      contactId: activity.contactId,
+      companyId: activity.companyId,
+      dealId: activity.dealId,
+      userId: activity.userId,
+      dueDate: nextDueDate,
+      recurrenceRule: activity.recurrenceRule,
+      recurrenceEndDate: activity.recurrenceEndDate,
+      recurringSourceId: activity.recurringSourceId || activity.id,
+      metadata: activity.metadata,
+    });
+    await this.activityRepo.save(next);
+  }
+
+  private calculateNextDueDate(
+    currentDueDate: Date | null,
+    rule: string,
+  ): Date {
+    const base = currentDueDate ? new Date(currentDueDate) : new Date();
+    switch (rule) {
+      case 'daily':
+        base.setDate(base.getDate() + 1);
+        break;
+      case 'weekly':
+        base.setDate(base.getDate() + 7);
+        break;
+      case 'monthly':
+        base.setMonth(base.getMonth() + 1);
+        break;
+      case 'yearly':
+        base.setFullYear(base.getFullYear() + 1);
+        break;
+    }
+    return base;
   }
 
   async remove(tenantId: string, id: string): Promise<void> {
     const activity = await this.findOne(tenantId, id);
     await this.activityRepo.remove(activity);
+  }
+
+  async findSubtasks(
+    tenantId: string,
+    parentId: string,
+  ): Promise<Activity[]> {
+    return this.activityRepo
+      .createQueryBuilder('activity')
+      .leftJoinAndSelect('activity.user', 'user')
+      .where('activity.tenantId = :tenantId', { tenantId })
+      .andWhere('activity.parentId = :parentId', { parentId })
+      .orderBy('activity.createdAt', 'ASC')
+      .getMany();
   }
 
   async getUpcomingTasks(

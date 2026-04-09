@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { MentionInput } from "@/components/mention-input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import {
@@ -19,7 +20,10 @@ import {
   Clock,
   Plus,
   Check,
+  Repeat,
 } from "lucide-react";
+import { SubtaskToggle } from "@/components/subtask-list";
+import { renderMentions } from "@/lib/render-mentions";
 
 const ACTIVITY_ICONS: Record<string, React.ElementType> = {
   call: Phone,
@@ -49,15 +53,18 @@ export function DealActivityTimeline({ dealId, compact = false }: DealActivityTi
   const [showForm, setShowForm] = useState(false);
   const [newType, setNewType] = useState("note");
   const [newSubject, setNewSubject] = useState("");
+  const [newBody, setNewBody] = useState("");
 
   const handleCreate = async () => {
     if (!newSubject.trim()) return;
     await createActivity.mutateAsync({
       type: newType,
       subject: newSubject,
+      body: newBody || undefined,
       dealId,
     });
     setNewSubject("");
+    setNewBody("");
     setShowForm(false);
   };
 
@@ -101,15 +108,21 @@ export function DealActivityTimeline({ dealId, compact = false }: DealActivityTi
               <option value="task">Task</option>
             </select>
             <Input
-              placeholder="What happened?"
+              placeholder="Subject"
               value={newSubject}
               onChange={(e) => setNewSubject(e.target.value)}
               className="h-8 text-sm"
-              onKeyDown={(e) => e.key === "Enter" && handleCreate()}
+              onKeyDown={(e) => e.key === "Enter" && !newBody && handleCreate()}
             />
           </div>
+          <MentionInput
+            placeholder="Add details or notes... Use @ to mention teammates"
+            value={newBody}
+            onChange={setNewBody}
+            className="min-h-[60px] text-sm"
+          />
           <div className="flex justify-end gap-2">
-            <Button variant="ghost" size="sm" onClick={() => { setShowForm(false); setNewSubject(""); }}>
+            <Button variant="ghost" size="sm" onClick={() => { setShowForm(false); setNewSubject(""); setNewBody(""); }}>
               Cancel
             </Button>
             <Button size="sm" onClick={handleCreate} disabled={!newSubject.trim() || createActivity.isPending}>
@@ -130,26 +143,48 @@ export function DealActivityTimeline({ dealId, compact = false }: DealActivityTi
             const isCompleted = !!activity.completedAt;
 
             return (
-              <div key={activity.id} className="flex gap-3 rounded-md px-2 py-2 hover:bg-muted/50 transition-colors">
-                <div className={cn("flex h-8 w-8 shrink-0 items-center justify-center rounded-full", colorClass)}>
-                  <Icon className="h-3.5 w-3.5" />
+              <div key={activity.id}>
+                <div className="flex gap-3 rounded-md px-2 py-2 hover:bg-muted/50 transition-colors">
+                  <div className={cn("flex h-8 w-8 shrink-0 items-center justify-center rounded-full", colorClass)}>
+                    <Icon className="h-3.5 w-3.5" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-1.5">
+                      <p className={cn("text-sm", isTask && isCompleted && "line-through text-muted-foreground")}>
+                        {activity.subject}
+                      </p>
+                      {activity.recurrenceRule && (
+                        <span
+                          className="inline-flex items-center text-muted-foreground"
+                          title={`Repeats ${activity.recurrenceRule}`}
+                        >
+                          <Repeat className="h-3 w-3" />
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      {activity.user ? `${activity.user.firstName} ${activity.user.lastName}` : "System"}{" "}
+                      · {new Date(activity.createdAt).toLocaleDateString("en-US", {
+                        month: "short", day: "numeric", hour: "numeric", minute: "2-digit",
+                      })}
+                    </p>
+                    {activity.body && (
+                      <p className="mt-0.5 text-xs text-muted-foreground line-clamp-2">
+                        {renderMentions(activity.body)}
+                      </p>
+                    )}
+                    {isTask && (
+                      <SubtaskToggle activity={activity} dealId={dealId} />
+                    )}
+                  </div>
+                  <div className="flex items-center gap-1 shrink-0">
+                    {isTask && !isCompleted && (
+                      <Button variant="ghost" size="icon" className="h-7 w-7 shrink-0" onClick={() => completeActivity.mutate(activity.id)}>
+                        <Check className="h-3.5 w-3.5" />
+                      </Button>
+                    )}
+                  </div>
                 </div>
-                <div className="flex-1 min-w-0">
-                  <p className={cn("text-sm", isTask && isCompleted && "line-through text-muted-foreground")}>
-                    {activity.subject}
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    {activity.user ? `${activity.user.firstName} ${activity.user.lastName}` : "System"}{" "}
-                    · {new Date(activity.createdAt).toLocaleDateString("en-US", {
-                      month: "short", day: "numeric", hour: "numeric", minute: "2-digit",
-                    })}
-                  </p>
-                </div>
-                {isTask && !isCompleted && (
-                  <Button variant="ghost" size="icon" className="h-7 w-7 shrink-0" onClick={() => completeActivity.mutate(activity.id)}>
-                    <Check className="h-3.5 w-3.5" />
-                  </Button>
-                )}
               </div>
             );
           })}

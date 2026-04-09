@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
+import { formatCurrency } from "@/lib/currency";
 import {
   useDeals,
   usePipelines,
@@ -23,19 +24,12 @@ import { DealQuickView } from "./components/deal-quick-view";
 import { LossReasonDialog } from "./components/loss-reason-dialog";
 
 type ViewMode = "board" | "list";
-
-function formatCurrency(amount: number): string {
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(amount);
-}
+type PipelineType = "sales" | "project";
 
 export default function DealsPage() {
   const router = useRouter();
   const [viewMode, setViewMode] = useState<ViewMode>("board");
+  const [pipelineType, setPipelineType] = useState<PipelineType>("sales");
   const [selectedPipelineId, setSelectedPipelineId] = useState<string>("");
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
@@ -61,8 +55,13 @@ export default function DealsPage() {
   const [filterCloseDateFrom, setFilterCloseDateFrom] = useState("");
   const [filterCloseDateTo, setFilterCloseDateTo] = useState("");
 
-  const { data: pipelines } = usePipelines();
+  const { data: pipelines } = usePipelines(pipelineType);
   const createDeal = useCreateDeal();
+
+  // Reset selected pipeline when type changes
+  useEffect(() => {
+    setSelectedPipelineId("");
+  }, [pipelineType]);
 
   // Default to first real pipeline in board view
   useEffect(() => {
@@ -174,7 +173,9 @@ export default function DealsPage() {
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Pipelines</h1>
           <p className="text-muted-foreground">
-            Track and manage your sales pipelines.
+            {pipelineType === "sales"
+              ? "Track and manage your sales pipelines."
+              : "Track and manage your project delivery pipelines."}
           </p>
         </div>
         <div className="flex items-center gap-3">
@@ -213,6 +214,34 @@ export default function DealsPage() {
           <Button onClick={() => setShowCreateForm(!showCreateForm)}>
             {showCreateForm ? "Cancel" : "Create Deal"}
           </Button>
+        </div>
+      </div>
+
+      {/* Pipeline type toggle */}
+      <div className="flex items-center gap-4">
+        <div className="flex rounded-md border border-border">
+          <button
+            onClick={() => setPipelineType("sales")}
+            className={cn(
+              "px-4 py-1.5 text-sm font-medium transition-colors rounded-l-md",
+              pipelineType === "sales"
+                ? "bg-primary text-primary-foreground"
+                : "text-muted-foreground hover:text-foreground hover:bg-muted",
+            )}
+          >
+            Sales
+          </button>
+          <button
+            onClick={() => setPipelineType("project")}
+            className={cn(
+              "px-4 py-1.5 text-sm font-medium transition-colors rounded-r-md",
+              pipelineType === "project"
+                ? "bg-primary text-primary-foreground"
+                : "text-muted-foreground hover:text-foreground hover:bg-muted",
+            )}
+          >
+            Projects
+          </button>
         </div>
       </div>
 

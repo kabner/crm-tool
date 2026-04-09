@@ -27,6 +27,7 @@ export interface Deal {
   pipeline?: { id: string; name: string };
   owner: DealOwner | null;
   company: DealCompany | null;
+  currency: string;
   customProps: Record<string, unknown>;
   createdAt: string;
   updatedAt: string;
@@ -34,6 +35,7 @@ export interface Deal {
   lastStageChangeAt: string | null;
   lastActivityAt: string | null;
   priority: string;
+  visibility: string;
 }
 
 export interface DealsResponse {
@@ -71,6 +73,7 @@ export interface PipelineStage {
     id: string;
     name: string;
     amount: number | null;
+    currency: string;
     closeDate: string | null;
     owner: DealOwner | null;
     company: DealCompany | null;
@@ -115,6 +118,7 @@ export interface PipelineSummary {
 export interface Pipeline {
   id: string;
   name: string;
+  type?: string; // 'sales' | 'project'
   isDefault: boolean;
   stages?: {
     id: string;
@@ -128,11 +132,13 @@ export interface Pipeline {
 export interface CreateDealInput {
   name: string;
   amount?: number;
+  currency?: string;
   pipelineId: string;
   stageId: string;
   closeDate?: string;
   companyName?: string;
   ownerId?: string;
+  visibility?: string;
 }
 
 export interface UpdateDealInput extends Partial<CreateDealInput> {
@@ -207,10 +213,11 @@ export function usePipelineSummary(pipelineId: string) {
   });
 }
 
-export function usePipelines() {
+export function usePipelines(type?: string) {
+  const url = type ? `/api/v1/pipelines?type=${type}` : "/api/v1/pipelines";
   return useQuery<Pipeline[]>({
-    queryKey: ["pipelines"],
-    queryFn: () => apiClient.get<Pipeline[]>("/api/v1/pipelines"),
+    queryKey: ["pipelines", type],
+    queryFn: () => apiClient.get<Pipeline[]>(url),
   });
 }
 

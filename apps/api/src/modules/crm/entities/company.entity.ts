@@ -51,6 +51,9 @@ export class Company {
   @Column({ name: 'lifecycle_stage', default: 'lead' })
   lifecycleStage: string;
 
+  @Column({ default: 'everyone' })
+  visibility: string; // 'everyone' | 'owner' | 'private'
+
   @Column({ name: 'created_by_id', nullable: true })
   createdById: string;
 

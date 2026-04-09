@@ -67,9 +67,20 @@ export class CreateDealDto {
   @IsObject()
   customProps?: Record<string, any>;
 
+  @ApiPropertyOptional({ description: 'Currency code (e.g. USD, EUR, GBP)', default: 'USD' })
+  @IsOptional()
+  @IsString()
+  currency?: string;
+
   @ApiPropertyOptional({ description: 'Deal priority', enum: ['none', 'low', 'medium', 'high'] })
   @IsOptional()
   @IsString()
   @IsIn(['none', 'low', 'medium', 'high'])
   priority?: string;
+
+  @ApiPropertyOptional({ description: 'Record visibility', enum: ['everyone', 'owner', 'private'] })
+  @IsOptional()
+  @IsString()
+  @IsIn(['everyone', 'owner', 'private'])
+  visibility?: string;
 }

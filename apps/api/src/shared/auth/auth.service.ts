@@ -272,6 +272,22 @@ export class AuthService {
     await this.userRepository.update(userId, { passwordHash: newPasswordHash });
   }
 
+  async listTenantUsers(
+    tenantId: string,
+  ): Promise<{ id: string; firstName: string; lastName: string; email: string }[]> {
+    const users = await this.userRepository.find({
+      where: { tenantId, status: 'active' },
+      select: ['id', 'firstName', 'lastName', 'email'],
+      order: { firstName: 'ASC', lastName: 'ASC' },
+    });
+    return users.map((u) => ({
+      id: u.id,
+      firstName: u.firstName,
+      lastName: u.lastName,
+      email: u.email,
+    }));
+  }
+
   async updateProfile(
     userId: string,
     data: { firstName?: string; lastName?: string },

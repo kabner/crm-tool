@@ -47,6 +47,25 @@ export class ContactsController {
     return this.contactsService.findAll(tenantId, filters, userId);
   }
 
+  @Get('duplicates')
+  @RequirePermissions(Permissions.CONTACTS_READ)
+  @ApiOperation({ summary: 'Find duplicate contacts' })
+  @ApiResponse({ status: 200, description: 'List of duplicate contact pairs' })
+  async findDuplicates(@CurrentUser('tenantId') tenantId: string) {
+    return this.contactsService.findDuplicates(tenantId);
+  }
+
+  @Post('merge')
+  @RequirePermissions(Permissions.CONTACTS_WRITE)
+  @ApiOperation({ summary: 'Merge two contacts' })
+  @ApiResponse({ status: 200, description: 'Merged contact' })
+  async merge(
+    @CurrentUser('tenantId') tenantId: string,
+    @Body() body: { keepId: string; mergeId: string },
+  ) {
+    return this.contactsService.merge(tenantId, body.keepId, body.mergeId);
+  }
+
   @Get(':id')
   @RequirePermissions(Permissions.CONTACTS_READ)
   @ApiOperation({ summary: 'Get a single contact by ID' })

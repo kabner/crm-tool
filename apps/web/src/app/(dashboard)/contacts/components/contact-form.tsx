@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { PhoneInput } from '@/components/ui/phone-input';
 import { useCompanies } from '@/hooks/use-companies';
+import { useContactTypes } from '@/hooks/use-contact-types';
 
 const contactSchema = z.object({
   firstName: z.string().min(1, 'First name is required'),
@@ -17,9 +18,11 @@ const contactSchema = z.object({
   phone: z.string().optional(),
   jobTitle: z.string().optional(),
   companyId: z.string().min(1, 'Company is required'),
+  contactType: z.string().optional(),
   leadStatus: z.string().optional(),
   tags: z.string().optional(),
   source: z.string().optional(),
+  visibility: z.enum(['everyone', 'owner', 'private']).optional(),
 });
 
 type ContactFormValues = z.infer<typeof contactSchema>;
@@ -45,9 +48,11 @@ interface ContactFormProps {
     jobTitle?: string | null;
     companyId?: string | null;
     company?: { id: string; name: string } | null;
+    contactType?: string | null;
     leadStatus?: string | null;
     tags?: string[];
     source?: string | null;
+    visibility?: string;
   };
   onSubmit: (data: {
     firstName: string;
@@ -56,9 +61,11 @@ interface ContactFormProps {
     phone?: string;
     jobTitle?: string;
     companyId: string;
+    contactType?: string;
     leadStatus?: string;
     tags?: string[];
     source?: string;
+    visibility?: string;
   }) => void;
   isLoading?: boolean;
   onCancel?: () => void;
@@ -70,6 +77,7 @@ export function ContactForm({
   isLoading,
   onCancel,
 }: ContactFormProps) {
+  const { data: contactTypes } = useContactTypes();
   const [companySearch, setCompanySearch] = useState(initialData?.company?.name ?? '');
 
   const { data: companiesData } = useCompanies({
@@ -94,9 +102,11 @@ export function ContactForm({
       phone: initialData?.phone ?? '',
       jobTitle: initialData?.jobTitle ?? '',
       companyId: initialData?.companyId ?? initialData?.company?.id ?? '',
+      contactType: initialData?.contactType ?? '',
       leadStatus: initialData?.leadStatus ?? '',
       tags: initialData?.tags?.join(', ') ?? '',
       source: initialData?.source ?? '',
+      visibility: (initialData?.visibility as 'everyone' | 'owner' | 'private') ?? 'everyone',
     },
   });
 
@@ -115,9 +125,11 @@ export function ContactForm({
       phone: values.phone || undefined,
       jobTitle: values.jobTitle || undefined,
       companyId: values.companyId,
+      contactType: values.contactType || undefined,
       leadStatus: values.leadStatus || undefined,
       tags,
       source: values.source || undefined,
+      visibility: values.visibility || undefined,
     });
   }
 
@@ -216,6 +228,22 @@ export function ContactForm({
       </div>
 
       <div className="space-y-2">
+        <Label htmlFor="contactType">Contact Type</Label>
+        <select
+          id="contactType"
+          {...register('contactType')}
+          className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+        >
+          <option value="">Select type...</option>
+          {(contactTypes ?? []).map((ct) => (
+            <option key={ct.id} value={ct.name}>
+              {ct.name}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      <div className="space-y-2">
         <Label htmlFor="leadStatus">Lead Status</Label>
         <select
           id="leadStatus"
@@ -235,9 +263,23 @@ export function ContactForm({
         <Input id="tags" placeholder="e.g. vip, enterprise" {...register('tags')} />
       </div>
 
-      <div className="space-y-2">
-        <Label htmlFor="source">Source</Label>
-        <Input id="source" placeholder="e.g. website, referral" {...register('source')} />
+      <div className="grid grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <Label htmlFor="source">Source</Label>
+          <Input id="source" placeholder="e.g. website, referral" {...register('source')} />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="visibility">Visibility</Label>
+          <select
+            id="visibility"
+            {...register('visibility')}
+            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+          >
+            <option value="everyone">Everyone</option>
+            <option value="owner">Only Me &amp; Owner</option>
+            <option value="private">Private</option>
+          </select>
+        </div>
       </div>
 
       <div className="flex justify-end gap-2 pt-4">

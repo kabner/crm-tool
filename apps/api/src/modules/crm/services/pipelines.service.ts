@@ -22,11 +22,17 @@ export class PipelinesService {
     private readonly dealRepository: Repository<Deal>,
   ) {}
 
-  async findAll(tenantId: string): Promise<Pipeline[]> {
-    const pipelines = await this.pipelineRepository
+  async findAll(tenantId: string, type?: string): Promise<Pipeline[]> {
+    const qb = this.pipelineRepository
       .createQueryBuilder('pipeline')
       .loadRelationCountAndMap('pipeline.stageCount', 'pipeline.stages')
-      .where('pipeline.tenantId = :tenantId', { tenantId })
+      .where('pipeline.tenantId = :tenantId', { tenantId });
+
+    if (type) {
+      qb.andWhere('pipeline.type = :type', { type });
+    }
+
+    const pipelines = await qb
       .orderBy('pipeline.createdAt', 'ASC')
       .getMany();
 

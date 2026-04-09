@@ -42,9 +42,10 @@ export class DealsController {
   @ApiResponse({ status: 200, description: 'Paginated list of deals' })
   async findAll(
     @CurrentUser('tenantId') tenantId: string,
+    @CurrentUser('userId') userId: string,
     @Query() filters: DealFilterDto,
   ) {
-    return this.dealsService.findAll(tenantId, filters);
+    return this.dealsService.findAll(tenantId, filters, userId);
   }
 
   @Get('pipeline/:pipelineId')

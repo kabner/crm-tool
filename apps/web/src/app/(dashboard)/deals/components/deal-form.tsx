@@ -8,17 +8,21 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { usePipelines, usePipeline } from "@/hooks/use-deals";
+import { usePipelineFields } from "@/hooks/use-pipeline-fields";
 import { EntitySearch } from "@/components/entity-search";
 import { apiClient } from "@/lib/api-client";
+import { CURRENCIES } from "@/lib/currency";
 
 const dealSchema = z.object({
   name: z.string().min(1, "Deal name is required"),
   amount: z.string().optional(),
+  currency: z.string().optional(),
   pipelineId: z.string().min(1, "Pipeline is required"),
   stageId: z.string().min(1, "Stage is required"),
   closeDate: z.string().optional(),
   companyName: z.string().optional(),
   ownerId: z.string().optional(),
+  visibility: z.enum(['everyone', 'owner', 'private']).optional(),
 });
 
 type DealFormValues = z.infer<typeof dealSchema>;
@@ -27,21 +31,27 @@ interface DealFormProps {
   initialData?: {
     name?: string;
     amount?: number | null;
+    currency?: string;
     pipelineId?: string;
     stageId?: string;
     closeDate?: string | null;
     companyName?: string;
     companyId?: string;
     ownerId?: string | null;
+    visibility?: string;
+    customProps?: Record<string, unknown>;
   };
   onSubmit: (data: {
     name: string;
     amount?: number;
+    currency?: string;
     pipelineId: string;
     stageId: string;
     closeDate?: string;
     companyName?: string;
     ownerId?: string;
+    visibility?: string;
+    customProps?: Record<string, unknown>;
   }) => void;
   isLoading?: boolean;
 }
@@ -52,6 +62,9 @@ const selectClassName =
 export function DealForm({ initialData, onSubmit, isLoading }: DealFormProps) {
   const { data: pipelines } = usePipelines();
   const [selectedCompanyId, setSelectedCompanyId] = useState(initialData?.companyId ?? "");
+  const [customFieldValues, setCustomFieldValues] = useState<Record<string, unknown>>(
+    initialData?.customProps ?? {},
+  );
   const [showCreateConfirm, setShowCreateConfirm] = useState(false);
   const [pendingCompanyName, setPendingCompanyName] = useState("");
 
@@ -66,6 +79,7 @@ export function DealForm({ initialData, onSubmit, isLoading }: DealFormProps) {
     defaultValues: {
       name: initialData?.name ?? "",
       amount: initialData?.amount != null ? String(initialData.amount) : "",
+      currency: initialData?.currency ?? "USD",
       pipelineId: initialData?.pipelineId ?? "",
       stageId: initialData?.stageId ?? "",
       closeDate: initialData?.closeDate
@@ -73,11 +87,13 @@ export function DealForm({ initialData, onSubmit, isLoading }: DealFormProps) {
         : "",
       companyName: initialData?.companyName ?? "",
       ownerId: initialData?.ownerId ?? "",
+      visibility: (initialData?.visibility as 'everyone' | 'owner' | 'private') ?? "everyone",
     },
   });
 
   const selectedPipelineId = watch("pipelineId");
   const { data: selectedPipeline } = usePipeline(selectedPipelineId);
+  const { data: pipelineFields } = usePipelineFields(selectedPipelineId);
 
   // Reset stage when pipeline changes (but not on initial load)
   useEffect(() => {
@@ -128,12 +144,19 @@ export function DealForm({ initialData, onSubmit, isLoading }: DealFormProps) {
     onSubmit({
       name: values.name,
       amount: values.amount ? parseFloat(values.amount) : undefined,
+      currency: values.currency || "USD",
       pipelineId: values.pipelineId,
       stageId: values.stageId,
       closeDate: values.closeDate || undefined,
       companyName: values.companyName || undefined,
       ownerId: values.ownerId || undefined,
+      visibility: values.visibility || undefined,
+      customProps: Object.keys(customFieldValues).length > 0 ? customFieldValues : undefined,
     });
+  }
+
+  function setCustomField(key: string, value: unknown) {
+    setCustomFieldValues((prev) => ({ ...prev, [key]: value }));
   }
 
   return (
@@ -152,23 +175,31 @@ export function DealForm({ initialData, onSubmit, isLoading }: DealFormProps) {
           )}
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-3 gap-4">
           <div className="space-y-2">
             <Label htmlFor="amount">Amount</Label>
-            <div className="relative">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
-                $
-              </span>
-              <Input
-                id="amount"
-                type="number"
-                min="0"
-                step="0.01"
-                placeholder="0"
-                className="pl-7"
-                {...register("amount")}
-              />
-            </div>
+            <Input
+              id="amount"
+              type="number"
+              min="0"
+              step="0.01"
+              placeholder="0"
+              {...register("amount")}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="currency">Currency</Label>
+            <select
+              id="currency"
+              {...register("currency")}
+              className={selectClassName}
+            >
+              {CURRENCIES.map((c) => (
+                <option key={c.code} value={c.code}>
+                  {c.code} ({c.symbol})
+                </option>
+              ))}
+            </select>
           </div>
           <div className="space-y-2">
             <Label htmlFor="closeDate">Close Date</Label>
@@ -246,6 +277,119 @@ export function DealForm({ initialData, onSubmit, isLoading }: DealFormProps) {
             />
           </div>
         </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="visibility">Visibility</Label>
+          <select
+            id="visibility"
+            {...register("visibility")}
+            className={selectClassName}
+          >
+            <option value="everyone">Everyone</option>
+            <option value="owner">Only Me &amp; Owner</option>
+            <option value="private">Private</option>
+          </select>
+        </div>
+
+        {/* Pipeline-specific custom fields */}
+        {pipelineFields && pipelineFields.length > 0 && (
+          <div className="space-y-4 border-t pt-4">
+            <Label className="text-base font-semibold">Pipeline Fields</Label>
+            <div className="grid grid-cols-2 gap-4">
+              {pipelineFields.map((field) => (
+                <div key={field.id} className="space-y-2">
+                  <Label>
+                    {field.name}
+                    {field.required && " *"}
+                  </Label>
+                  {field.fieldType === "text" && (
+                    <Input
+                      value={String(customFieldValues[field.fieldKey] ?? "")}
+                      onChange={(e) => setCustomField(field.fieldKey, e.target.value)}
+                      required={field.required}
+                    />
+                  )}
+                  {field.fieldType === "number" && (
+                    <Input
+                      type="number"
+                      value={String(customFieldValues[field.fieldKey] ?? "")}
+                      onChange={(e) =>
+                        setCustomField(field.fieldKey, e.target.value ? Number(e.target.value) : "")
+                      }
+                      required={field.required}
+                    />
+                  )}
+                  {field.fieldType === "date" && (
+                    <Input
+                      type="date"
+                      value={String(customFieldValues[field.fieldKey] ?? "")}
+                      onChange={(e) => setCustomField(field.fieldKey, e.target.value)}
+                      required={field.required}
+                    />
+                  )}
+                  {field.fieldType === "boolean" && (
+                    <div className="flex items-center pt-1">
+                      <input
+                        type="checkbox"
+                        checked={!!customFieldValues[field.fieldKey]}
+                        onChange={(e) => setCustomField(field.fieldKey, e.target.checked)}
+                        className="h-4 w-4 rounded border-input"
+                      />
+                    </div>
+                  )}
+                  {field.fieldType === "select" && (
+                    <select
+                      value={String(customFieldValues[field.fieldKey] ?? "")}
+                      onChange={(e) => setCustomField(field.fieldKey, e.target.value)}
+                      className={selectClassName}
+                      required={field.required}
+                    >
+                      <option value="">Select...</option>
+                      {field.options?.map((opt) => (
+                        <option key={opt} value={opt}>
+                          {opt}
+                        </option>
+                      ))}
+                    </select>
+                  )}
+                  {field.fieldType === "currency" && (
+                    <Input
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      value={String(customFieldValues[field.fieldKey] ?? "")}
+                      onChange={(e) =>
+                        setCustomField(field.fieldKey, e.target.value ? Number(e.target.value) : "")
+                      }
+                      required={field.required}
+                    />
+                  )}
+                  {field.fieldType === "percentage" && (
+                    <Input
+                      type="number"
+                      step="0.1"
+                      min="0"
+                      max="100"
+                      value={String(customFieldValues[field.fieldKey] ?? "")}
+                      onChange={(e) =>
+                        setCustomField(field.fieldKey, e.target.value ? Number(e.target.value) : "")
+                      }
+                      required={field.required}
+                    />
+                  )}
+                  {field.fieldType === "url" && (
+                    <Input
+                      type="url"
+                      value={String(customFieldValues[field.fieldKey] ?? "")}
+                      onChange={(e) => setCustomField(field.fieldKey, e.target.value)}
+                      required={field.required}
+                    />
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         <div className="flex justify-end pt-4">
           <Button type="submit" disabled={isLoading}>
