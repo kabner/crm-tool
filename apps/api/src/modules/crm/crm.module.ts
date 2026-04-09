@@ -23,6 +23,8 @@ import {
   TenantSetting,
   ExchangeRate,
   PipelineField,
+  GoogleConnection,
+  EmailSyncLog,
 } from './entities';
 import { Notification } from '../../shared/notifications/entities/notification.entity';
 import { ContactsController } from './controllers/contacts.controller';
@@ -65,6 +67,10 @@ import { CurrencyController } from './controllers/currency.controller';
 import { CurrencyService } from './services/currency.service';
 import { PipelineFieldsController } from './controllers/pipeline-fields.controller';
 import { PipelineFieldsService } from './services/pipeline-fields.service';
+import { GoogleIntegrationController } from './controllers/google-integration.controller';
+import { GoogleAuthService } from './services/google-auth.service';
+import { GmailSyncService } from './services/gmail-sync.service';
+import { CalendarSyncService } from './services/calendar-sync.service';
 
 @Module({
   imports: [
@@ -92,10 +98,12 @@ import { PipelineFieldsService } from './services/pipeline-fields.service';
       TenantSetting,
       ExchangeRate,
       PipelineField,
+      GoogleConnection,
+      EmailSyncLog,
     ]),
   ],
-  controllers: [ContactsController, CompaniesController, ActivitiesController, DealsController, PipelinesController, ListsController, ImportExportController, SearchController, SavedViewsController, FavoritesController, UserSettingsController, FeedController, ContactTypesController, ActivityTypesController, AttachmentsController, LeadsController, CardScannerController, TenantSettingsController, CurrencyController, PipelineFieldsController],
-  providers: [ContactsService, CompaniesService, ActivitiesService, DealsService, PipelinesService, ListsService, ImportExportService, SearchService, SavedViewsService, FavoritesService, UserSettingsService, FeedService, ContactTypesService, ActivityTypesService, AttachmentsService, LeadsService, CardScannerService, TenantSettingsService, CurrencyService, PipelineFieldsService],
-  exports: [ContactsService, CompaniesService, ActivitiesService, DealsService, PipelinesService, ListsService, ImportExportService, SearchService, SavedViewsService, FavoritesService, UserSettingsService, FeedService, ContactTypesService, ActivityTypesService, AttachmentsService, LeadsService, CardScannerService, TenantSettingsService, CurrencyService, PipelineFieldsService],
+  controllers: [ContactsController, CompaniesController, ActivitiesController, DealsController, PipelinesController, ListsController, ImportExportController, SearchController, SavedViewsController, FavoritesController, UserSettingsController, FeedController, ContactTypesController, ActivityTypesController, AttachmentsController, LeadsController, CardScannerController, TenantSettingsController, CurrencyController, PipelineFieldsController, GoogleIntegrationController],
+  providers: [ContactsService, CompaniesService, ActivitiesService, DealsService, PipelinesService, ListsService, ImportExportService, SearchService, SavedViewsService, FavoritesService, UserSettingsService, FeedService, ContactTypesService, ActivityTypesService, AttachmentsService, LeadsService, CardScannerService, TenantSettingsService, CurrencyService, PipelineFieldsService, GoogleAuthService, GmailSyncService, CalendarSyncService],
+  exports: [ContactsService, CompaniesService, ActivitiesService, DealsService, PipelinesService, ListsService, ImportExportService, SearchService, SavedViewsService, FavoritesService, UserSettingsService, FeedService, ContactTypesService, ActivityTypesService, AttachmentsService, LeadsService, CardScannerService, TenantSettingsService, CurrencyService, PipelineFieldsService, GoogleAuthService, GmailSyncService, CalendarSyncService],
 })
 export class CrmModule {}

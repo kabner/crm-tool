@@ -24,3 +24,5 @@ export { Lead } from './lead.entity';
 export { TenantSetting } from './tenant-setting.entity';
 export { ExchangeRate } from './exchange-rate.entity';
 export { PipelineField } from './pipeline-field.entity';
+export { GoogleConnection } from './google-connection.entity';
+export { EmailSyncLog } from './email-sync-log.entity';
