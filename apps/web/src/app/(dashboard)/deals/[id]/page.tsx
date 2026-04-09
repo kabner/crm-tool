@@ -21,6 +21,7 @@ import {
   useMoveDealStage,
   usePipeline,
 } from "@/hooks/use-deals";
+import { usePipelineFields } from "@/hooks/use-pipeline-fields";
 import { DealForm } from "../components/deal-form";
 import { DealActivityTimeline } from "../components/deal-activity-timeline";
 import { AttachmentsPanel } from "@/components/attachments-panel";
@@ -46,6 +47,7 @@ export default function DealDetailPage() {
 
   const pipelineId = deal?.stage?.pipeline?.id ?? deal?.pipeline?.id ?? "";
   const { data: pipeline } = usePipeline(pipelineId);
+  const { data: pipelineFields } = usePipelineFields(pipelineId);
 
   const [isEditing, setIsEditing] = useState(false);
 
@@ -239,6 +241,7 @@ export default function DealDetailPage() {
                 ownerId: deal.owner
                   ? undefined
                   : undefined,
+                customProps: deal.customProps,
               }}
               onSubmit={handleUpdate}
               isLoading={updateDeal.isPending}
@@ -360,17 +363,60 @@ export default function DealDetailPage() {
                     </dd>
                   </div>
 
-                  {/* Custom properties */}
+                  {/* Pipeline-specific custom fields */}
+                  {pipelineFields && pipelineFields.length > 0 && deal.customProps && (
+                    <div className="sm:col-span-2">
+                      <dt className="text-sm font-medium text-muted-foreground">
+                        Pipeline Fields
+                      </dt>
+                      <dd className="mt-1">
+                        <dl className="grid grid-cols-2 gap-2">
+                          {pipelineFields.map((field) => {
+                            const val = deal.customProps[field.fieldKey];
+                            let display: string;
+                            if (val == null || val === "") {
+                              display = "-";
+                            } else if (field.fieldType === "boolean") {
+                              display = val ? "Yes" : "No";
+                            } else if (field.fieldType === "currency") {
+                              display = `$${Number(val).toLocaleString(undefined, { minimumFractionDigits: 2 })}`;
+                            } else if (field.fieldType === "percentage") {
+                              display = `${val}%`;
+                            } else if (field.fieldType === "date") {
+                              display = new Date(String(val)).toLocaleDateString();
+                            } else {
+                              display = String(val);
+                            }
+                            return (
+                              <div key={field.id}>
+                                <dt className="text-xs text-muted-foreground">
+                                  {field.name}
+                                </dt>
+                                <dd className="text-sm">{display}</dd>
+                              </div>
+                            );
+                          })}
+                        </dl>
+                      </dd>
+                    </div>
+                  )}
+                  {/* Other custom properties */}
                   {deal.customProps &&
-                    Object.keys(deal.customProps).length > 0 && (
+                    Object.keys(deal.customProps).filter(
+                      (k) => !pipelineFields?.some((f) => f.fieldKey === k),
+                    ).length > 0 && (
                       <div className="sm:col-span-2">
                         <dt className="text-sm font-medium text-muted-foreground">
                           Custom Properties
                         </dt>
                         <dd className="mt-1">
                           <dl className="grid grid-cols-2 gap-2">
-                            {Object.entries(deal.customProps).map(
-                              ([key, value]) => (
+                            {Object.entries(deal.customProps)
+                              .filter(
+                                ([key]) =>
+                                  !pipelineFields?.some((f) => f.fieldKey === key),
+                              )
+                              .map(([key, value]) => (
                                 <div key={key}>
                                   <dt className="text-xs text-muted-foreground">
                                     {key}
@@ -379,8 +425,7 @@ export default function DealDetailPage() {
                                     {String(value)}
                                   </dd>
                                 </div>
-                              ),
-                            )}
+                              ))}
                           </dl>
                         </dd>
                       </div>
