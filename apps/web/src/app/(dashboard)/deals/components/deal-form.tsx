@@ -10,10 +10,12 @@ import { Label } from "@/components/ui/label";
 import { usePipelines, usePipeline } from "@/hooks/use-deals";
 import { EntitySearch } from "@/components/entity-search";
 import { apiClient } from "@/lib/api-client";
+import { CURRENCIES } from "@/lib/currency";
 
 const dealSchema = z.object({
   name: z.string().min(1, "Deal name is required"),
   amount: z.string().optional(),
+  currency: z.string().optional(),
   pipelineId: z.string().min(1, "Pipeline is required"),
   stageId: z.string().min(1, "Stage is required"),
   closeDate: z.string().optional(),
@@ -28,6 +30,7 @@ interface DealFormProps {
   initialData?: {
     name?: string;
     amount?: number | null;
+    currency?: string;
     pipelineId?: string;
     stageId?: string;
     closeDate?: string | null;
@@ -39,6 +42,7 @@ interface DealFormProps {
   onSubmit: (data: {
     name: string;
     amount?: number;
+    currency?: string;
     pipelineId: string;
     stageId: string;
     closeDate?: string;
@@ -69,6 +73,7 @@ export function DealForm({ initialData, onSubmit, isLoading }: DealFormProps) {
     defaultValues: {
       name: initialData?.name ?? "",
       amount: initialData?.amount != null ? String(initialData.amount) : "",
+      currency: initialData?.currency ?? "USD",
       pipelineId: initialData?.pipelineId ?? "",
       stageId: initialData?.stageId ?? "",
       closeDate: initialData?.closeDate
@@ -132,6 +137,7 @@ export function DealForm({ initialData, onSubmit, isLoading }: DealFormProps) {
     onSubmit({
       name: values.name,
       amount: values.amount ? parseFloat(values.amount) : undefined,
+      currency: values.currency || "USD",
       pipelineId: values.pipelineId,
       stageId: values.stageId,
       closeDate: values.closeDate || undefined,
@@ -157,23 +163,31 @@ export function DealForm({ initialData, onSubmit, isLoading }: DealFormProps) {
           )}
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-3 gap-4">
           <div className="space-y-2">
             <Label htmlFor="amount">Amount</Label>
-            <div className="relative">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
-                $
-              </span>
-              <Input
-                id="amount"
-                type="number"
-                min="0"
-                step="0.01"
-                placeholder="0"
-                className="pl-7"
-                {...register("amount")}
-              />
-            </div>
+            <Input
+              id="amount"
+              type="number"
+              min="0"
+              step="0.01"
+              placeholder="0"
+              {...register("amount")}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="currency">Currency</Label>
+            <select
+              id="currency"
+              {...register("currency")}
+              className={selectClassName}
+            >
+              {CURRENCIES.map((c) => (
+                <option key={c.code} value={c.code}>
+                  {c.code} ({c.symbol})
+                </option>
+              ))}
+            </select>
           </div>
           <div className="space-y-2">
             <Label htmlFor="closeDate">Close Date</Label>

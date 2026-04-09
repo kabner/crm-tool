@@ -3,21 +3,13 @@
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
+import { formatCurrency } from "@/lib/currency";
 import type { Deal } from "@/hooks/use-deals";
 
 interface DealsTableProps {
   deals: Deal[];
   isLoading: boolean;
   onRowClick: (id: string) => void;
-}
-
-function formatCurrency(amount: number): string {
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(amount);
 }
 
 function isPastDue(dateStr: string): boolean {
@@ -143,7 +135,7 @@ export function DealsTable({ deals, isLoading, onRowClick }: DealsTableProps) {
                   {deal.name}
                 </td>
                 <td className="px-4 py-3 text-sm font-medium">
-                  {deal.amount != null ? formatCurrency(deal.amount) : "-"}
+                  {deal.amount != null ? formatCurrency(deal.amount, deal.currency) : "-"}
                 </td>
                 <td className="px-4 py-3">
                   <Badge

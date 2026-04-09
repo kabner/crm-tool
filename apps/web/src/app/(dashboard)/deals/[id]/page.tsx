@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
+import { formatCurrency } from "@/lib/currency";
 import {
   useDeal,
   useUpdateDeal,
@@ -24,15 +25,6 @@ import { DealForm } from "../components/deal-form";
 import { DealActivityTimeline } from "../components/deal-activity-timeline";
 import { AttachmentsPanel } from "@/components/attachments-panel";
 import { VisibilityBadge } from "@/components/visibility-badge";
-
-function formatCurrency(amount: number): string {
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(amount);
-}
 
 function isPastDue(dateStr: string): boolean {
   const today = new Date();
@@ -166,7 +158,7 @@ export default function DealDetailPage() {
             </div>
             {deal.amount != null && (
               <p className="text-xl font-semibold text-muted-foreground">
-                {formatCurrency(deal.amount)}
+                {formatCurrency(deal.amount, deal.currency)}
               </p>
             )}
           </div>
@@ -239,6 +231,7 @@ export default function DealDetailPage() {
               initialData={{
                 name: deal.name,
                 amount: deal.amount,
+                currency: deal.currency,
                 pipelineId: pipelineId,
                 stageId: deal.stage?.id,
                 closeDate: deal.closeDate,
@@ -274,7 +267,7 @@ export default function DealDetailPage() {
                     </dt>
                     <dd className="mt-1 text-sm font-semibold">
                       {deal.amount != null
-                        ? formatCurrency(deal.amount)
+                        ? formatCurrency(deal.amount, deal.currency)
                         : "-"}
                     </dd>
                   </div>

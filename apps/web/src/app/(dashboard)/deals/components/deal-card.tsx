@@ -3,11 +3,13 @@
 import { useRef } from "react";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
+import { formatCurrency } from "@/lib/currency";
 
 interface DealCardDeal {
   id: string;
   name: string;
   amount: number | null;
+  currency?: string;
   closeDate: string | null;
   owner: { firstName: string; lastName: string } | null;
   company: { name: string } | null;
@@ -17,15 +19,6 @@ interface DealCardProps {
   deal: DealCardDeal;
   onDragStart: (e: React.DragEvent, dealId: string) => void;
   onDragEnd?: (e: React.DragEvent) => void;
-}
-
-function formatCurrency(amount: number): string {
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(amount);
 }
 
 function isPastDue(dateStr: string): boolean {
@@ -88,7 +81,7 @@ export function DealCard({ deal, onDragStart, onDragEnd }: DealCardProps) {
       {/* Amount */}
       {deal.amount != null && (
         <p className="mt-2 text-base font-bold text-foreground">
-          {formatCurrency(Number(deal.amount))}
+          {formatCurrency(Number(deal.amount), deal.currency)}
         </p>
       )}
 

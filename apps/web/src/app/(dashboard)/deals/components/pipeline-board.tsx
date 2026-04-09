@@ -4,6 +4,7 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import { CalendarDays, CheckSquare } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
+import { formatCurrency } from "@/lib/currency";
 import { usePipelineBoard, useMoveDealStage } from "@/hooks/use-deals";
 import {
   useActivities,
@@ -16,15 +17,6 @@ import { useRouter } from "next/navigation";
 interface PipelineBoardProps {
   pipelineId: string;
   onDealClick?: (dealId: string) => void;
-}
-
-function formatCurrency(amount: number): string {
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(amount);
 }
 
 function stageColor(stageType: string) {
@@ -77,6 +69,7 @@ interface DealInfo {
   id: string;
   name: string;
   amount: number | null;
+  currency: string;
   closeDate: string | null;
   owner: { firstName: string; lastName: string } | null;
   company: { name: string } | null;
@@ -576,7 +569,7 @@ export function PipelineBoard({ pipelineId, onDealClick }: PipelineBoardProps) {
                         )}
                         {cardFields.includes("amount") && deal.amount != null && (
                           <p className="mt-2 text-base font-bold text-foreground">
-                            {formatCurrency(Number(deal.amount))}
+                            {formatCurrency(Number(deal.amount), deal.currency)}
                           </p>
                         )}
                         {cardFields.includes("owner") && deal.owner && (

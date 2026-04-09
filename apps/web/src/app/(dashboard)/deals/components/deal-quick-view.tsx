@@ -12,18 +12,10 @@ import {
   SheetBody,
 } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
+import { formatCurrency } from "@/lib/currency";
 import { useDeal, useMoveDealStage, usePipeline } from "@/hooks/use-deals";
 import { DealActivityTimeline } from "./deal-activity-timeline";
 import { ExternalLink, Clock, Building2, User, CalendarDays, TrendingUp } from "lucide-react";
-
-function formatCurrency(amount: number): string {
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(amount);
-}
 
 function daysInStage(lastStageChangeAt: string | null): number | null {
   if (!lastStageChangeAt) return null;
@@ -84,7 +76,7 @@ export function DealQuickView({ dealId, open, onOpenChange, onRequestLossReason 
                   <SheetTitle>{deal.name}</SheetTitle>
                   {deal.amount != null && (
                     <p className="text-lg font-bold text-foreground mt-0.5">
-                      {formatCurrency(deal.amount)}
+                      {formatCurrency(deal.amount, deal.currency)}
                     </p>
                   )}
                 </div>

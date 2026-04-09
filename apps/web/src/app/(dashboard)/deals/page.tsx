@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
+import { formatCurrency } from "@/lib/currency";
 import {
   useDeals,
   usePipelines,
@@ -24,15 +25,6 @@ import { LossReasonDialog } from "./components/loss-reason-dialog";
 
 type ViewMode = "board" | "list";
 type PipelineType = "sales" | "project";
-
-function formatCurrency(amount: number): string {
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(amount);
-}
 
 export default function DealsPage() {
   const router = useRouter();

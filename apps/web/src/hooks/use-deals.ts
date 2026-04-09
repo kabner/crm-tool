@@ -27,6 +27,7 @@ export interface Deal {
   pipeline?: { id: string; name: string };
   owner: DealOwner | null;
   company: DealCompany | null;
+  currency: string;
   customProps: Record<string, unknown>;
   createdAt: string;
   updatedAt: string;
@@ -72,6 +73,7 @@ export interface PipelineStage {
     id: string;
     name: string;
     amount: number | null;
+    currency: string;
     closeDate: string | null;
     owner: DealOwner | null;
     company: DealCompany | null;
@@ -130,6 +132,7 @@ export interface Pipeline {
 export interface CreateDealInput {
   name: string;
   amount?: number;
+  currency?: string;
   pipelineId: string;
   stageId: string;
   closeDate?: string;
