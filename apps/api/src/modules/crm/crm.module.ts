@@ -21,6 +21,7 @@ import {
   RecordAttachment,
   Lead,
   TenantSetting,
+  ExchangeRate,
 } from './entities';
 import { Notification } from '../../shared/notifications/entities/notification.entity';
 import { ContactsController } from './controllers/contacts.controller';
@@ -59,6 +60,8 @@ import { CardScannerController } from './controllers/card-scanner.controller';
 import { CardScannerService } from './services/card-scanner.service';
 import { TenantSettingsController } from './controllers/tenant-settings.controller';
 import { TenantSettingsService } from './services/tenant-settings.service';
+import { CurrencyController } from './controllers/currency.controller';
+import { CurrencyService } from './services/currency.service';
 
 @Module({
   imports: [
@@ -84,10 +87,11 @@ import { TenantSettingsService } from './services/tenant-settings.service';
       RecordAttachment,
       Lead,
       TenantSetting,
+      ExchangeRate,
     ]),
   ],
-  controllers: [ContactsController, CompaniesController, ActivitiesController, DealsController, PipelinesController, ListsController, ImportExportController, SearchController, SavedViewsController, FavoritesController, UserSettingsController, FeedController, ContactTypesController, ActivityTypesController, AttachmentsController, LeadsController, CardScannerController, TenantSettingsController],
-  providers: [ContactsService, CompaniesService, ActivitiesService, DealsService, PipelinesService, ListsService, ImportExportService, SearchService, SavedViewsService, FavoritesService, UserSettingsService, FeedService, ContactTypesService, ActivityTypesService, AttachmentsService, LeadsService, CardScannerService, TenantSettingsService],
-  exports: [ContactsService, CompaniesService, ActivitiesService, DealsService, PipelinesService, ListsService, ImportExportService, SearchService, SavedViewsService, FavoritesService, UserSettingsService, FeedService, ContactTypesService, ActivityTypesService, AttachmentsService, LeadsService, CardScannerService, TenantSettingsService],
+  controllers: [ContactsController, CompaniesController, ActivitiesController, DealsController, PipelinesController, ListsController, ImportExportController, SearchController, SavedViewsController, FavoritesController, UserSettingsController, FeedController, ContactTypesController, ActivityTypesController, AttachmentsController, LeadsController, CardScannerController, TenantSettingsController, CurrencyController],
+  providers: [ContactsService, CompaniesService, ActivitiesService, DealsService, PipelinesService, ListsService, ImportExportService, SearchService, SavedViewsService, FavoritesService, UserSettingsService, FeedService, ContactTypesService, ActivityTypesService, AttachmentsService, LeadsService, CardScannerService, TenantSettingsService, CurrencyService],
+  exports: [ContactsService, CompaniesService, ActivitiesService, DealsService, PipelinesService, ListsService, ImportExportService, SearchService, SavedViewsService, FavoritesService, UserSettingsService, FeedService, ContactTypesService, ActivityTypesService, AttachmentsService, LeadsService, CardScannerService, TenantSettingsService, CurrencyService],
 })
 export class CrmModule {}

@@ -32,6 +32,9 @@ export class Product {
   @Column({ name: 'image_ids', type: 'text', array: true, default: '{}' })
   imageIds: string[];
 
+  @Column({ default: 'USD' })
+  currency: string;
+
   @Column({ name: 'custom_props', type: 'jsonb', default: '{}' })
   customProps: Record<string, any>;
 

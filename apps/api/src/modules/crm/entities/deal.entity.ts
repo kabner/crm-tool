@@ -56,6 +56,9 @@ export class Deal {
   @Column({ name: 'last_activity_at', type: 'timestamptz', nullable: true })
   lastActivityAt: Date;
 
+  @Column({ default: 'USD' })
+  currency: string;
+
   @Column({ default: 'none', length: 10 })
   priority: string;
 
