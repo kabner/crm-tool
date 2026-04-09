@@ -14,13 +14,11 @@ import {
 import { Response } from 'express';
 import { JwtAuthGuard } from '../../../shared/auth/guards/jwt-auth.guard';
 import { CurrentUser } from '../../../shared/auth/decorators/current-user.decorator';
-import { Public } from '../../../shared/auth/decorators/public.decorator';
 import { GoogleAuthService } from '../services/google-auth.service';
 import { GmailSyncService } from '../services/gmail-sync.service';
 import { CalendarSyncService } from '../services/calendar-sync.service';
 
 @Controller('api/v1/integrations/google')
-@UseGuards(JwtAuthGuard)
 export class GoogleIntegrationController {
   constructor(
     private readonly googleAuth: GoogleAuthService,
@@ -28,6 +26,7 @@ export class GoogleIntegrationController {
     private readonly calendarSync: CalendarSyncService,
   ) {}
 
+  @UseGuards(JwtAuthGuard)
   @Get('auth-url')
   getAuthUrl(
     @CurrentUser('tenantId') tenantId: string,
@@ -37,7 +36,6 @@ export class GoogleIntegrationController {
     return { url };
   }
 
-  @Public()
   @Get('callback')
   async handleCallback(
     @Query('code') code: string,
@@ -73,6 +71,7 @@ export class GoogleIntegrationController {
     }
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get('status')
   async getStatus(@CurrentUser('userId') userId: string) {
     const connection = await this.googleAuth.getConnection(userId);
@@ -88,12 +87,14 @@ export class GoogleIntegrationController {
     };
   }
 
+  @UseGuards(JwtAuthGuard)
   @Delete('disconnect')
   async disconnect(@CurrentUser('userId') userId: string) {
     await this.googleAuth.disconnect(userId);
     return { success: true };
   }
 
+  @UseGuards(JwtAuthGuard)
   @Post('gmail/sync')
   async syncGmail(@CurrentUser('userId') userId: string) {
     try {
@@ -107,6 +108,7 @@ export class GoogleIntegrationController {
     }
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get('gmail/thread/:threadId')
   async getThread(
     @CurrentUser('userId') userId: string,
@@ -122,6 +124,7 @@ export class GoogleIntegrationController {
     }
   }
 
+  @UseGuards(JwtAuthGuard)
   @Post('gmail/send')
   async sendEmail(
     @CurrentUser('userId') userId: string,
@@ -143,6 +146,7 @@ export class GoogleIntegrationController {
     }
   }
 
+  @UseGuards(JwtAuthGuard)
   @Post('calendar/sync')
   async syncCalendar(@CurrentUser('userId') userId: string) {
     try {
@@ -156,6 +160,7 @@ export class GoogleIntegrationController {
     }
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get('calendar/upcoming')
   async getUpcomingEvents(
     @CurrentUser('userId') userId: string,
@@ -174,6 +179,7 @@ export class GoogleIntegrationController {
     }
   }
 
+  @UseGuards(JwtAuthGuard)
   @Post('calendar/events')
   async createEvent(
     @CurrentUser('userId') userId: string,
