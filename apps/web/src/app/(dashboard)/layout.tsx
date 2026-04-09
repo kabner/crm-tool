@@ -40,79 +40,83 @@ import { Separator } from "@/components/ui/separator";
 import { NotificationBell } from "@/components/notifications/notification-bell";
 import { GlobalSearch } from "@/components/search/global-search";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { useRecordLabels } from "@/hooks/use-record-labels";
 
 type NavItem = { label: string; href: string; icon: React.ElementType };
 type NavSection = { section: string; items: NavItem[] };
 
 const STORAGE_KEY = "sidebar-expanded-sections";
 
-const navSections: NavSection[] = [
-  {
-    section: "CRM",
-    items: [
-      { label: "Home", href: "/home", icon: Home },
-      { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-      { label: "Contacts", href: "/contacts", icon: Users },
-      { label: "Companies", href: "/companies", icon: Building2 },
-      { label: "Leads", href: "/leads", icon: UserPlus },
-    ],
-  },
-  {
-    section: "Sales",
-    items: [
-      { label: "Pipelines", href: "/deals", icon: Handshake },
-      { label: "Sequences", href: "/sequences", icon: GitBranch },
-      { label: "Lists", href: "/lists", icon: ListFilter },
-    ],
-  },
-  {
-    section: "Marketing",
-    items: [
-      { label: "Emails", href: "/emails", icon: Mail },
-      { label: "Automation", href: "/automation", icon: Zap },
-      { label: "Forms", href: "/forms", icon: ClipboardList },
-      { label: "Campaigns", href: "/campaigns", icon: Megaphone },
-    ],
-  },
-  {
-    section: "Service",
-    items: [
-      { label: "Tickets", href: "/tickets", icon: Ticket },
-      { label: "Chat", href: "/chat", icon: MessageSquare },
-      { label: "Knowledge Base", href: "/knowledge-base", icon: BookOpen },
-    ],
-  },
-  {
-    section: "Content",
-    items: [
-      { label: "Content", href: "/content", icon: FileText },
-      { label: "Assets", href: "/assets", icon: Image },
-    ],
-  },
-  {
-    section: "Commerce",
-    items: [
-      { label: "Products", href: "/commerce/products", icon: Package },
-      { label: "Invoices", href: "/commerce/invoices", icon: Receipt },
-      { label: "Subscriptions", href: "/commerce/subscriptions", icon: RefreshCw },
-      { label: "Revenue", href: "/commerce/revenue", icon: DollarSign },
-    ],
-  },
-  {
-    section: "Analytics",
-    items: [
-      { label: "Reports", href: "/reports", icon: BarChart3 },
-    ],
-  },
-  {
-    section: "Settings",
-    items: [
-      { label: "Settings", href: "/settings", icon: Settings },
-    ],
-  },
-];
+function useNavSections(): NavSection[] {
+  const { label } = useRecordLabels();
+  return [
+    {
+      section: "CRM",
+      items: [
+        { label: label("home"), href: "/home", icon: Home },
+        { label: label("dashboard"), href: "/dashboard", icon: LayoutDashboard },
+        { label: label("contacts"), href: "/contacts", icon: Users },
+        { label: label("companies"), href: "/companies", icon: Building2 },
+        { label: label("leads"), href: "/leads", icon: UserPlus },
+      ],
+    },
+    {
+      section: "Sales",
+      items: [
+        { label: label("pipelines"), href: "/deals", icon: Handshake },
+        { label: "Sequences", href: "/sequences", icon: GitBranch },
+        { label: "Lists", href: "/lists", icon: ListFilter },
+      ],
+    },
+    {
+      section: "Marketing",
+      items: [
+        { label: "Emails", href: "/emails", icon: Mail },
+        { label: "Automation", href: "/automation", icon: Zap },
+        { label: "Forms", href: "/forms", icon: ClipboardList },
+        { label: "Campaigns", href: "/campaigns", icon: Megaphone },
+      ],
+    },
+    {
+      section: "Service",
+      items: [
+        { label: "Tickets", href: "/tickets", icon: Ticket },
+        { label: "Chat", href: "/chat", icon: MessageSquare },
+        { label: "Knowledge Base", href: "/knowledge-base", icon: BookOpen },
+      ],
+    },
+    {
+      section: "Content",
+      items: [
+        { label: "Content", href: "/content", icon: FileText },
+        { label: "Assets", href: "/assets", icon: Image },
+      ],
+    },
+    {
+      section: "Commerce",
+      items: [
+        { label: "Products", href: "/commerce/products", icon: Package },
+        { label: "Invoices", href: "/commerce/invoices", icon: Receipt },
+        { label: "Subscriptions", href: "/commerce/subscriptions", icon: RefreshCw },
+        { label: "Revenue", href: "/commerce/revenue", icon: DollarSign },
+      ],
+    },
+    {
+      section: "Analytics",
+      items: [
+        { label: "Reports", href: "/reports", icon: BarChart3 },
+      ],
+    },
+    {
+      section: "Settings",
+      items: [
+        { label: "Settings", href: "/settings", icon: Settings },
+      ],
+    },
+  ];
+}
 
-function getInitialExpandedSections(pathname: string): Record<string, boolean> {
+function getInitialExpandedSections(pathname: string, sections: NavSection[]): Record<string, boolean> {
   // Try loading from localStorage
   let stored: Record<string, boolean> = {};
   if (typeof window !== "undefined") {
@@ -125,7 +129,7 @@ function getInitialExpandedSections(pathname: string): Record<string, boolean> {
   }
 
   // Always expand the section containing the active route
-  for (const section of navSections) {
+  for (const section of sections) {
     const hasActive = section.items.some(
       (item) => pathname === item.href || pathname.startsWith(item.href + "/"),
     );
@@ -145,8 +149,9 @@ export default function DashboardLayout({
   const [collapsed, setCollapsed] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
+  const navSections = useNavSections();
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>(() =>
-    getInitialExpandedSections(pathname),
+    getInitialExpandedSections(pathname, navSections),
   );
 
   // Auto-expand section containing active route when pathname changes

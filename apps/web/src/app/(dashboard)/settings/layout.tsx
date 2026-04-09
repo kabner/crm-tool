@@ -8,6 +8,7 @@ const SETTINGS_NAV = [
   {
     section: 'General',
     items: [
+      { label: 'General', href: '/settings/general' },
       { label: 'Account', href: '/settings/account' },
       { label: 'Users', href: '/settings/users' },
       { label: 'Merge & Dedup', href: '/settings/merge' },
