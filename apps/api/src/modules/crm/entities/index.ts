@@ -23,3 +23,4 @@ export { RecordAttachment } from './record-attachment.entity';
 export { Lead } from './lead.entity';
 export { TenantSetting } from './tenant-setting.entity';
 export { ExchangeRate } from './exchange-rate.entity';
+export { PipelineField } from './pipeline-field.entity';
