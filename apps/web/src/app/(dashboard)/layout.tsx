@@ -32,6 +32,7 @@ import {
   RefreshCw,
   DollarSign,
   UserPlus,
+  Inbox,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import * as Avatar from "@radix-ui/react-avatar";
@@ -55,6 +56,7 @@ function useNavSections(): NavSection[] {
       items: [
         { label: label("home"), href: "/home", icon: Home },
         { label: label("dashboard"), href: "/dashboard", icon: LayoutDashboard },
+        { label: "Inbox", href: "/inbox", icon: Inbox },
         { label: label("contacts"), href: "/contacts", icon: Users },
         { label: label("companies"), href: "/companies", icon: Building2 },
         { label: label("leads"), href: "/leads", icon: UserPlus },
