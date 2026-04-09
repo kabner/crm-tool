@@ -14,17 +14,23 @@ import {
 import { Response } from 'express';
 import { JwtAuthGuard } from '../../../shared/auth/guards/jwt-auth.guard';
 import { CurrentUser } from '../../../shared/auth/decorators/current-user.decorator';
+import { ConfigService } from '@nestjs/config';
 import { GoogleAuthService } from '../services/google-auth.service';
 import { GmailSyncService } from '../services/gmail-sync.service';
 import { CalendarSyncService } from '../services/calendar-sync.service';
 
 @Controller('api/v1/integrations/google')
 export class GoogleIntegrationController {
+  private readonly frontendUrl: string;
+
   constructor(
     private readonly googleAuth: GoogleAuthService,
     private readonly gmailSync: GmailSyncService,
     private readonly calendarSync: CalendarSyncService,
-  ) {}
+    private readonly configService: ConfigService,
+  ) {
+    this.frontendUrl = this.configService.get('FRONTEND_URL') || 'http://localhost:3000';
+  }
 
   @UseGuards(JwtAuthGuard)
   @Get('auth-url')
@@ -56,17 +62,17 @@ export class GoogleIntegrationController {
 
       if (!tenantId || !userId || !code) {
         return res.redirect(
-          'http://localhost:3000/settings/integrations?google=error',
+          `${this.frontendUrl}/settings/integrations?google=error`,
         );
       }
 
       await this.googleAuth.handleCallback(tenantId, userId, code);
       return res.redirect(
-        'http://localhost:3000/settings/integrations?google=connected',
+        `${this.frontendUrl}/settings/integrations?google=connected`,
       );
     } catch (error) {
       return res.redirect(
-        'http://localhost:3000/settings/integrations?google=error',
+        `${this.frontendUrl}/settings/integrations?google=error`,
       );
     }
   }
