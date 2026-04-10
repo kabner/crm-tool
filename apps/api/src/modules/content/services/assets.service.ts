@@ -23,8 +23,8 @@ export class AssetsService {
     @InjectRepository(AssetFolder)
     private readonly folderRepo: Repository<AssetFolder>,
   ) {
-    // Resolve to project root uploads/ directory
-    this.uploadDir = path.resolve(process.cwd(), '..', '..', 'uploads');
+    // Use ./uploads relative to cwd (works in both local dev and Docker)
+    this.uploadDir = path.resolve(process.cwd(), 'uploads');
     if (!fs.existsSync(this.uploadDir)) {
       fs.mkdirSync(this.uploadDir, { recursive: true });
     }
