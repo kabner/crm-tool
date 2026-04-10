@@ -15,7 +15,7 @@ WORKDIR /app
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/apps/api/dist ./dist
 COPY --from=builder /app/apps/api/package.json ./package.json
-RUN mkdir -p /uploads /tmp/uploads && chown -R node:node /uploads /tmp/uploads
+RUN mkdir -p /app/uploads /tmp/uploads && chown -R node:node /app/uploads /tmp/uploads
 EXPOSE 3001
 USER node
 CMD ["node", "dist/main.js"]
